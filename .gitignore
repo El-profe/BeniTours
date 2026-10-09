@@ -5,3 +5,4 @@ config/comercial.local.php
 .env.local
 storage/private/
 storage/uploads/
+storage/cache/

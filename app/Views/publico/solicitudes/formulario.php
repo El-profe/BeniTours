@@ -8,7 +8,7 @@ $qrSrc = $qrValido ? (preg_match('~\Ahttps?://~i', $qr) ? $qr : $baseUrl . $qr) 
     <div class="row justify-content-center"><div class="col-lg-9 col-xl-8">
         <div class="text-center mb-4">
             <span class="badge bg-warning text-dark rounded-pill mb-2">Publicación comercial</span>
-            <h1 class="h2 fw-bold">Publica tu negocio en BeniTurs</h1>
+            <h1 class="h2 fw-bold">Publica tu negocio en BeniTours</h1>
             <p class="text-muted">Completa tus datos, elige un plan y envía tu comprobante. Activaremos tu negocio cuando verifiquemos el pago.</p>
         </div>
         <ol class="list-unstyled d-flex justify-content-between gap-2 small mb-4" aria-label="Pasos de la solicitud">
@@ -127,7 +127,7 @@ $qrSrc = $qrValido ? (preg_match('~\Ahttps?://~i', $qr) ? $qr : $baseUrl . $qr) 
                         <div class="col-md-6 text-center">
                             <?php if ($qrSrc !== null): ?>
                                 <div class="bg-white p-2 d-inline-block rounded-4 border shadow-sm">
-                                    <img src="<?= $escape($qrSrc) ?>" class="img-fluid rounded-3" style="max-height: 240px;" alt="QR institucional de recaudación BeniTurs">
+                                    <img src="<?= $escape($qrSrc) ?>" class="img-fluid rounded-3" style="max-height: 240px;" alt="QR institucional de recaudación BeniTours">
                                 </div>
                                 <small class="d-block text-muted mt-2">Escanea desde la app de tu banco</small>
                             <?php else: ?>
@@ -166,7 +166,7 @@ $qrSrc = $qrValido ? (preg_match('~\Ahttps?://~i', $qr) ? $qr : $baseUrl . $qr) 
                             <i class="bi bi-cash-coin fs-1 text-success flex-shrink-0"></i>
                             <div>
                                 <h3 class="h5 fw-bold text-success-emphasis mb-2">Pago Presencial en Efectivo</h3>
-                                <p class="small text-muted mb-3">Tu solicitud quedará registrada en el sistema. Puedes cancelar en nuestras oficinas de BeniTurs en Trinidad o coordinar para que un promotor pase por tu negocio.</p>
+                                <p class="small text-muted mb-3">Tu solicitud quedará registrada en el sistema. Puedes cancelar en nuestras oficinas de BeniTours en Trinidad o coordinar para que un promotor pase por tu negocio.</p>
                                 <div class="bg-white p-3 rounded-3 border border-success-subtle">
                                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                         <div>

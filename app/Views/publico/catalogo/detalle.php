@@ -59,7 +59,7 @@
                 <?php endif; ?>
             </div>
 
-            <section class="card border-0 shadow-sm rounded-4 p-4 bg-white" aria-labelledby="tituloUbicacion">
+            <section class="card border-0 shadow-sm rounded-4 p-4 bg-white d-none d-lg-block" aria-labelledby="tituloUbicacion">
                 <h2 id="tituloUbicacion" class="h5 fw-bold text-dark mb-3"><i class="bi bi-geo-alt me-2 text-danger" aria-hidden="true"></i>Ubicación</h2>
                 <p class="mb-1 text-dark fw-semibold"><?= htmlspecialchars($lugar['direccion'] ?? '') ?></p>
                 <?php if (!empty($lugar['referencia_ubicacion'])): ?>
@@ -75,20 +75,104 @@
                 <?php else: ?>
                     <p class="text-muted small mt-3 mb-2">La ubicación exacta en el mapa todavía no está disponible.</p>
                 <?php endif; ?>
-                <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= $queryMaps ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success rounded-pill px-4 mt-2 align-self-start">
+                <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= $queryMaps ?>" target="_blank" rel="noopener noreferrer" 
+                   onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MAPA')"
+                   class="btn btn-outline-success rounded-pill px-4 mt-2 align-self-start">
                     <i class="bi bi-map-fill me-2" aria-hidden="true"></i> Cómo llegar
                 </a>
             </section>
+
+            <?php if (!empty($lugar['enlace_menu'])): ?>
+                <?php
+                    $urlMenu = $lugar['enlace_menu'];
+                    $urlEmbedMenu = $urlMenu;
+                    $esGoogleDrive = str_contains($urlMenu, 'drive.google.com');
+                    if ($esGoogleDrive) {
+                        $urlEmbedMenu = preg_replace('/(\/view|\/edit)(\?.*)?$/', '/preview', $urlMenu);
+                        if (!str_contains($urlEmbedMenu, '/preview')) {
+                            $urlEmbedMenu = rtrim($urlMenu, '/') . '/preview';
+                        }
+                    }
+                    $esImagen = (bool)preg_match('/\.(jpe?g|png|webp|gif)(\?.*)?$/i', $urlMenu);
+                ?>
+                <!-- Menú / Carta de Productos debajo del mapa -->
+                <section class="card border-0 shadow-sm rounded-4 p-4 bg-white mt-4 d-none d-lg-block" aria-labelledby="tituloMenu">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h2 id="tituloMenu" class="h5 fw-bold text-dark mb-0">
+                            <i class="bi bi-book-half me-2 text-warning" aria-hidden="true"></i>Menú / Carta de Productos
+                        </h2>
+                        <a href="<?= htmlspecialchars($lugar['enlace_menu']) ?>" target="_blank" rel="noopener noreferrer" 
+                           onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MENU')"
+                           class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en pantalla completa
+                        </a>
+                    </div>
+
+                    <?php if ($esImagen): ?>
+                        <div class="rounded-4 overflow-hidden border text-center bg-light p-2">
+                            <img src="<?= htmlspecialchars($urlEmbedMenu) ?>" 
+                                 alt="Menú de <?= htmlspecialchars($lugar['nombre']) ?>" 
+                                 class="img-fluid rounded-3 w-100" 
+                                 style="max-height: 750px; object-fit: contain;" 
+                                 loading="lazy">
+                        </div>
+                    <?php elseif ($esGoogleDrive): ?>
+                        <div class="menu-drive-card rounded-4 border text-center p-4 p-md-5">
+                            <span class="menu-drive-icon"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+                            <h3 class="h6 fw-bold text-dark mt-3 mb-2">Menú disponible en Google Drive</h3>
+                            <p class="small text-muted mb-3 mx-auto">Ábrelo en una nueva pestaña para verlo completo, sin errores de carga en tu celular.</p>
+                            <a href="<?= htmlspecialchars($urlMenu, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
+                               onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MENU')"
+                               class="btn btn-success rounded-pill px-4 fw-semibold">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Abrir menú
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="menu-embed-container rounded-4 overflow-hidden border shadow-sm" style="height: 560px; background-color: #f8f9fa;">
+                            <iframe src="<?= htmlspecialchars($urlEmbedMenu, ENT_QUOTES, 'UTF-8') ?>"
+                                    title="Menú digital de <?= htmlspecialchars($lugar['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                    width="100%" height="100%" 
+                                    style="border: 0;"
+                                    loading="lazy"
+                                    allow="autoplay"
+                                    allowfullscreen></iframe>
+                        </div>
+                    <?php endif; ?>
+                </section>
+            <?php endif; ?>
         </div>
 
         <!-- Información del lugar -->
         <div class="col-lg-5 place-detail-info-column">
             <section class="card border-0 shadow-sm rounded-4 p-4 p-xl-5 bg-white place-detail-info" aria-labelledby="nombreLugar">
                 <h1 id="nombreLugar" class="h2 fw-bold text-dark mb-3"><?= htmlspecialchars($lugar['nombre']) ?></h1>
-                <div class="mb-4">
+                <?php
+                    $estadoHorario = \App\Services\HorarioHelper::evaluarEstado($lugar['horario_atencion'] ?? null);
+                ?>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-4">
                     <span class="badge bg-light text-success border border-success-subtle rounded-pill px-3 py-2">
                         <i class="bi <?= htmlspecialchars($lugar['categoria_icono'] ?? 'bi-geo-alt') ?> me-1" aria-hidden="true"></i> <?= htmlspecialchars($lugar['categoria'] ?? '') ?>
                     </span>
+                    <?php if ($estadoHorario): ?>
+                        <span class="badge <?= $estadoHorario['badge'] ?> rounded-pill px-3 py-2">
+                            <?= htmlspecialchars($estadoHorario['texto']) ?>
+                        </span>
+                    <?php endif; ?>
+                    <div class="place-detail-actions ms-auto d-inline-flex align-items-center gap-2">
+                        <span id="badgeDistanciaDetalle" class="badge bg-danger text-white shadow-sm rounded-pill px-2 py-1 fw-bold d-none" style="font-size: 0.72rem;" aria-live="polite"></span>
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-none"
+                            data-btn-favorito
+                            data-id="<?= (int)$lugar['id_lugar'] ?>"
+                            data-nombre="<?= htmlspecialchars($lugar['nombre']) ?>"
+                            data-slug="<?= htmlspecialchars($lugar['slug']) ?>"
+                            data-categoria="<?= htmlspecialchars($lugar['categoria'] ?? '') ?>"
+                            data-imagen="<?= htmlspecialchars($lugar['imagen'] ?? '') ?>"
+                            data-municipio="<?= htmlspecialchars($lugar['municipio'] ?? '') ?>"
+                            data-url="<?= htmlspecialchars($ogMeta['url'] ?? '') ?>">
+                        <i class="bi bi-heart"></i>
+                        <span class="label-favorito small fw-semibold">Añadir a mi ruta</span>
+                    </button>
+                    </div>
                 </div>
                 <h2 class="h5 fw-bold text-dark mb-3">Descripción</h2>
                 <p class="text-secondary mb-4" style="white-space: pre-line;"><?= htmlspecialchars($lugar['descripcion'] ?? '') ?></p>
@@ -101,19 +185,23 @@
                     if (strlen($whatsappRaw) === 8) {
                         $whatsappRaw = '591' . $whatsappRaw;
                     }
-                    $mensajeWa = rawurlencode("Hola, vi la información de " . $lugar['nombre'] . " en BeniTurs y quisiera hacer una consulta.");
+                    $mensajeWa = rawurlencode("Hola, vi la información de " . $lugar['nombre'] . " en BeniTours y quisiera hacer una consulta.");
                     $telefonoRaw = preg_replace('/[^\d+]/', '', $lugar['telefono_contacto'] ?? '');
                 ?>
                 <div class="border-top pt-4 mb-4">
                     <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-chat-dots me-2 text-success" aria-hidden="true"></i>Contacto Directo</h2>
                     <div class="d-grid gap-2">
                         <?php if (!empty($whatsappRaw)): ?>
-                            <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $mensajeWa ?>" target="_blank" rel="noopener noreferrer" class="btn btn-success rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $mensajeWa ?>" target="_blank" rel="noopener noreferrer" 
+                                onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'WHATSAPP')"
+                                class="btn btn-success rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-whatsapp fs-5"></i> Contactar por WhatsApp
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($telefonoRaw)): ?>
-                            <a href="tel:<?= $telefonoRaw ?>" class="btn btn-outline-dark rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                            <a href="tel:<?= $telefonoRaw ?>" 
+                                onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'TELEFONO')"
+                                class="btn btn-outline-dark rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-telephone-fill"></i> Llamar: <?= htmlspecialchars($lugar['telefono_contacto']) ?>
                             </a>
                         <?php endif; ?>
@@ -127,27 +215,142 @@
                 </div>
 
                 <?php if (!empty($promociones)): ?>
-                    <div class="border-top pt-4 mb-4">
+                    <div class="border-top pt-4 mb-4 d-none d-lg-block">
                         <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-tag-fill text-warning me-2" aria-hidden="true"></i>Promociones activas</h2>
                         <?php foreach ($promociones as $pr): ?>
-                            <div class="p-3 rounded-3 border bg-warning-subtle border-warning-subtle mb-2">
-                                <strong class="text-dark d-block"><?= htmlspecialchars($pr['titulo']) ?></strong>
+                            <div class="p-3 rounded-4 border bg-warning-subtle border-warning-subtle mb-3 shadow-sm">
+                                <?php if (!empty($pr['imagen'])): ?>
+                                    <div class="mb-2 rounded-3 overflow-hidden" style="max-height: 160px;">
+                                        <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($pr['imagen']) ?>" 
+                                             alt="<?= htmlspecialchars($pr['titulo']) ?>"
+                                             class="w-100 object-fit-cover" style="height: 140px;" loading="lazy">
+                                    </div>
+                                <?php endif; ?>
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                    <strong class="text-dark d-block"><?= htmlspecialchars($pr['titulo']) ?></strong>
+                                    <span class="badge bg-danger text-white rounded-pill px-2 py-1 extra-small fw-bold"><?= htmlspecialchars($pr['descuento_texto'] ?: 'Oferta') ?></span>
+                                </div>
                                 <p class="text-secondary small mb-2"><?= htmlspecialchars($pr['descripcion']) ?></p>
-                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><?= htmlspecialchars($pr['descuento_texto'] ?: 'Oferta') ?></span>
+                                <div class="extra-small text-muted mb-2">
+                                    <i class="bi bi-clock-history text-danger me-1"></i> Hasta: <?= date('d/m/Y', strtotime($pr['fecha_fin'])) ?>
+                                </div>
+                                <?php
+                                    $textoWaDetalle = rawurlencode("Hola, vi su promoción '{$pr['titulo']}' (" . ($pr['descuento_texto'] ?: 'Oferta') . ") en BeniTours y quisiera aprovecharla en {$lugar['nombre']}.");
+                                ?>
+                                <?php if (!empty($whatsappRaw)): ?>
+                                    <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $textoWaDetalle ?>" 
+                                       target="_blank" rel="noopener noreferrer"
+                                       class="btn btn-sm btn-success rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-1 shadow-sm mt-1">
+                                        <i class="bi bi-whatsapp"></i> Pedir / Aprovechar Oferta
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="btn btn-light btn-sm w-100 rounded-pill text-muted">
+                <a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="btn btn-light btn-sm w-100 rounded-pill text-muted d-none d-lg-block">
                     <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver al Directorio
                 </a>
             </section>
+
+            <!-- Orden exclusivo para celular: información, mapa, menú y promociones. -->
+            <div class="d-lg-none mt-4">
+                <section class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" aria-labelledby="tituloUbicacionMovil">
+                    <h2 id="tituloUbicacionMovil" class="h5 fw-bold text-dark mb-3"><i class="bi bi-geo-alt me-2 text-danger" aria-hidden="true"></i>Ubicación</h2>
+                    <p class="mb-1 text-dark fw-semibold"><?= htmlspecialchars($lugar['direccion'] ?? '') ?></p>
+                    <?php if (!empty($lugar['referencia_ubicacion'])): ?>
+                        <p class="text-muted small mb-3"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Referencia: <?= htmlspecialchars($lugar['referencia_ubicacion']) ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($mapa)): ?>
+                        <div class="place-map rounded-4 overflow-hidden border mt-3 mb-3">
+                            <iframe src="<?= htmlspecialchars($mapa['url'], ENT_QUOTES, 'UTF-8') ?>"
+                                    title="Mapa de ubicación de <?= htmlspecialchars($lugar['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                    width="100%" height="300" loading="lazy"
+                                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted small mt-3 mb-2">La ubicación exacta en el mapa todavía no está disponible.</p>
+                    <?php endif; ?>
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= $queryMaps ?>" target="_blank" rel="noopener noreferrer"
+                       onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MAPA')"
+                       class="btn btn-outline-success rounded-pill px-4 mt-2">
+                        <i class="bi bi-map-fill me-2" aria-hidden="true"></i>Cómo llegar
+                    </a>
+                </section>
+
+                <?php if (!empty($lugar['enlace_menu'])): ?>
+                    <?php
+                        $urlMenuMovil = $lugar['enlace_menu'];
+                        $esGoogleDriveMovil = str_contains($urlMenuMovil, 'drive.google.com');
+                        $esImagenMovil = (bool)preg_match('/\.(jpe?g|png|webp|gif)(\?.*)?$/i', $urlMenuMovil);
+                    ?>
+                    <section class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" aria-labelledby="tituloMenuMovil">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <h2 id="tituloMenuMovil" class="h5 fw-bold text-dark mb-0"><i class="bi bi-book-half me-2 text-warning" aria-hidden="true"></i>Menú / Carta</h2>
+                            <a href="<?= htmlspecialchars($urlMenuMovil, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
+                               onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MENU')"
+                               class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">Abrir menú</a>
+                        </div>
+                        <?php if ($esImagenMovil): ?>
+                            <div class="rounded-4 overflow-hidden border text-center bg-light p-2"><img src="<?= htmlspecialchars($urlMenuMovil) ?>" alt="Menú de <?= htmlspecialchars($lugar['nombre']) ?>" class="img-fluid rounded-3 w-100" loading="lazy"></div>
+                        <?php elseif ($esGoogleDriveMovil): ?>
+                            <div class="menu-drive-card rounded-4 border text-center p-4"><span class="menu-drive-icon"><i class="bi bi-file-earmark-pdf-fill"></i></span><p class="small text-muted mt-3 mb-0">Ábrelo en una nueva pestaña para verlo completo.</p></div>
+                        <?php else: ?>
+                            <div class="menu-embed-container rounded-4 overflow-hidden border" style="height: 460px;"><iframe src="<?= htmlspecialchars($urlMenuMovil, ENT_QUOTES, 'UTF-8') ?>" title="Menú digital de <?= htmlspecialchars($lugar['nombre'], ENT_QUOTES, 'UTF-8') ?>" width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen></iframe></div>
+                        <?php endif; ?>
+                    </section>
+                <?php endif; ?>
+
+                <?php if (!empty($promociones)): ?>
+                    <section class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" aria-labelledby="tituloPromosMovil">
+                        <h2 id="tituloPromosMovil" class="h5 fw-bold text-dark mb-3"><i class="bi bi-tag-fill text-warning me-2" aria-hidden="true"></i>Promociones activas</h2>
+                        <?php foreach ($promociones as $pr): ?>
+                            <div class="p-3 rounded-4 border bg-warning-subtle border-warning-subtle mb-3 shadow-sm">
+                                <?php if (!empty($pr['imagen'])): ?><div class="mb-2 rounded-3 overflow-hidden" style="max-height:160px;"><img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($pr['imagen']) ?>" alt="<?= htmlspecialchars($pr['titulo']) ?>" class="w-100 object-fit-cover" style="height:140px;" loading="lazy"></div><?php endif; ?>
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1"><strong class="text-dark d-block"><?= htmlspecialchars($pr['titulo']) ?></strong><span class="badge bg-danger text-white rounded-pill px-2 py-1 extra-small fw-bold"><?= htmlspecialchars($pr['descuento_texto'] ?: 'Oferta') ?></span></div>
+                                <p class="text-secondary small mb-2"><?= htmlspecialchars($pr['descripcion']) ?></p>
+                                <div class="extra-small text-muted mb-2"><i class="bi bi-clock-history text-danger me-1"></i>Hasta: <?= date('d/m/Y', strtotime($pr['fecha_fin'])) ?></div>
+                                <?php if (!empty($whatsappRaw)): ?>
+                                    <?php $textoWaMovil = rawurlencode("Hola, vi su promoción '{$pr['titulo']}' (" . ($pr['descuento_texto'] ?: 'Oferta') . ") en BeniTours y quisiera aprovecharla en {$lugar['nombre']}."); ?>
+                                    <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $textoWaMovil ?>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success rounded-pill w-100 fw-bold"><i class="bi bi-whatsapp me-1"></i>Pedir / Aprovechar oferta</a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </section>
+                <?php endif; ?>
+                <a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="btn btn-light btn-sm w-100 rounded-pill text-muted mb-2"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Volver al Directorio</a>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const badgeDistancia = document.getElementById('badgeDistanciaDetalle');
+    const coordenadasLugar = <?= !empty($mapa) ? json_encode([
+        'lat' => (float)$mapa['latitud'],
+        'lng' => (float)$mapa['longitud']
+    ]) : 'null' ?>;
+
+    if (badgeDistancia && coordenadasLugar && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((posicion) => {
+            const aRad = Math.PI / 180;
+            const radioTierraKm = 6371;
+            const latUsuario = posicion.coords.latitude;
+            const lngUsuario = posicion.coords.longitude;
+            const dLat = (coordenadasLugar.lat - latUsuario) * aRad;
+            const dLng = (coordenadasLugar.lng - lngUsuario) * aRad;
+            const valor = Math.sin(dLat / 2) ** 2
+                + Math.cos(latUsuario * aRad) * Math.cos(coordenadasLugar.lat * aRad) * Math.sin(dLng / 2) ** 2;
+            const distanciaKm = radioTierraKm * 2 * Math.atan2(Math.sqrt(valor), Math.sqrt(1 - valor));
+            const texto = distanciaKm < 1
+                ? `A ${Math.round(distanciaKm * 1000)} m`
+                : `A ${distanciaKm.toFixed(1)} km`;
+            badgeDistancia.innerHTML = `<i class="bi bi-cursor-fill me-1" aria-hidden="true"></i>${texto}`;
+            badgeDistancia.classList.remove('d-none');
+        }, () => {}, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+    }
+
     const btnCompartir = document.getElementById('btnCompartirLugar');
     if (btnCompartir) {
         btnCompartir.addEventListener('click', async () => {
@@ -156,8 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: titulo + ' | BeniTurs',
-                        text: '¡Conoce ' + titulo + ' en Trinidad, Beni a través de BeniTurs!',
+                        title: titulo + ' | BeniTours',
+                        text: '¡Conoce ' + titulo + ' en Trinidad, Beni a través de BeniTours!',
                         url: url
                     });
                 } catch (e) { /* Cancelado por el usuario */ }

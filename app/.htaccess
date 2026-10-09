@@ -1,4 +1,7 @@
-# Prohibir acceso web directo al código de la aplicación
+# app/.htaccess
+# Bloqueo total de acceso HTTP directo a código fuente del backend
+Options -Indexes -ExecCGI
+
 <IfModule mod_authz_core.c>
     Require all denied
 </IfModule>

@@ -9,7 +9,7 @@ $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF
             <div class="login-logo-wrap mb-4">
                 <a href="<?= $escape($baseUrl) ?>/" title="Volver al Catálogo Público">
                     <img src="<?= $escape($baseUrl) ?>/assets/img/logo.png" 
-                         alt="BeniTurs" 
+                         alt="BeniTours" 
                          class="login-logo img-fluid">
                 </a>
             </div>

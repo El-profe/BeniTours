@@ -40,7 +40,7 @@
         const textareaMensaje = document.getElementById('modalCredMensajeCompleto');
         if (textareaMensaje) {
             const loginUrl = data.login_url || (window.location.origin + '/negocio/login');
-            const mensajeCompleto = data.mensaje_texto || `¡Hola! Tu negocio "${data.nombre_establecimiento}" ya está activo en BeniTurs.\nAcceso: ${loginUrl}\nUsuario: ${data.usuario}\nClave: ${data.clave}`;
+            const mensajeCompleto = data.mensaje_texto || `¡Hola! Tu negocio "${data.nombre_establecimiento}" ya está activo en BeniTours.\nAcceso: ${loginUrl}\nUsuario: ${data.usuario}\nClave: ${data.clave}`;
             textareaMensaje.value = mensajeCompleto;
         }
 
@@ -130,7 +130,7 @@
     </p>
 
     <div class="footer">
-        BeniTurs · Guía Turística y Directorio Departamental del Beni · Soporte: Trinidad, Beni
+        BeniTours · Guía Turística y Directorio Departamental del Beni · Soporte: Trinidad, Beni
     </div>
 
     <div style="text-align: center; margin-top: 30px;" class="btn-print">

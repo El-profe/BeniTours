@@ -1,15 +1,15 @@
-# trinidad_turismo/public/.htaccess
-# Redirección de todas las solicitudes hacia el Front Controller
+# public/assets/.htaccess
+# Directorio exclusivo de recursos estáticos (CSS, JS, imágenes, fuentes)
 
-Options -Indexes
+Options -Indexes -ExecCGI
 
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # Si la petición es un archivo o directorio físico existente, servirlo directamente (CSS, JS, imágenes)
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-
-    # Enviar cualquier otra solicitud a index.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
-</IfModule>
+# Denegar ejecución de cualquier script ejecutable
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phar|pl|py|cgi|sh|bash)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

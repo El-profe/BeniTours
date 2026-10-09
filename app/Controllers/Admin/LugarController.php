@@ -33,7 +33,26 @@ class LugarController extends Controller {
     }
 
     public function index(): void {
-        $lugares = $this->lugarModel->listarParaAdmin();
+        $buscar = trim($_GET['buscar'] ?? '');
+        $tipo = trim($_GET['tipo'] ?? '');
+        $idCategoria = !empty($_GET['categoria']) ? (int)$_GET['categoria'] : null;
+        $idMunicipio = !empty($_GET['municipio']) ? (int)$_GET['municipio'] : null;
+        $filtroEstado = isset($_GET['estado']) && $_GET['estado'] !== '' ? (int)$_GET['estado'] : null;
+        $filtroVisibilidad = isset($_GET['visibilidad']) && $_GET['visibilidad'] !== '' ? (int)$_GET['visibilidad'] : null;
+
+        $estadisticas = $this->lugarModel->obtenerEstadisticasAdmin();
+        $categorias = $this->categoriaModel->listarTodasActivas();
+        $municipios = $this->municipioModel->listarActivos();
+
+        $lugares = $this->lugarModel->listarParaAdmin(
+            $buscar ?: null,
+            $tipo ?: null,
+            $idCategoria,
+            $idMunicipio,
+            $filtroEstado,
+            $filtroVisibilidad
+        );
+
         $mensaje = $_SESSION['admin_flash'] ?? null;
         unset($_SESSION['admin_flash']);
         $credencialesGeneradas = $_SESSION['credenciales_generadas'] ?? null;
@@ -42,6 +61,15 @@ class LugarController extends Controller {
         $this->render('admin/lugares/index', [
             'titulo'                => 'Gestión de Lugares y Negocios',
             'lugares'               => $lugares,
+            'buscar'                => $buscar,
+            'tipoActual'            => $tipo,
+            'categoriaActual'       => $idCategoria,
+            'municipioActual'       => $idMunicipio,
+            'estadoActual'          => $filtroEstado,
+            'visibilidadActual'     => $filtroVisibilidad,
+            'estadisticas'          => $estadisticas,
+            'categorias'            => $categorias,
+            'municipios'            => $municipios,
             'mensaje'               => $mensaje,
             'credencialesGeneradas' => $credencialesGeneradas,
             'csrfToken'             => CsrfMiddleware::obtenerToken()
@@ -128,6 +156,7 @@ class LugarController extends Controller {
             }
 
             $this->publicacionModel->crear($idLugar, 1, 1, (int)$_SESSION['admin_id']);
+            try { (new \App\Models\OperacionAdmin())->registrar($idLugar, (int)$_SESSION['admin_id'], 'FICHA_CREADA', "Ficha creada: {$nombre}"); } catch (\Throwable $ignored) {}
 
             if ($tipoLugar === 'COMERCIAL' && !empty($_POST['crear_cuenta'])) {
                 $codigoPlan = trim($_POST['codigo_plan'] ?? 'MENSUAL');
@@ -255,6 +284,7 @@ class LugarController extends Controller {
                 'email_contacto'       => trim($_POST['email_contacto'] ?? ''),
                 'horario_atencion'     => trim($_POST['horario_atencion'] ?? '')
             ]);
+            try { (new \App\Models\OperacionAdmin())->registrar($id, (int)$_SESSION['admin_id'], 'FICHA_ACTUALIZADA', "Datos de ficha actualizados: {$nombre}"); } catch (\Throwable $ignored) {}
 
             // Procesar subida de múltiples fotografías nuevas
             $fotosSubidasCount = 0;
@@ -385,6 +415,7 @@ class LugarController extends Controller {
         $motivo = $nuevoEstado === 0 ? trim($_POST['motivo'] ?? 'Deshabilitado por administración') : null;
 
         $this->publicacionModel->cambiarHabilitacion($id, $nuevoEstado, $motivo);
+        try { (new \App\Models\OperacionAdmin())->registrar($id, (int)$_SESSION['admin_id'], $nuevoEstado ? 'FICHA_HABILITADA' : 'FICHA_SUSPENDIDA', $nuevoEstado ? 'La publicación fue habilitada.' : 'La publicación fue suspendida.'); } catch (\Throwable $ignored) {}
 
         $_SESSION['admin_flash'] = $nuevoEstado ? "La ficha ha sido habilitada." : "La ficha ha sido deshabilitada.";
         header("Location: {$this->config['base_url']}/admin/lugares");
@@ -472,4 +503,3 @@ class LugarController extends Controller {
         exit();
     }
 }
-

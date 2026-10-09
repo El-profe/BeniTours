@@ -38,15 +38,17 @@ class CatalogoController extends Controller {
 
         $idMunicipio = !empty($_GET['municipio']) ? (int)$_GET['municipio'] : null;
         $lugares = $this->lugarModel->listarPublicos($categoriaSeleccionada, null, $idMunicipio);
+        $promocionesVigentes = (new Promocion())->listarTodasVigentesPublicas();
 
         $this->render('publico/catalogo/index', [
-            'titulo'                => 'BeniTurs - Directorio Turístico y Comercial del Beni',
+            'titulo'                => 'BeniTours - Directorio Turístico y Comercial del Beni',
             'heroPantallaCompleta'  => true,
             'categorias'            => $categorias,
             'municipios'            => $municipios,
             'categoriaSeleccionada' => $categoriaSeleccionada,
             'municipioSeleccionado' => $idMunicipio,
-            'lugares'               => $lugares
+            'lugares'               => $lugares,
+            'promocionesVigentes'   => $promocionesVigentes
         ], 'publico');
     }
 
@@ -67,6 +69,9 @@ class CatalogoController extends Controller {
             exit();
         }
 
+        // Registrar telemetría de vista de ficha comercial o turística
+        \App\Services\TelemetriaService::registrarEvento((int)$lugar['id_lugar'], 'VISTA');
+
         $promocionModel = new Promocion();
         $promociones = $promocionModel->listarVigentesPublicas((int)$lugar['id_lugar']);
         $fotografias = (new Fotografia())->listarPorLugar((int)$lugar['id_lugar']);
@@ -74,7 +79,7 @@ class CatalogoController extends Controller {
             ? "{$this->config['base_url']}/imagen?f=" . urlencode($lugar['imagen'])
             : "{$this->config['base_url']}/assets/img/logo2.png";
         $ogMeta = [
-            'title' => "{$lugar['nombre']} | BeniTurs",
+            'title' => "{$lugar['nombre']} | BeniTours",
             'description' => mb_substr(strip_tags($lugar['descripcion'] ?? ''), 0, 160, 'UTF-8'),
             'image' => $imgUrl,
             'url' => "{$this->config['base_url']}/catalogo/detalle?slug=" . urlencode($lugar['slug'])
@@ -99,11 +104,33 @@ class CatalogoController extends Controller {
         $termino = !empty($_GET['q']) ? trim($_GET['q']) : null;
 
         $resultados = $this->lugarModel->listarPublicos($idCategoria, $termino, $idMunicipio);
+        foreach ($resultados as &$resultado) {
+            $resultado['estado_horario'] = \App\Services\HorarioHelper::evaluarEstado($resultado['horario_atencion'] ?? null);
+        }
+        unset($resultado);
 
         $this->json([
             'success'      => true,
             'total'        => count($resultados),
             'resultados'   => $resultados
         ]);
+    }
+
+    /**
+     * Endpoint API para registrar eventos de telemetría (WhatsApp, Mapa, Favoritos, etc.)
+     */
+    public function apiRegistrarEvento(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $idLugar = (int)($input['id_lugar'] ?? ($_POST['id_lugar'] ?? 0));
+        $evento = (string)($input['tipo_evento'] ?? ($_POST['tipo_evento'] ?? ''));
+
+        if ($idLugar > 0 && !empty($evento)) {
+            $exito = \App\Services\TelemetriaService::registrarEvento($idLugar, $evento);
+            $this->json(['success' => $exito]);
+            return;
+        }
+
+        http_response_code(400);
+        $this->json(['success' => false, 'error' => 'Parámetros no válidos.']);
     }
 }

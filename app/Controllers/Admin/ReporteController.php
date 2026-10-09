@@ -56,6 +56,10 @@ class ReporteController extends Controller {
         // 7. Categorías activas para filtros
         $categorias = $this->db->query("SELECT id_categoria, nombre FROM categorias WHERE activo = 1 ORDER BY nombre ASC")->fetchAll(PDO::FETCH_ASSOC);
 
+        // 8. Telemetría y Rendimiento Comercial (Conversiones a WhatsApp y Mapas)
+        $totalesTelemetria = \App\Services\TelemetriaService::obtenerTotalesGlobales($filtros['desde'], $filtros['hasta']);
+        $rankingRendimiento = \App\Services\TelemetriaService::obtenerRankingComercial($filtros['desde'], $filtros['hasta'], 50);
+
         $this->render('admin/reportes/index', [
             'titulo'              => 'Centro de Reportes y Analítica',
             'kpis'                => $kpis,
@@ -68,6 +72,8 @@ class ReporteController extends Controller {
             'analiticaVisitas'    => $analiticaVisitas,
             'visitasResumen'      => $analiticaVisitas['resumen'],
             'graficoVisitas'      => $analiticaVisitas['meses'],
+            'totalesTelemetria'   => $totalesTelemetria,
+            'rankingRendimiento'  => $rankingRendimiento,
             'categorias'          => $categorias,
             'filtros'             => $filtros,
             'errorFiltros'        => $filtros['error']
@@ -241,6 +247,31 @@ class ReporteController extends Controller {
         // Deuda en mora estimada: comercios vencidos * tarifa
         $carteraEnMora = $comerciosVencidos * $tarifaVigente;
 
+        // Proyección Escalonada de Flujo de Caja (30, 60 y 90 días)
+        $flujo30d = 0.0;
+        $cant30d = 0;
+        $flujo60d = 0.0;
+        $cant60d = 0;
+        $flujo90d = 0.0;
+        $cant90d = 0;
+
+        foreach ($todasVigencias as $v) {
+            $dias = (int)($v['dias_restantes'] ?? -1);
+            if ($dias >= 0 && $dias <= 30) {
+                $cant30d++;
+                $flujo30d += $tarifaVigente;
+            } elseif ($dias > 30 && $dias <= 60) {
+                $cant60d++;
+                $flujo60d += $tarifaVigente;
+            } elseif ($dias > 60 && $dias <= 90) {
+                $cant90d++;
+                $flujo90d += $tarifaVigente;
+            }
+        }
+
+        $totalUniverso = $comerciosActivos + $comerciosVencidos;
+        $tasaRetencion = $totalUniverso > 0 ? round(($comerciosActivos / $totalUniverso) * 100, 1) : 100.0;
+
         return [
             'total_recaudado'        => $totalRecaudado,
             'total_mes'              => $totalMes,
@@ -250,7 +281,14 @@ class ReporteController extends Controller {
             'comercios_activos'      => $comerciosActivos,
             'comercios_por_vencer'   => $comerciosPorVencer,
             'comercios_vencidos'     => $comerciosVencidos,
-            'solicitudes_pendientes' => $solicitudesPendientes
+            'solicitudes_pendientes' => $solicitudesPendientes,
+            'proyeccion_30d_monto'   => $flujo30d,
+            'proyeccion_30d_cant'    => $cant30d,
+            'proyeccion_60d_monto'   => $flujo60d,
+            'proyeccion_60d_cant'    => $cant60d,
+            'proyeccion_90d_monto'   => $flujo90d,
+            'proyeccion_90d_cant'    => $cant90d,
+            'tasa_retencion'         => $tasaRetencion
         ];
     }
 
@@ -367,7 +405,7 @@ class ReporteController extends Controller {
             'buscar'          => $buscar,
             'metodo'          => $metodo,
             'estado_vigencia' => $estadoVigencia,
-            'tab'             => in_array($tab, ['finanzas', 'vigencias', 'comercios', 'visitas'], true) ? $tab : 'finanzas',
+            'tab'             => in_array($tab, ['finanzas', 'vigencias', 'comercios', 'visitas', 'rendimiento'], true) ? $tab : 'finanzas',
             'preset'          => $preset,
             'error'           => $error
         ];
@@ -619,14 +657,74 @@ class ReporteController extends Controller {
         if ($filtros['error']) { http_response_code(422); exit($filtros['error']); }
 
         match ($tipo) {
-            'financiero' => $this->exportarFinanciero($filtros['desde'], $filtros['hasta'], $filtros['categoria'], $filtros['buscar'], $filtros['metodo']),
-            'vigencias'  => $this->exportarVigencias($filtros['categoria'], $filtros['buscar'], $filtros['estado_vigencia']),
-            'antiguedad' => $this->exportarAntiguedad($filtros['buscar'], $filtros['categoria']),
-            'comercio'   => $this->exportarComercioIndividual((int)($_GET['id_lugar'] ?? 0)),
-            'lugares'    => $this->exportarLugares(),
-            'solicitudes'=> $this->exportarSolicitudes(),
-            default      => die('Tipo de reporte no válido.')
+            'financiero'  => $this->exportarFinanciero($filtros['desde'], $filtros['hasta'], $filtros['categoria'], $filtros['buscar'], $filtros['metodo']),
+            'vigencias'   => $this->exportarVigencias($filtros['categoria'], $filtros['buscar'], $filtros['estado_vigencia']),
+            'antiguedad'  => $this->exportarAntiguedad($filtros['buscar'], $filtros['categoria']),
+            'proyeccion'  => $this->exportarProyeccion($filtros['categoria'], $filtros['buscar']),
+            'rendimiento' => $this->exportarRendimiento($filtros['desde'], $filtros['hasta']),
+            'comercio'    => $this->exportarComercioIndividual((int)($_GET['id_lugar'] ?? 0)),
+            'lugares'     => $this->exportarLugares(),
+            'solicitudes' => $this->exportarSolicitudes(),
+            default       => die('Tipo de reporte no válido.')
         };
+    }
+
+    private function exportarRendimiento(string $desde = '', string $hasta = ''): void {
+        $ranking = \App\Services\TelemetriaService::obtenerRankingComercial($desde, $hasta, 100);
+        $filas = [];
+        $pos = 1;
+        foreach ($ranking as $r) {
+            $filas[] = [
+                'Puesto'              => '#' . ($pos++),
+                'Establecimiento'     => $r['establecimiento'],
+                'Categoría'           => $r['categoria'],
+                'Vistas Ficha'        => (int)$r['vistas'],
+                'Clics WhatsApp'      => (int)$r['contactos_whatsapp'],
+                'Rutas Mapa'          => (int)$r['rutas_mapa'],
+                'En Favoritos'        => (int)$r['guardado_favoritos'],
+                'Total Conversiones'  => (int)$r['total_conversiones']
+            ];
+        }
+        $this->generarCsv('ranking_rendimiento_turistico', [
+            'Puesto', 'Establecimiento', 'Categoría', 'Vistas Ficha', 'Clics WhatsApp', 'Rutas Mapa', 'En Favoritos', 'Total Conversiones'
+        ], $filas);
+    }
+
+    private function exportarProyeccion(int $categoria = 0, string $buscar = ''): void {
+        $vigencias = $this->obtenerReporteVigencias($categoria, $buscar);
+        $tarifaVigente = (float)$this->db->query("SELECT monto FROM tarifas WHERE activo = 1 ORDER BY vigente_desde DESC LIMIT 1")->fetchColumn();
+        if ($tarifaVigente <= 0) $tarifaVigente = 250.00;
+
+        $filas = [];
+        foreach ($vigencias as $v) {
+            $dias = (int)($v['dias_restantes'] ?? -1);
+            $horizonte = 'Mora Expirada';
+            if ($dias >= 0 && $dias <= 30) {
+                $horizonte = 'Corto Plazo (0-30 días)';
+            } elseif ($dias > 30 && $dias <= 60) {
+                $horizonte = 'Mediano Plazo (31-60 días)';
+            } elseif ($dias > 60 && $dias <= 90) {
+                $horizonte = 'Trimestral (61-90 días)';
+            } elseif ($dias > 90) {
+                $horizonte = 'Largo Plazo (+90 días)';
+            }
+
+            $filas[] = [
+                'ID Comercio'      => '#' . $v['id_lugar'],
+                'Establecimiento'  => $v['establecimiento'],
+                'Categoría'        => $v['categoria'],
+                'Teléfono'         => $v['telefono_contacto'] ?: ($v['whatsapp_contacto'] ?: 'S/N'),
+                'Fecha Venc.'      => date('d/m/Y', strtotime($v['fecha_vencimiento'])),
+                'Días Restantes'   => $dias,
+                'Horizonte'        => $horizonte,
+                'Tarifa Estim. Bs' => number_format($tarifaVigente, 2, '.', ''),
+                'Estado Cobertura' => $v['estado_cobertura']
+            ];
+        }
+
+        $this->generarCsv('proyeccion_flujo_cobranzas', [
+            'ID Comercio', 'Establecimiento', 'Categoría', 'Teléfono', 'Fecha Venc.', 'Días Restantes', 'Horizonte', 'Tarifa Estim. Bs', 'Estado Cobertura'
+        ], $filas);
     }
 
     private function exportarFinanciero(string $desde, string $hasta, int $categoria, string $buscar = '', string $metodo = ''): void {

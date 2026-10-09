@@ -105,9 +105,9 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
 <div class="container-fluid p-0">
     <!-- Encabezado Membrete Oficial para Impresión -->
     <div class="print-only-header mb-4 p-3 border-bottom text-center">
-        <h2 class="fw-bold mb-1">BENITURS TRINIDAD - GUÍA TURÍSTICA Y COMERCIAL</h2>
+        <h2 class="fw-bold mb-1">BENITOURS TRINIDAD - GUÍA TURÍSTICA Y COMERCIAL</h2>
         <p class="text-muted small mb-1">Informe Analítico Oficial de Recaudación, Cobertura Comercial y Antigüedad</p>
-        <small class="text-muted">Fecha de Emisión: <?= date('d/m/Y H:i') ?> | Sistema de Administración BeniTurs</small>
+        <small class="text-muted">Fecha de Emisión: <?= date('d/m/Y H:i') ?> | Sistema de Administración BeniTours</small>
     </div>
 
     <!-- Encabezado Superior en Pantalla -->
@@ -132,6 +132,16 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                     <li>
                         <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=vigencias&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>&estado_vigencia=<?= urlencode($filtros['estado_vigencia']) ?>">
                             <i class="bi bi-clock-history text-primary me-2"></i>Control de Vigencias
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=proyeccion&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>">
+                            <i class="bi bi-graph-up-arrow text-info me-2"></i>Proyección de Cobranzas (30-90d)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=rendimiento&desde=<?= urlencode($filtros['desde']) ?>&hasta=<?= urlencode($filtros['hasta']) ?>">
+                            <i class="bi bi-bullseye text-danger me-2"></i>Ranking de Rendimiento y Conversión
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
@@ -197,28 +207,13 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
     <div class="admin-card p-3 mb-4 report-filters">
         <form action="<?= htmlspecialchars($baseUrl) ?>/admin/reportes" method="GET" id="formFiltrosReportes">
             <input type="hidden" name="tab" id="inputTabActivo" value="<?= htmlspecialchars($tabActivo) ?>">
+            <input type="hidden" name="buscar" id="buscarServidor" value="<?= htmlspecialchars($filtros['buscar']) ?>">
 
             <!-- Fila Superior: Buscador en Vivo y Presets -->
             <div class="row g-2 align-items-center mb-3">
-                <div class="col-md-6 col-lg-5">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" name="buscar" id="buscadorVivo" 
-                               value="<?= htmlspecialchars($filtros['buscar']) ?>" 
-                               class="form-control border-start-0 ps-0 shadow-none" 
-                               placeholder="Buscar por comercio, comprobante, teléfono..."
-                               autocomplete="off">
-                        <?php if (!empty($filtros['buscar'])): ?>
-                            <button type="button" class="btn btn-outline-secondary border-start-0" onclick="limpiarBuscador()" title="Limpiar búsqueda">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
                 <!-- Botonera de Presets de Fecha -->
-                <div class="col-md-6 col-lg-7">
-                    <div class="d-flex gap-1 flex-wrap align-items-center justify-content-md-end">
+                <div class="col-12">
+                    <div class="d-flex gap-1 flex-wrap align-items-center">
                         <span class="extra-small text-muted fw-bold me-1">Rangos:</span>
                         <button type="button" onclick="aplicarPreset('hoy')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'hoy' ? 'active' : '' ?>">Hoy</button>
                         <button type="button" onclick="aplicarPreset('semana')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'semana' ? 'active' : '' ?>">Esta Semana</button>
@@ -313,9 +308,20 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                 <i class="bi bi-graph-up me-1"></i> 4. Tráfico Turístico
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?= $tabActivo === 'rendimiento' ? 'active' : '' ?>" id="tab-rendimiento-btn" data-bs-toggle="pill" data-bs-target="#tab-rendimiento" type="button" role="tab" onclick="cambiarPestana('rendimiento')">
+                <i class="bi bi-bullseye me-1 text-danger"></i> 5. Rendimiento & Conversión
+            </button>
+        </li>
     </ul>
 
     <!-- Contenido de las Pestañas -->
+    <div id="buscadorReportes" class="input-group input-group-sm mb-3" style="max-width: 360px; display: none;">
+        <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
+        <input type="search" id="buscadorVivo" class="form-control" value="<?= htmlspecialchars($filtros['buscar']) ?>" placeholder="Buscar en esta tabla..." autocomplete="off" aria-label="Buscar en la tabla">
+        <button type="button" class="btn btn-outline-secondary" id="btnLimpiarBuscador" title="Limpiar búsqueda" style="display: <?= !empty($filtros['buscar']) ? '' : 'none' ?>;"><i class="bi bi-x-circle"></i></button>
+    </div>
+
     <div class="tab-content" id="tabsReportesContent">
 
         <!-- ========================================== -->
@@ -404,6 +410,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                         <h6 class="fw-bold text-dark mb-0"><i class="bi bi-receipt text-success me-2"></i>Abonos y Transacciones Confirmadas</h6>
                         <small class="text-muted">Mostrando pagos según el rango y filtros aplicados</small>
                     </div>
+                    <div class="reporte-search-slot" data-tab="finanzas"></div>
                     <span class="badge bg-light text-dark border px-3 py-2"><span id="conteoPagos"><?= count($pagos) ?></span> pagos registrados</span>
                 </div>
                 <div class="table-responsive" style="max-height: 520px;">
@@ -464,12 +471,59 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
         <!-- PESTAÑA 2: CONTROL DE VIGENCIAS Y COBRO    -->
         <!-- ========================================== -->
         <div class="tab-pane fade <?= $tabActivo === 'vigencias' ? 'show active' : '' ?>" id="tab-vigencias" role="tabpanel">
+            <!-- Proyección Escalonada de Flujo y Retención de Cartera -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Tasa de Retención Activa</span>
+                        <h3 class="fw-bold text-success mt-2 mb-1"><?= number_format($kpis['tasa_retencion'], 1) ?>%</h3>
+                        <small class="text-muted extra-small">Comercios al día frente a la cartera total</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Llamadas y menú</span>
+                        <h3 class="fw-bold text-info mt-2 mb-1"><?= number_format($totalesTelemetria['total_telefono'] + $totalesTelemetria['total_menu']) ?></h3>
+                        <small class="text-muted extra-small"><?= number_format($totalesTelemetria['total_telefono']) ?> llamadas · <?= number_format($totalesTelemetria['total_menu']) ?> menús</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-danger border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Interés en promociones</span>
+                        <h3 class="fw-bold text-danger mt-2 mb-1"><?= number_format($totalesTelemetria['total_promociones']) ?></h3>
+                        <small class="text-muted extra-small">Aperturas de promociones comerciales</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Corto Plazo (0 - 30 días)</span>
+                        <h3 class="fw-bold text-primary mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_30d_monto'], 2) ?></h3>
+                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_30d_cant'] ?></strong> renovaciones estimadas</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Mediano Plazo (31 - 60 días)</span>
+                        <h3 class="fw-bold text-info mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_60d_monto'], 2) ?></h3>
+                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_60d_cant'] ?></strong> renovaciones estimadas</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Trimestral (61 - 90 días)</span>
+                        <h3 class="fw-bold text-warning mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_90d_monto'], 2) ?></h3>
+                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_90d_cant'] ?></strong> renovaciones estimadas</small>
+                    </div>
+                </div>
+            </div>
+
             <div class="admin-card mb-4 overflow-hidden">
                 <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h6 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Monitoreo de Suscripciones y Vencimientos</h6>
                         <small class="text-muted">Estado actual de la membresía comercial de cada establecimiento</small>
                     </div>
+                    <div class="reporte-search-slot" data-tab="vigencias"></div>
                     <span class="badge bg-light text-dark border px-3 py-2"><span id="conteoVigencias"><?= count($vigencias) ?></span> fichas activas</span>
                 </div>
                 <div class="table-responsive" style="max-height: 520px;">
@@ -491,7 +545,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                                     <?php
                                         $telWa = preg_replace('/\D/', '', $v['whatsapp_contacto'] ?: ($v['telefono_contacto'] ?: ''));
                                         if (strlen($telWa) === 8) $telWa = '591' . $telWa;
-                                        $msg = "Hola *" . $v['establecimiento'] . "*, le saludamos de BeniTurs Trinidad. Le recordamos que su membresía comercial vence el " . date('d/m/Y', strtotime($v['fecha_vencimiento'])) . ". ¿Desea renovar?";
+                                        $msg = "Hola *" . $v['establecimiento'] . "*, le saludamos de BeniTours Trinidad. Le recordamos que su membresía comercial vence el " . date('d/m/Y', strtotime($v['fecha_vencimiento'])) . ". ¿Desea renovar?";
                                         $waLink = !empty($telWa) ? "https://wa.me/{$telWa}?text=" . rawurlencode($msg) : null;
                                     ?>
                                     <tr class="fila-buscable" data-texto="<?= strtolower(htmlspecialchars($v['establecimiento'] . ' ' . $v['categoria'] . ' ' . $v['estado_cobertura'])) ?>">
@@ -559,7 +613,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
                     <h5 class="fw-bold mb-1"><i class="bi bi-award-fill text-warning me-2"></i>Ranking de Antigüedad y Trayectoria de Comercios</h5>
-                    <p class="text-muted small mb-0">Ordenados cronológicamente desde los primeros comercios pioneros que se unieron a BeniTurs Trinidad</p>
+                    <p class="text-muted small mb-0">Ordenados cronológicamente desde los primeros comercios pioneros que se unieron a BeniTours Trinidad</p>
                 </div>
                 <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-3 py-2">
                     <?= count($comerciosAntiguedad) ?> Comercios Registrados
@@ -613,6 +667,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                         <h6 class="fw-bold text-dark mb-0"><i class="bi bi-list-ol text-primary me-2"></i>Padrón Cronológico de Comercios</h6>
                         <small class="text-muted">Listado completo ordenado por fecha de antigüedad en la plataforma</small>
                     </div>
+                    <div class="reporte-search-slot" data-tab="comercios"></div>
                     <span class="badge bg-light text-dark border px-3 py-2"><span id="conteoAntiguedad"><?= count($comerciosAntiguedad) ?></span> establecimientos</span>
                 </div>
                 <div class="table-responsive" style="max-height: 520px;">
@@ -826,6 +881,117 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                 </div>
             </div>
         </div>
+
+        <!-- ======================================================== -->
+        <!-- PESTAÑA 5: RENDIMIENTO TURÍSTICO Y CONVERSIONES COMERCIALES -->
+        <!-- ======================================================== -->
+        <div class="tab-pane fade <?= $tabActivo === 'rendimiento' ? 'show active' : '' ?>" id="tab-rendimiento" role="tabpanel">
+            <!-- 1. Cuadrícula de KPIs Globales de Conversión -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Vistas de Fichas</span>
+                        <h3 class="fw-bold text-primary mt-2 mb-1"><?= number_format($totalesTelemetria['total_vistas']) ?></h3>
+                        <small class="text-muted extra-small">Interés generado en destinos del Beni</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Contactos por WhatsApp</span>
+                        <h3 class="fw-bold text-success mt-2 mb-1"><?= number_format($totalesTelemetria['total_whatsapp']) ?></h3>
+                        <small class="text-muted extra-small">Consultas directas a comercios</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-danger border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Rutas en Google Maps</span>
+                        <h3 class="fw-bold text-danger mt-2 mb-1"><?= number_format($totalesTelemetria['total_mapa']) ?></h3>
+                        <small class="text-muted extra-small">Turistas que trazaron ruta a locales</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
+                        <span class="text-muted extra-small fw-bold text-uppercase">Tasa Global de Conversión</span>
+                        <h3 class="fw-bold text-warning mt-2 mb-1"><?= $totalesTelemetria['tasa_conversion_gral'] ?>%</h3>
+                        <small class="text-muted extra-small">Turistas que pasaron de mirar a contactar</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Tabla del Ranking de Popularidad y Conversiones -->
+            <div class="admin-card mb-4 overflow-hidden">
+                <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-bullseye text-danger me-2"></i>Ranking de Comercios con Mayor Conversión Turística</h6>
+                        <small class="text-muted">Establecimientos que más consultas por WhatsApp y rutas en mapa generan en la plataforma</small>
+                    </div>
+                    <span class="badge bg-light text-dark border px-3 py-2"><?= count($rankingRendimiento) ?> comercios analizados</span>
+                </div>
+                <div class="table-responsive" style="max-height: 520px;">
+                    <table class="table admin-table table-hover table-sm align-middle mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th># Puesto</th>
+                                <th>Establecimiento</th>
+                                <th>Categoría</th>
+                                <th class="text-center">Vistas de Ficha</th>
+                                <th class="text-center text-success"><i class="bi bi-whatsapp me-1"></i> WhatsApp</th>
+                                <th class="text-center text-danger"><i class="bi bi-geo-alt-fill me-1"></i> Rutas Mapa</th>
+                                <th class="text-center text-danger-emphasis"><i class="bi bi-heart-fill me-1"></i> En Favoritos</th>
+                                <th class="text-end fw-bold">Total Conversiones</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($rankingRendimiento)): ?>
+                                <?php $posRanking = 1; foreach ($rankingRendimiento as $r): ?>
+                                    <tr>
+                                        <td>
+                                            <?php if ($posRanking === 1): ?>
+                                                <span class="badge bg-warning text-dark fw-bold rounded-pill px-2">🥇 #1</span>
+                                            <?php elseif ($posRanking === 2): ?>
+                                                <span class="badge bg-secondary text-white fw-bold rounded-pill px-2">🥈 #2</span>
+                                            <?php elseif ($posRanking === 3): ?>
+                                                <span class="badge bg-danger-subtle text-danger-emphasis fw-bold rounded-pill px-2">🥉 #3</span>
+                                            <?php else: ?>
+                                                <code class="text-muted small">#<?= $posRanking ?></code>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" onclick="abrirInformeComercio(<?= (int)$r['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
+                                                <?= htmlspecialchars($r['establecimiento']) ?>
+                                            </a>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border extra-small"><?= htmlspecialchars($r['categoria']) ?></span></td>
+                                        <td class="text-center small"><?= number_format((int)$r['vistas']) ?></td>
+                                        <td class="text-center small fw-semibold text-success"><?= number_format((int)$r['contactos_whatsapp']) ?></td>
+                                        <td class="text-center small fw-semibold text-danger"><?= number_format((int)$r['rutas_mapa']) ?></td>
+                                        <td class="text-center small text-muted"><?= number_format((int)$r['guardado_favoritos']) ?></td>
+                                        <td class="text-end fw-bold text-primary small">
+                                            <?= number_format((int)$r['total_conversiones']) ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" onclick="abrirInformeComercio(<?= (int)$r['id_lugar'] ?>)" class="btn btn-outline-primary btn-sm py-0 px-2" title="Ver ficha y expediente">
+                                                    <i class="bi bi-file-earmark-person"></i> Ficha
+                                                </button>
+                                                <a href="<?= htmlspecialchars($baseUrl) ?>/catalogo/detalle?slug=<?= urlencode($r['slug']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm py-0 px-2" title="Abrir en catálogo público">
+                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php $posRanking++; endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="9" class="text-center py-4 text-muted small">No hay interacciones registradas en este período.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -867,7 +1033,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                         </div>
                         <div class="col-md-5">
                             <div class="p-3 bg-success-subtle rounded-3 h-100 border border-success-subtle">
-                                <span class="badge bg-success text-white extra-small mb-1">Trayectoria en BeniTurs</span>
+                                <span class="badge bg-success text-white extra-small mb-1">Trayectoria en BeniTours</span>
                                 <h4 class="fw-bold text-success mb-1" id="mAntiguedad">--</h4>
                                 <small class="text-muted d-block mb-2">Total aportado acumulado:</small>
                                 <h4 class="fw-bold text-dark mb-0">Bs <span id="mTotalAportado">0.00</span></h4>
@@ -934,15 +1100,47 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Inicialización de Gráficos (Chart.js)
-    iniciarGraficos();
+    // El buscador debe funcionar aunque un gráfico no pueda cargarse.
+    const buscador = document.getElementById('buscadorVivo');
+    const contenedorBuscador = document.getElementById('buscadorReportes');
+    const botonLimpiar = document.getElementById('btnLimpiarBuscador');
+    const buscarServidor = document.getElementById('buscarServidor');
 
-    // 2. Buscador en vivo reactivo en tablas
-    const inputBuscador = document.getElementById('buscadorVivo');
-    if (inputBuscador) {
-        inputBuscador.addEventListener('input', (e) => {
-            filtrarTablasEnVivo(e.target.value);
+    const ubicarBuscador = (tab) => {
+        const destino = document.querySelector(`.reporte-search-slot[data-tab="${tab}"]`);
+        if (!contenedorBuscador) return;
+        if (destino) {
+            destino.appendChild(contenedorBuscador);
+            contenedorBuscador.style.display = '';
+        } else {
+            contenedorBuscador.style.display = 'none';
+        }
+    };
+
+    ubicarBuscador(document.getElementById('inputTabActivo')?.value || 'finanzas');
+
+    document.querySelectorAll('#tabsReportes button[data-bs-toggle="pill"]').forEach((boton) => {
+        boton.addEventListener('shown.bs.tab', (evento) => {
+            const tab = evento.target.id.replace('tab-', '').replace('-btn', '');
+            ubicarBuscador(tab);
         });
+    });
+
+    if (buscador) {
+        buscador.addEventListener('input', (e) => {
+            const termino = e.target.value;
+            if (botonLimpiar) botonLimpiar.style.display = termino.trim() !== '' ? '' : 'none';
+            if (buscarServidor) buscarServidor.value = termino;
+            filtrarTablasEnVivo(termino);
+        });
+    }
+
+    if (botonLimpiar) botonLimpiar.addEventListener('click', limpiarBuscador);
+
+    try {
+        iniciarGraficos();
+    } catch (error) {
+        console.error('No se pudieron inicializar todos los gráficos del reporte.', error);
     }
 });
 
@@ -950,14 +1148,18 @@ document.addEventListener('DOMContentLoaded', () => {
  * Filtra las filas de las tablas en vivo conforme el usuario escribe en el buscador
  */
 function filtrarTablasEnVivo(termino) {
-    const query = termino.trim().toLowerCase();
+    const normalizar = (valor) => String(valor || '')
+        .toLocaleLowerCase('es')
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+    const query = normalizar(termino.trim());
     const filas = document.querySelectorAll('.fila-buscable');
     let visiblesPagos = 0;
     let visiblesVigencias = 0;
     let visiblesAntiguedad = 0;
 
     filas.forEach(fila => {
-        const texto = fila.getAttribute('data-texto') || '';
+        const texto = normalizar(fila.getAttribute('data-texto'));
         const coincide = query === '' || texto.includes(query);
         fila.style.display = coincide ? '' : 'none';
 
@@ -981,11 +1183,12 @@ function filtrarTablasEnVivo(termino) {
 
 function limpiarBuscador() {
     const input = document.getElementById('buscadorVivo');
-    if (input) {
-        input.value = '';
-        filtrarTablasEnVivo('');
-        document.getElementById('formFiltrosReportes').submit();
-    }
+    if (input) input.value = '';
+    const boton = document.getElementById('btnLimpiarBuscador');
+    if (boton) boton.style.display = 'none';
+    const buscarServidor = document.getElementById('buscarServidor');
+    if (buscarServidor) buscarServidor.value = '';
+    filtrarTablasEnVivo('');
 }
 
 /**
@@ -1108,13 +1311,13 @@ function imprimirEstadoCuentaModal() {
         </head>
         <body>
             <div class="text-center pb-3 mb-3 border-bottom">
-                <h3 class="fw-bold mb-1">BENITURS TRINIDAD</h3>
+                <h3 class="fw-bold mb-1">BENITOURS TRINIDAD</h3>
                 <h5 class="text-muted mb-0">Ficha Individual y Estado de Cuenta de Comercio</h5>
                 <small class="text-muted">Fecha de emisión: ${new Date().toLocaleDateString('es-BO')}</small>
             </div>
             ${modalBody}
             <div class="mt-5 pt-4 text-center border-top small text-muted">
-                <p class="mb-0">Documento emitido por el Sistema de Administración BeniTurs Trinidad.</p>
+                <p class="mb-0">Documento emitido por el Sistema de Administración BeniTours Trinidad.</p>
             </div>
             <script>
                 window.onload = function() { window.print(); }

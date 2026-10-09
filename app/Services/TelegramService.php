@@ -50,7 +50,7 @@ class TelegramService {
     public static function notificarNuevaSolicitud(int $idSolicitud, array $datos, string $rutaComprobante): int {
         $config = self::configuracion();
         $mime = ComprobanteService::validarImagen($rutaComprobante);
-        $caption = "🔔 <b>NUEVA SOLICITUD COMERCIAL - BENITURS</b>\n" .
+        $caption = "🔔 <b>NUEVA SOLICITUD COMERCIAL - BENITOURS</b>\n" .
             '🏪 <b>Negocio:</b> ' . self::html($datos['nombre_establecimiento']) . "\n" .
             '📌 <b>Categoría:</b> ' . self::html($datos['categoria']) . "\n" .
             '👤 <b>Dueño:</b> ' . self::html($datos['nombre_solicitante']) . "\n" .
@@ -70,7 +70,7 @@ class TelegramService {
 
     public static function notificarNuevaSolicitudTexto(int $idSolicitud, array $datos): int {
         $config = self::configuracion();
-        $texto = "🔔 <b>NUEVA SOLICITUD EN EFECTIVO - BENITURS</b>\n" .
+        $texto = "🔔 <b>NUEVA SOLICITUD EN EFECTIVO - BENITOURS</b>\n" .
             '🏪 <b>Negocio:</b> ' . self::html($datos['nombre_establecimiento']) . "\n" .
             '📌 <b>Categoría:</b> ' . self::html($datos['categoria'] ?? '') . "\n" .
             '👤 <b>Dueño:</b> ' . self::html($datos['nombre_solicitante']) . "\n" .

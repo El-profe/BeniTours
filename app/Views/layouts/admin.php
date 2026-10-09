@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titulo ?? 'Panel') ?> | BeniTurs Admin</title>
+    <title><?= htmlspecialchars($titulo ?? 'Panel') ?> | BeniTours Admin</title>
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo2.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo2.png') ?>">
 
     <!-- Bootstrap 5.3.3 CSS (Local) -->
@@ -24,7 +24,7 @@
                 
                 <div class="lh-sm">
                     <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png" 
-                    alt="BeniTurs" 
+                    alt="BeniTours" 
                     class="navbar-logo"
                     height="42">
                 </div>

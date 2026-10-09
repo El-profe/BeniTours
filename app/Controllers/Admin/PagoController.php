@@ -26,7 +26,8 @@ class PagoController extends Controller {
 
     public function index(): void {
         $filtroEstado = trim($_GET['estado'] ?? '');
-        $pagos = $this->pagoModel->listar($filtroEstado ?: null);
+        $buscar = trim($_GET['buscar'] ?? '');
+        $pagos = $this->pagoModel->listar($filtroEstado ?: null, $buscar ?: null);
 
         // Identificar publicaciones comerciales próximas a vencer (en los siguientes 5 días) (RF-29)
         $db = Database::getConnection();
@@ -74,6 +75,7 @@ class PagoController extends Controller {
             'titulo'               => 'Gestión de Pagos y Mensualidades',
             'pagos'                => $pagos,
             'filtroActual'         => $filtroEstado,
+            'buscar'               => $buscar,
             'proximosVencimientos' => $proximosVencimientos,
             'estadisticas'          => [
                 'totalConfirmado'    => $totalConfirmado,
@@ -195,6 +197,7 @@ class PagoController extends Controller {
                 'metodo_pago'           => $metodo,
                 'observaciones'         => $observaciones
             ]);
+            try { (new \App\Models\OperacionAdmin())->registrar($idLugar, (int)$_SESSION['admin_id'], 'PAGO_REGISTRADO', "Pago #{$idPago} registrado por Bs " . number_format($monto, 2), 'pago', $idPago); } catch (\Throwable $ignored) {}
         } catch (\Throwable $e) {
             $_SESSION['admin_error'] = 'No se pudo registrar el pago: ' . $e->getMessage();
             header("Location: {$this->config['base_url']}/admin/pagos/crear");
@@ -219,6 +222,7 @@ class PagoController extends Controller {
 
         try {
             $resultado = PagoService::confirmarPago($idPago, $idAdmin);
+            try { $pago = $this->pagoModel->buscarPorId($idPago); (new \App\Models\OperacionAdmin())->registrar((int)($pago['id_lugar'] ?? 0), $idAdmin, 'PAGO_CONFIRMADO', "Pago #{$idPago} confirmado y vigencia generada.", 'pago', $idPago); } catch (\Throwable $ignored) {}
             $_SESSION['admin_flash'] = "¡Pago #{$idPago} CONFIRMADO! Vigencia generada del {$resultado['fecha_inicio']} al {$resultado['fecha_vencimiento']} ({$resultado['tipo_periodo']}). La visibilidad depende de la aprobación, habilitación y fechas de cobertura.";
         } catch (\Exception $e) {
             $_SESSION['admin_error'] = "Error al confirmar: " . $e->getMessage();
@@ -276,6 +280,7 @@ class PagoController extends Controller {
         $motivo = trim($_POST['motivo_anulacion'] ?? 'Comprobante no acreditado');
 
         $this->pagoModel->anular($idPago, $motivo);
+        try { $pago = $this->pagoModel->buscarPorId($idPago); (new \App\Models\OperacionAdmin())->registrar((int)($pago['id_lugar'] ?? 0), (int)$_SESSION['admin_id'], 'PAGO_ANULADO', "Pago #{$idPago} anulado: {$motivo}", 'pago', $idPago); } catch (\Throwable $ignored) {}
         $_SESSION['admin_flash'] = "El pago #{$idPago} ha sido ANULADO.";
         header("Location: {$this->config['base_url']}/admin/pagos");
         exit();

@@ -7,6 +7,7 @@ use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\LugarController;
 use App\Controllers\Admin\SolicitudController as AdminSolicitudController;
 use App\Controllers\Admin\PagoController;
+use App\Controllers\Admin\ComercioController;
 
 /**
  * Catálogo Público
@@ -14,6 +15,7 @@ use App\Controllers\Admin\PagoController;
 $router->get('/', [CatalogoController::class, 'index']);
 $router->get('/catalogo', [CatalogoController::class, 'index']);
 $router->get('/catalogo/detalle', [CatalogoController::class, 'detalle']);
+$router->post('/api/telemetria/evento', [CatalogoController::class, 'apiRegistrarEvento']);
 $router->get('/imagen', [ImagenController::class, 'ver']);
 
 /**
@@ -44,6 +46,10 @@ $router->post('/admin/lugares/eliminar-foto', [LugarController::class, 'eliminar
 $router->post('/admin/lugares/establecer-portada', [LugarController::class, 'establecerPortada']);
 $router->post('/admin/lugares/restablecer-clave', [LugarController::class, 'restablecerClave']);
 $router->post('/admin/lugares/crear-cuenta', [LugarController::class, 'crearCuenta']);
+
+// Vista operativa 360 y seguimiento de comercios
+$router->get('/admin/comercios/detalle', [ComercioController::class, 'detalle']);
+$router->post('/admin/comercios/seguimiento', [ComercioController::class, 'guardarSeguimiento']);
 
 // Solicitudes
 $router->get('/admin/solicitudes', [AdminSolicitudController::class, 'index']);
@@ -89,6 +95,7 @@ $router->post('/negocio/fotos/eliminar', [\App\Controllers\Negocio\PanelControll
 $router->get('/negocio/promociones', [\App\Controllers\Negocio\PanelController::class, 'promociones']);
 $router->post('/negocio/promociones/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarPromocion']);
 $router->post('/negocio/promociones/estado', [\App\Controllers\Negocio\PanelController::class, 'estadoPromocion']);
+$router->post('/negocio/promociones/eliminar', [\App\Controllers\Negocio\PanelController::class, 'eliminarPromocion']);
 $router->get('/negocio/perfil', [\App\Controllers\Negocio\PanelController::class, 'perfil']);
 $router->post('/negocio/perfil/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarPerfil']);
 $router->get('/negocio/renovar', [\App\Controllers\Negocio\PanelController::class, 'renovar']);

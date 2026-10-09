@@ -22,7 +22,8 @@ class SolicitudController extends Controller {
         header('Cache-Control: private, no-store');
         header('Referrer-Policy: no-referrer');
         $filtroEstado = trim($_GET['estado'] ?? '');
-        $solicitudes  = $this->solicitudModel->listar($filtroEstado ?: null);
+        $buscar = trim($_GET['buscar'] ?? '');
+        $solicitudes  = $this->solicitudModel->listar($filtroEstado ?: null, $buscar ?: null);
         $mensaje      = $_SESSION['admin_flash'] ?? null;
         $error        = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
@@ -31,6 +32,7 @@ class SolicitudController extends Controller {
             'titulo'       => 'Revisión de Solicitudes Comerciales',
             'solicitudes'  => $solicitudes,
             'filtroActual' => $filtroEstado,
+            'buscar'       => $buscar,
             'mensaje'      => $mensaje,
             'error'        => $error,
             'csrfToken'    => CsrfMiddleware::obtenerToken()
@@ -56,6 +58,7 @@ class SolicitudController extends Controller {
         }
         try {
             \App\Services\SolicitudService::rechazar($id, (int)$_SESSION['admin_id'], trim($observaciones));
+            try { (new \App\Models\OperacionAdmin())->registrar(0, (int)$_SESSION['admin_id'], 'SOLICITUD_RECHAZADA', "Solicitud #{$id} rechazada.", 'solicitud', $id); } catch (\Throwable $ignored) {}
         } catch (\PDOException $e) {
             error_log('No se pudo rechazar la solicitud #' . $id);
             $this->json(['success'=>false,'error'=>'No se pudo guardar la resolución.'], 500);
@@ -89,6 +92,7 @@ class SolicitudController extends Controller {
             error_log('Error al aprovisionar solicitud #' . $id . ' ' . $e->getMessage());
             $this->json(['success'=>false,'error'=>'No se pudo completar el aprovisionamiento: ' . $e->getMessage()], 500);
         }
+        try { (new \App\Models\OperacionAdmin())->registrar((int)($resultado['id_lugar'] ?? 0), (int)$_SESSION['admin_id'], 'SOLICITUD_APROBADA', "Solicitud #{$id} aprobada y comercio activado.", 'solicitud', $id); } catch (\Throwable $ignored) {}
         $this->json(['success'=>true,'estado'=>'ACEPTADA','message'=>'Negocio activado con éxito.'] + $resultado);
     }
     public function comprobante(): void {

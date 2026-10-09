@@ -304,6 +304,7 @@ CREATE TABLE `promociones` (
   `titulo` varchar(150) NOT NULL,
   `descripcion` text NOT NULL,
   `descuento_texto` varchar(100) DEFAULT NULL,
+  `imagen_archivo` varchar(255) DEFAULT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1,

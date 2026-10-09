@@ -1,5 +1,5 @@
 <!-- Hero Principal con Buscador Central -->
-<section class="hero-trinidad text-white position-relative">
+<section class="hero-trinidad text-white position-relative" id="inicio">
     <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="<?= htmlspecialchars($baseUrl) ?>/assets/img/hero-poster.webp" aria-hidden="true">
         <source src="<?= htmlspecialchars($baseUrl) ?>/assets/video/video.mp4" type="video/mp4">
     </video>
@@ -59,10 +59,10 @@
 
     <!-- Filtro de Municipios del Beni -->
     <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
-        <div class="d-inline-flex align-items-center bg-white shadow-sm border rounded-pill px-3 py-1">
-            <i class="bi bi-geo-alt-fill text-danger me-2"></i>
-            <span class="text-secondary small fw-semibold me-2 d-none d-sm-inline">Municipio:</span>
-            <select id="selectMunicipio" class="form-select form-select-sm border-0 shadow-none py-1 ps-1 pe-4 bg-transparent fw-bold text-dark" style="cursor: pointer;">
+        <div class="municipio-filter align-items-center rounded-pill px-3 py-1">
+            <span class="municipio-filter-icon"><i class="bi bi-geo-alt-fill"></i></span>
+            <span class="municipio-filter-label small fw-semibold me-2 d-none d-sm-inline">Municipio:</span>
+            <select id="selectMunicipio" class="form-select form-select-sm border-0 shadow-none py-1 ps-1 pe-4 bg-transparent fw-bold" aria-label="Seleccionar municipio">
                 <option value="">Todo el Departamento del Beni</option>
                 <?php foreach ($municipios as $m): ?>
                     <option value="<?= (int)$m['id_municipio'] ?>"
@@ -191,21 +191,40 @@
     <!-- Cuadrícula de Fichas de Lugares -->
     <div class="row g-4" id="gridLugaresCatalogo">
         <?php if (!empty($lugares)): ?>
-            <?php foreach ($lugares as $l): ?>
+            <?php foreach ($lugares as $indiceLugar => $l): ?>
                 <?php
                     $icono = ($l['categoria_icono'] ?? '') ?: 'bi-geo-alt';
                     $descripcion = $l['descripcion'] ?? '';
                     if (mb_strlen($descripcion, 'UTF-8') > 140) {
                         $descripcion = mb_substr($descripcion, 0, 140, 'UTF-8') . '...';
                     }
+                    $estadoHorario = \App\Services\HorarioHelper::evaluarEstado($l['horario_atencion'] ?? null);
+                    $urlFicha = $baseUrl . '/catalogo/detalle?slug=' . urlencode($l['slug']);
                 ?>
-                <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col"
+                <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col<?= ($indiceLugar >= 9) ? ' d-none tarjeta-oculta-fila' : '' ?>"
                      data-id="<?= (int)$l['id_lugar'] ?>"
                      data-nombre="<?= htmlspecialchars(mb_strtolower($l['nombre'], 'UTF-8')) ?>"
                      data-categoria="<?= (int)$l['id_categoria'] ?>"
                      data-municipio="<?= (int)($l['id_municipio'] ?? 1) ?>"
                      data-coordenadas="<?= htmlspecialchars($l['coordenadas_gps'] ?? '') ?>">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative place-card">
+                        <!-- Botón de Favorito / Guardar en mi ruta -->
+                        <button type="button" 
+                                class="btn btn-light bg-white bg-opacity-75 rounded-circle shadow-sm position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center p-0 border-0" 
+                                style="width: 38px; height: 38px; z-index: 10;"
+                                data-btn-favorito
+                                data-id="<?= (int)$l['id_lugar'] ?>"
+                                data-nombre="<?= htmlspecialchars($l['nombre']) ?>"
+                                data-slug="<?= htmlspecialchars($l['slug']) ?>"
+                                data-categoria="<?= htmlspecialchars($l['categoria'] ?? '') ?>"
+                                data-imagen="<?= htmlspecialchars($l['imagen'] ?? '') ?>"
+                                data-municipio="<?= htmlspecialchars($l['municipio'] ?? '') ?>"
+                                data-url="<?= htmlspecialchars($urlFicha) ?>"
+                                title="Guardar en mi itinerario"
+                                aria-label="Guardar en mi itinerario">
+                            <i class="bi bi-heart text-secondary fs-6"></i>
+                        </button>
+
                         <?php if (!empty($l['imagen'])): ?>
                             <div class="position-relative" style="height: 200px; background-color: #092611;">
                                 <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($l['imagen']) ?>"
@@ -219,22 +238,35 @@
                                         · <i class="bi bi-geo-alt text-warning"></i> <?= htmlspecialchars($l['municipio']) ?>
                                     <?php endif; ?>
                                 </span>
+                                <?php if (!empty($l['promo_activa_texto'])): ?>
+                                    <span class="badge bg-danger text-white position-absolute bottom-0 start-0 m-3 rounded-pill fw-bold shadow-sm" style="z-index: 5;">
+                                        <i class="bi bi-tag-fill me-1"></i> <?= htmlspecialchars($l['promo_activa_texto']) ?>
+                                    </span>
+                                <?php endif; ?>
+                                <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
                             </div>
                         <?php else: ?>
                             <div class="card-header-place p-4 text-white text-center position-relative">
                                 <div class="place-icon-bubble mx-auto mb-2 shadow-sm">
                                     <i class="bi <?= htmlspecialchars($icono) ?> fs-3 text-success"></i>
                                 </div>
-                                <h5 class="fw-bold mb-1 text-white text-truncate"><?= htmlspecialchars($l['nombre']) ?></h5>
+                                <h5 class="fw-bold mb-1 text-white text-truncate pe-4"><?= htmlspecialchars($l['nombre']) ?></h5>
                                 <span class="extra-small text-white-50 text-uppercase fw-semibold tracking-wide">
                                     <?= htmlspecialchars($l['categoria'] ?? '') ?>
                                     <?php if (!empty($l['municipio'])): ?>
                                         · <?= htmlspecialchars($l['municipio']) ?>
                                     <?php endif; ?>
                                 </span>
+                                <?php if (!empty($l['promo_activa_texto'])): ?>
+                                    <div class="mt-2">
+                                        <span class="badge bg-danger text-white rounded-pill fw-bold shadow-sm px-3 py-1">
+                                            <i class="bi bi-tag-fill me-1"></i> Promo: <?= htmlspecialchars($l['promo_activa_texto']) ?>
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
                             </div>
                         <?php endif; ?>
-                        <div class="badge-distancia-container position-absolute top-0 end-0 m-3"></div>
                         <div class="card-body p-4 d-flex flex-column">
                             <?php if (!empty($l['imagen'])): ?>
                                 <h5 class="fw-bold text-dark text-truncate mb-2"><?= htmlspecialchars($l['nombre']) ?></h5>
@@ -243,10 +275,15 @@
                                 <?= htmlspecialchars($descripcion) ?>
                             </p>
                             <?php if (!empty($l['horario_atencion'])): ?>
-                                <div class="place-meta border-top pt-3 mb-3 small">
+                                <div class="place-meta border-top pt-3 mb-3 small d-flex justify-content-between align-items-center gap-2">
                                     <div class="text-muted extra-small text-truncate">
                                         <i class="bi bi-clock me-1 text-warning"></i> <?= htmlspecialchars($l['horario_atencion']) ?>
                                     </div>
+                                    <?php if ($estadoHorario): ?>
+                                        <span class="badge <?= $estadoHorario['badge'] ?> rounded-pill extra-small flex-shrink-0">
+                                            <?= htmlspecialchars($estadoHorario['texto']) ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                             <div class="d-flex gap-2">
@@ -265,6 +302,14 @@
                 No hay lugares disponibles en este momento.
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Botón Centrado de Ver Más / Ver Menos Lugares -->
+    <div id="contenedorVerMasLugares" class="text-center mt-4 mb-3<?= count($lugares) <= 9 ? ' d-none' : '' ?>">
+        <button type="button" id="btnVerMasLugares" class="btn btn-outline-success btn-ver-mas-catalogo rounded-pill px-4 py-2 fw-semibold shadow-sm">
+            <i class="bi bi-chevron-down me-2" id="iconoVerMasLugares"></i>
+            <span id="textoVerMasLugares">Ver más lugares (<?= max(0, count($lugares) - 9) ?> restantes)</span>
+        </button>
     </div>
     <!-- Datos iniciales de lugares en formato JSON para el mapa interactivo -->
     <script id="lugaresInicialesJson" type="application/json">
@@ -325,6 +370,296 @@
         </div>
     </div>
 </section>
+
+<!-- Sección Carrusel de Promociones y Ofertas Imperdibles -->
+<section class="seccion-promociones py-5 border-bottom position-relative" id="promociones">
+    <div class="container py-2">
+        <div class="text-center mb-4">
+            <div>
+                <span class="badge bg-danger text-white px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2 shadow-sm">
+                    <i class="bi bi-fire me-1"></i> Ahorra en tu viaje
+                </span>
+                <h2 class="fw-bold text-dark mb-1">Promociones y Ofertas Activas</h2>
+            </div>
+        </div>
+
+        <?php if (!empty($promocionesVigentes)): ?>
+            <div id="carruselPromociones" class="promo-carousel" role="region" aria-roledescription="carrusel" aria-label="Promociones activas" data-promo-carousel>
+                <?php if (count($promocionesVigentes) > 1): ?>
+                    <div class="promo-carousel-controls" aria-label="Controles del carrusel">
+                        <button class="btn btn-outline-dark rounded-circle shadow-sm promo-carousel-control promo-carousel-control-prev" type="button" data-promo-direction="prev" aria-label="Promoción anterior">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-dark rounded-circle shadow-sm promo-carousel-control promo-carousel-control-next" type="button" data-promo-direction="next" aria-label="Promoción siguiente">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                <?php endif; ?>
+                <div class="promo-carousel-stage">
+                    <?php foreach ($promocionesVigentes as $indicePromo => $pr): ?>
+                                    <?php
+                                        $fotoPromo = !empty($pr['imagen'])
+                                            ? "{$baseUrl}/imagen?f=" . urlencode($pr['imagen'])
+                                            : null;
+                                        $urlFichaPromo = "{$baseUrl}/catalogo/detalle?slug=" . urlencode($pr['lugar_slug']);
+                                        $waPromoRaw = preg_replace('/\D/', '', $pr['whatsapp_contacto'] ?? '');
+                                        if (strlen($waPromoRaw) === 8) {
+                                            $waPromoRaw = '591' . $waPromoRaw;
+                                        }
+                                        $textoWaPromo = rawurlencode("Hola, vi su promoción '{$pr['titulo']}'" . (!empty($pr['descuento_texto']) ? " ({$pr['descuento_texto']})" : "") . " en BeniTours y quisiera aprovecharla en {$pr['lugar_nombre']}.");
+                                        $fechaFinFmt = !empty($pr['fecha_fin']) ? date('d/m/Y', strtotime($pr['fecha_fin'])) : '';
+
+                                        $promoPayload = json_encode([
+                                            'id_promocion'       => (int)$pr['id_promocion'],
+                                            'id_lugar'           => (int)$pr['id_lugar'],
+                                            'titulo'             => $pr['titulo'],
+                                            'descripcion'        => $pr['descripcion'],
+                                            'descuento_texto'    => $pr['descuento_texto'] ?? '',
+                                            'imagen'             => $fotoPromo,
+                                            'lugar_nombre'       => $pr['lugar_nombre'],
+                                            'lugar_slug'         => $pr['lugar_slug'],
+                                            'url_ficha'          => $urlFichaPromo,
+                                            'lugar_direccion'    => $pr['lugar_direccion'] ?? '',
+                                            'lugar_referencia'   => $pr['lugar_referencia'] ?? '',
+                                            'municipio_nombre'   => $pr['municipio_nombre'] ?? 'Trinidad',
+                                            'categoria_nombre'   => $pr['categoria_nombre'] ?? '',
+                                            'categoria_icono'    => $pr['categoria_icono'] ?? 'bi-shop',
+                                            'latitud'            => $pr['latitud'] ?? null,
+                                            'longitud'           => $pr['longitud'] ?? null,
+                                            'fecha_fin_fmt'      => $fechaFinFmt,
+                                            'wa_contacto'        => $waPromoRaw,
+                                            'wa_texto'           => $textoWaPromo
+                                        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+                                    ?>
+                                    <article class="promo-carousel-card" 
+                                             data-promo-card 
+                                             data-promo-data='<?= htmlspecialchars($promoPayload, ENT_QUOTES, 'UTF-8') ?>'
+                                             aria-roledescription="diapositiva" 
+                                             aria-label="Promoción <?= $indicePromo + 1 ?> de <?= count($promocionesVigentes) ?>">
+                                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-promocion position-relative">
+                                            <!-- Cabecera de la tarjeta con imagen completa o diseño distintivo -->
+                                            <?php if ($fotoPromo): ?>
+                                                <div class="position-relative promo-card-img-container overflow-hidden" 
+                                                     style="height: 195px; background-color: #081c15; cursor: pointer;"
+                                                     data-promo-trigger="modal"
+                                                     title="Ver detalles completos de la promoción">
+                                                    <!-- Fondo desenfocado con los tonos del afiche -->
+                                                    <div class="position-absolute top-0 start-0 w-100 h-100" 
+                                                         style="background-image: url('<?= htmlspecialchars($fotoPromo) ?>'); background-size: cover; background-position: center; filter: blur(12px) brightness(0.4); transform: scale(1.15);"></div>
+                                                    <!-- Imagen principal ajustada completa sin recortes -->
+                                                    <img src="<?= htmlspecialchars($fotoPromo) ?>"
+                                                         alt="<?= htmlspecialchars($pr['lugar_nombre']) ?>"
+                                                         class="position-relative w-100 h-100 object-fit-contain p-1"
+                                                         style="z-index: 2;"
+                                                         loading="lazy">
+                                                    <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 rounded-pill extra-small shadow-sm" style="z-index: 3;">
+                                                        <i class="bi <?= htmlspecialchars($pr['categoria_icono'] ?? 'bi-shop') ?> me-1"></i> <?= htmlspecialchars($pr['categoria_nombre'] ?? '') ?>
+                                                    </span>
+                                                    <?php if (!empty($pr['descuento_texto'])): ?>
+                                                        <span class="badge bg-danger text-white position-absolute top-0 end-0 m-3 rounded-pill fw-bold shadow promo-discount-tag fs-6" style="z-index: 3;">
+                                                            <i class="bi bi-tag-fill me-1"></i> <?= htmlspecialchars($pr['descuento_texto']) ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="p-4 text-white position-relative bg-success bg-gradient" style="min-height: 140px; cursor: pointer;" data-promo-trigger="modal">
+                                                    <span class="badge bg-dark bg-opacity-50 text-white rounded-pill extra-small">
+                                                        <i class="bi <?= htmlspecialchars($pr['categoria_icono'] ?? 'bi-shop') ?> me-1"></i> <?= htmlspecialchars($pr['categoria_nombre'] ?? '') ?>
+                                                    </span>
+                                                    <?php if (!empty($pr['descuento_texto'])): ?>
+                                                        <span class="badge bg-danger text-white position-absolute top-0 end-0 m-3 rounded-pill fw-bold shadow promo-discount-tag fs-6">
+                                                            <i class="bi bi-tag-fill me-1"></i> <?= htmlspecialchars($pr['descuento_texto']) ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <div class="mt-2">
+                                                        <h5 class="fw-bold mb-0 text-white"><?= htmlspecialchars($pr['lugar_nombre']) ?></h5>
+                                                        <small class="text-white-50"><i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($pr['municipio_nombre'] ?? 'Trinidad') ?></small>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <!-- Cuerpo de la tarjeta -->
+                                            <div class="card-body p-3 p-sm-4 d-flex flex-column">
+                                                <?php if ($fotoPromo): ?>
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <h6 class="fw-bold text-dark mb-0 text-truncate" title="<?= htmlspecialchars($pr['lugar_nombre']) ?>">
+                                                            <?= htmlspecialchars($pr['lugar_nombre']) ?>
+                                                        </h6>
+                                                        <small class="text-muted extra-small"><i class="bi bi-geo-alt text-warning"></i> <?= htmlspecialchars($pr['municipio_nombre'] ?? 'Trinidad') ?></small>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <h5 class="fw-bold text-success mb-2 text-truncate" title="<?= htmlspecialchars($pr['titulo']) ?>">
+                                                    <?= htmlspecialchars($pr['titulo']) ?>
+                                                </h5>
+                                                <p class="text-secondary small flex-grow-1 mb-3 line-clamp-3">
+                                                    <?= htmlspecialchars($pr['descripcion']) ?>
+                                                </p>
+
+                                                <?php if ($fechaFinFmt): ?>
+                                                    <div class="extra-small text-muted mb-3 d-flex align-items-center gap-1">
+                                                        <i class="bi bi-clock-history text-danger"></i>
+                                                        <span>Válido hasta el <strong><?= $fechaFinFmt ?></strong></span>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <!-- Acciones -->
+                                                <div class="d-flex gap-2 pt-2 border-top mt-auto">
+                                                    <button type="button" 
+                                                            class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                                                            data-promo-trigger="modal">
+                                                        <i class="bi bi-eye"></i>
+                                                        <span>Ver Ficha</span>
+                                                    </button>
+                                                    <?php if (!empty($waPromoRaw)): ?>
+                                                        <a href="https://wa.me/<?= $waPromoRaw ?>?text=<?= $textoWaPromo ?>" 
+                                                           target="_blank" rel="noopener noreferrer"
+                                                           onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$pr['id_lugar'] ?>, 'WHATSAPP')"
+                                                           class="btn btn-success btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1 shadow-sm">
+                                                            <i class="bi bi-whatsapp"></i>
+                                                            <span>Aprovechar</span>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (count($promocionesVigentes) > 1): ?>
+                    <div class="promo-carousel-indicators" aria-label="Elegir promoción">
+                        <?php foreach ($promocionesVigentes as $indicePromo => $promocion): ?>
+                            <button type="button" data-promo-to="<?= $indicePromo ?>" <?= $indicePromo === 0 ? 'class="is-active" aria-current="true"' : '' ?> aria-label="Mostrar promoción <?= $indicePromo + 1 ?>"></button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <div class="p-4 rounded-4 bg-white border text-center mx-auto shadow-sm" style="max-width: 600px;">
+                <i class="bi bi-tag-fill text-warning fs-1 mb-2 d-block"></i>
+                <h5 class="fw-bold text-dark">Próximamente más Promociones</h5>
+                <p class="text-muted small mb-3">Nuestros comercios aliados renuevan ofertas continuamente. Visita el catálogo para explorar todos los lugares disponibles.</p>
+                <a href="#explorar" class="btn btn-outline-success btn-sm rounded-pill px-4 fw-semibold">
+                    <i class="bi bi-compass me-1"></i> Explorar Catálogo
+                </a>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- Modal Detalle de Promoción -->
+<div class="modal fade" id="modalDetallePromocion" tabindex="-1" aria-labelledby="modalPromoTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header bg-light border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <div class="promo-modal-header-badges">
+                    <span class="badge bg-success rounded-pill px-3 py-2 fw-semibold" id="modalPromoCategoria">
+                        <i class="bi bi-tag-fill me-1" id="modalPromoCatIcono"></i>
+                        <span id="modalPromoCatTexto">Promoción</span>
+                    </span>
+                    <span class="badge bg-danger text-white rounded-pill px-3 py-2 fw-bold d-none" id="modalPromoDescuentoTag">
+                        <i class="bi bi-fire me-1"></i> <span id="modalPromoDescuentoTexto"></span>
+                    </span>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <div class="row g-4 align-items-stretch">
+                    <!-- Columna Izquierda: Foto completa sin recortes -->
+                    <div class="col-lg-6 d-flex flex-column">
+                        <div class="promo-modal-image-box rounded-4 overflow-hidden position-relative shadow-sm flex-grow-1 d-flex align-items-center justify-content-center"
+                             style="min-height: 320px; max-height: 520px; background-color: #081c15;">
+                            <!-- Fondo desenfocado -->
+                            <div id="modalPromoImgBackdrop" class="position-absolute top-0 start-0 w-100 h-100"
+                                 style="background-size: cover; background-position: center; filter: blur(16px) brightness(0.35); transform: scale(1.15);"></div>
+                            <!-- Imagen principal completa sin recortes -->
+                            <img id="modalPromoImg" src="" alt="Promoción"
+                                 class="position-relative w-100 h-100 object-fit-contain p-2"
+                                 style="z-index: 2; max-height: 500px;"
+                                 loading="lazy">
+                            <!-- Placeholder si no hay imagen -->
+                            <div id="modalPromoNoImg" class="text-white text-center p-4 position-relative d-none" style="z-index: 2;">
+                                <i class="bi bi-tags display-1 text-warning mb-3 d-block"></i>
+                                <h4 class="fw-bold" id="modalPromoPlaceholderNombre"></h4>
+                                <p class="text-white-50 small mb-0">Oferta especial exclusiva en BeniTours</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Título, Lugar, Descripción, Botones y Mapa -->
+                    <div class="col-lg-6 d-flex flex-column">
+                        <!-- Título y Lugar -->
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="text-muted small fw-semibold">
+                                    <i class="bi bi-geo-alt text-danger me-1"></i><span id="modalPromoLugarMunicipio">Trinidad</span>
+                                </span>
+                            </div>
+                            <h3 class="fw-bold text-success mb-1" id="modalPromoTitulo"></h3>
+                            <h5 class="fw-semibold text-dark mb-2" id="modalPromoLugarNombre"></h5>
+                            
+                            <!-- Vigencia -->
+                            <div id="modalPromoVigenciaContainer" class="small text-muted mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-clock-history text-danger"></i>
+                                <span>Válido hasta: <strong class="text-dark" id="modalPromoFechaFin"></strong></span>
+                            </div>
+                            
+                            <!-- Descripción completa -->
+                            <div class="p-3 bg-light rounded-3 mb-3 border">
+                                <h6 class="fw-bold text-dark mb-1 small text-uppercase tracking-wider">
+                                    <i class="bi bi-info-circle text-success me-1"></i> Descripción de la oferta:
+                                </h6>
+                                <p class="text-secondary small mb-0 lh-base" id="modalPromoDescripcion" style="white-space: pre-line;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Mini Mapa de Ubicación -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-dark small text-uppercase">
+                                    <i class="bi bi-map-fill text-success me-1"></i> Ubicación del Comercio
+                                </span>
+                                <small class="text-muted extra-small text-truncate" id="modalPromoLugarDireccion" style="max-width: 250px;"></small>
+                            </div>
+                            <!-- Contenedor Mapa Leaflet -->
+                            <div id="modalPromoMapa" class="rounded-3 border shadow-sm" style="height: 180px; width: 100%; z-index: 1;"></div>
+                            <div id="modalPromoMapaFallback" class="alert alert-light border small text-muted text-center py-2 mb-0 d-none">
+                                <i class="bi bi-geo-alt me-1"></i> Dirección: <span id="modalPromoLugarDireccionAlt"></span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="mt-auto pt-3 border-top d-flex flex-wrap gap-2">
+                            <!-- WhatsApp -->
+                            <a id="modalPromoBtnWa" href="#" target="_blank" rel="noopener noreferrer"
+                               class="btn btn-success fw-bold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="bi bi-whatsapp fs-5"></i>
+                                <span>Aprovechar en WhatsApp</span>
+                            </a>
+
+                            <!-- Ver Ficha Completa -->
+                            <a id="modalPromoBtnFicha" href="#"
+                               class="btn btn-outline-success fw-semibold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-1">
+                                <span>Ver Ficha Completa</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+
+                            <!-- Cómo llegar (Google Maps) -->
+                            <a id="modalPromoBtnComoLlegar" href="#" target="_blank" rel="noopener noreferrer"
+                               class="btn btn-outline-secondary fw-semibold rounded-pill px-3 py-2 d-flex align-items-center justify-content-center gap-1"
+                               title="Abrir indicaciones en Google Maps">
+                                <i class="bi bi-compass"></i>
+                                <span>Cómo llegar</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
 
 <!-- Banner CTA -->
 <section class="container py-5" id="unirse">

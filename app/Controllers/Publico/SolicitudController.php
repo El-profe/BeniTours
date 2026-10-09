@@ -19,7 +19,7 @@ class SolicitudController extends Controller {
         $planes = (new Tarifa())->listarPlanesActivos();
 
         $this->render('publico/solicitudes/formulario', [
-            'titulo'        => 'Publica tu negocio en BeniTurs',
+            'titulo'        => 'Publica tu negocio en BeniTours',
             'categorias'    => $categorias,
             'municipios'    => $municipios,
             'planes'        => $planes,

@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 use App\Core\Controller;
 use App\Models\Administrador;
 use App\Middleware\CsrfMiddleware;
+use App\Services\RateLimiterService;
 
 /**
  * Gestiona el inicio y cierre de sesión del administrador.
@@ -59,6 +60,19 @@ class AuthController extends Controller {
             exit();
         }
 
+        $ip = RateLimiterService::obtenerIpCliente();
+        $rateKey = 'admin_login_' . $ip;
+
+        // 2. Comprobar limitador de tasa anti-fuerza bruta (máx 5 intentos en 15 min)
+        if (!RateLimiterService::estaPermitido($rateKey, 5, 900)) {
+            $segundos = RateLimiterService::segundosRestantes($rateKey);
+            $minutos = max(1, (int)ceil($segundos / 60));
+            http_response_code(429);
+            $_SESSION['auth_error'] = "Demasiados intentos fallidos. Por seguridad, el acceso está bloqueado durante {$minutos} minuto(s).";
+            header("Location: {$this->config['base_url']}/admin/login");
+            exit();
+        }
+
         $identificador = is_string($_POST['usuario'] ?? null) ? trim($_POST['usuario']) : '';
         $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
         $_SESSION['auth_usuario'] = mb_substr($identificador, 0, 120);
@@ -75,17 +89,22 @@ class AuthController extends Controller {
         $credencialesValidas = $admin && password_verify($password, $admin['password_hash']);
 
         if (!$credencialesValidas) {
+            RateLimiterService::registrarFallo($rateKey, 5, 900);
             $_SESSION['auth_error'] = 'Credenciales de acceso incorrectas o cuenta deshabilitada.';
             header("Location: {$this->config['base_url']}/admin/login");
             exit();
         }
 
-        // 2. Establecer sesión segura con regeneración de ID
+        // 3. Limpiar intentos fallidos tras éxito
+        RateLimiterService::limpiar($rateKey);
+
+        // 4. Establecer sesión segura con regeneración de ID
         session_regenerate_id(true);
         unset($_SESSION['auth_usuario'], $_SESSION['auth_error']);
-        $_SESSION['admin_id']     = $admin['id_administrador'];
-        $_SESSION['admin_nombre'] = $admin['nombre'];
-        $_SESSION['admin_user']   = $admin['usuario'];
+        $_SESSION['admin_id']      = $admin['id_administrador'];
+        $_SESSION['admin_nombre']  = $admin['nombre'];
+        $_SESSION['admin_user']    = $admin['usuario'];
+        $_SESSION['LAST_ACTIVITY'] = time();
 
         $this->adminModel->actualizarUltimoAcceso($admin['id_administrador']);
 
@@ -94,10 +113,17 @@ class AuthController extends Controller {
     }
 
     /**
-     * Cierra la sesión activa.
+     * Cierra la sesión activa y destruye cookies de forma segura.
      */
     public function logout(): void {
-        unset($_SESSION['admin_id'], $_SESSION['admin_nombre'], $_SESSION['admin_user']);
+        $_SESSION = [];
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
         session_destroy();
 
         header("Location: {$this->config['base_url']}/admin/login");

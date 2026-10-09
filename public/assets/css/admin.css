@@ -159,30 +159,129 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-/* Indicadores de audiencia y categorías: color completo, texto contrastado. */
+/* Indicadores de métricas del Dashboard: diseño limpio SaaS con burbujas de acento */
 .admin-metric-card {
-    color: #ffffff;
-    border: 0 !important;
-    box-shadow: 0 10px 22px rgba(19, 41, 29, 0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #ffffff;
+    border: 1px solid #e2ebe5 !important;
+    border-radius: 1.15rem;
+    box-shadow: 0 4px 14px rgba(9, 38, 17, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    color: var(--admin-text-main);
 }
 
 .admin-metric-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 28px rgba(19, 41, 29, 0.24);
+    box-shadow: 0 10px 24px rgba(9, 38, 17, 0.08);
+    border-color: #bcd9c6 !important;
 }
 
-.admin-metric-card .text-muted,
-.admin-metric-card [class*="text-"] {
-    color: #ffffff !important;
+/* Tarjetas KPI Hero de Plataforma y Tráfico */
+.dash-hero-metric {
+    background: #ffffff;
+    border: 1px solid #e2ebe5;
+    border-radius: 1.15rem;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 4px 14px rgba(9, 38, 17, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
 }
 
-.metric-success { background: linear-gradient(135deg, #087a3a, #16a05a); }
-.metric-primary { background: linear-gradient(135deg, #0756bf, #1687e7); }
-.metric-warning { background: linear-gradient(135deg, #c77b00, #f0a900); }
-.metric-danger  { background: linear-gradient(135deg, #b71f39, #e34b65); }
-.metric-info    { background: linear-gradient(135deg, #087d99, #12abc9); }
-.metric-dark    { background: linear-gradient(135deg, #263b4d, #4d6579); }
+.dash-hero-metric:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(9, 38, 17, 0.08);
+    border-color: #bcd9c6;
+}
+
+.dash-metric-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.dash-icon-emerald { background: rgba(25, 135, 84, 0.12); color: #198754; }
+.dash-icon-blue    { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
+.dash-icon-purple  { background: rgba(111, 66, 193, 0.12); color: #6f42c1; }
+.dash-icon-amber   { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+.dash-icon-rose    { background: rgba(225, 29, 72, 0.12); color: #e11d48; }
+.dash-icon-cyan    { background: rgba(14, 165, 233, 0.12); color: #0284c7; }
+.dash-icon-dark    { background: rgba(71, 85, 105, 0.12); color: #334155; }
+
+.dash-metric-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--admin-text-main);
+    letter-spacing: -0.5px;
+}
+
+.dash-metric-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--admin-text-muted);
+}
+
+.dash-metric-desc {
+    font-size: 0.76rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+/* Tarjetas interactivas de rubros comerciales */
+.dash-cat-card {
+    background: #ffffff;
+    border: 1px solid #e3ece6;
+    border-radius: 1.15rem;
+    padding: 1.1rem 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.95rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+    box-shadow: 0 2px 10px rgba(9, 38, 17, 0.03);
+    height: 100%;
+}
+
+.dash-cat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(9, 38, 17, 0.09);
+    border-color: #198754;
+    color: inherit;
+}
+
+.dash-cat-card:hover .dash-cat-arrow {
+    transform: translateX(4px);
+    color: #198754 !important;
+}
+
+.dash-cat-arrow {
+    transition: transform 0.2s ease, color 0.2s ease;
+    color: #cbd5e1;
+}
+
+.dash-cat-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--admin-text-main);
+    line-height: 1.25;
+}
+
+.dash-cat-count {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--admin-text-main);
+}
 
 /* El panel financiero se conserva en código para futuras necesidades, pero no se muestra en el dashboard. */
 .dashboard-renewal {
@@ -556,4 +655,538 @@ body {
     justify-content: center;
     font-size: 1.35rem;
 }
+
+/* Centro operativo administrativo */
+.admin-global-search { display:flex; align-items:center; gap:.4rem; background:#fff; border:1px solid #dce8df; border-radius:999px; padding:.25rem .35rem .25rem .75rem; transition:border-color .18s ease, box-shadow .18s ease; }
+.admin-global-search:focus-within { border-color:#198754; box-shadow:0 0 0 .22rem rgba(25,135,84,.12); }
+.admin-global-search input { border:0; outline:0; min-width:190px; font-size:.82rem; background:transparent; }
+.admin-global-search input::-webkit-search-cancel-button { cursor:pointer; }
+.admin-search-summary { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; min-height:42px; padding:.65rem .9rem; border:1px solid #dce9e0; border-radius:13px; background:linear-gradient(90deg,#f7fcf8,#fff); color:#52655a; font-size:.84rem; }
+.admin-search-summary > span:first-child { color:#1d5131; }
+.admin-search-chip { display:inline-flex; align-items:center; border-radius:50rem; padding:.25rem .6rem; background:#e7f4eb; color:#176a42; font-size:.76rem; font-weight:700; }
+.admin-search-chip-state { background:#eef2f5; color:#52606d; }
+.admin-empty-state { display:flex; flex-direction:column; align-items:center; gap:.35rem; color:#66756c; }
+.admin-empty-state > i { color:#198754; font-size:2rem; margin-bottom:.15rem; }
+.admin-empty-state strong { color:#284634; }
+.operation-timeline { max-height:390px; overflow:auto; }
+.operation-item { position:relative; padding:0 0 1rem 1rem; margin-left:.35rem; border-left:2px solid #d9e9dd; font-size:.82rem; }
+.operation-item:before { content:''; position:absolute; width:9px; height:9px; background:#198754; border-radius:50%; left:-5.5px; top:.25rem; }
+@media (max-width: 767.98px) { .admin-global-search { width:100%; order:2; } .admin-global-search input { min-width:0; flex:1; } .commerce-360 .table-responsive { font-size:.8rem; } .list-group-item { padding-left:1rem!important; padding-right:1rem!important; } }
+
+/* --------------------------------------------------------------------------
+   DIRECTORIO DE LUGARES Y COMERCIOS - REDISEÑO Y BUSCADOR AVANZADO
+   -------------------------------------------------------------------------- */
+.place-kpi-card {
+    background: #ffffff;
+    border: 1px solid #e3ece6;
+    border-radius: 1.15rem;
+    padding: 1rem 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    height: 100%;
+}
+
+.place-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(9, 38, 17, 0.07);
+    border-color: #bcd9c6;
+}
+
+.place-kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.place-kpi-val {
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--admin-text-main);
+}
+
+.place-kpi-lbl {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.place-filters-card {
+    background: #ffffff;
+    border: 1px solid #e1ebe4;
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 14px rgba(9, 38, 17, 0.04);
+}
+
+.place-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.place-search-wrapper .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #83978a;
+    font-size: 1.05rem;
+    pointer-events: none;
+}
+
+.place-search-input {
+    width: 100%;
+    border: 1.5px solid #d4e2d8;
+    border-radius: 50rem;
+    padding: 0.65rem 2.8rem 0.65rem 2.75rem;
+    font-size: 0.9rem;
+    background: #fbfdfc;
+    color: var(--admin-text-main);
+    transition: all 0.2s ease;
+}
+
+.place-search-input:focus {
+    background: #ffffff;
+    border-color: #198754;
+    box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
+    outline: none;
+}
+
+.btn-clear-search {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e9ecef;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-clear-search:hover {
+    background: #dee2e6;
+    color: #212529;
+}
+
+.place-filter-select {
+    border: 1.5px solid #d4e2d8;
+    border-radius: 0.75rem;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #384d40;
+    background-color: #fbfdfc;
+    transition: all 0.2s ease;
+}
+
+.place-filter-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.12);
+    outline: none;
+}
+
+.place-table-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6eee8;
+    flex-shrink: 0;
+}
+
+.place-table-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    background: #eaf4ed;
+    color: #198754;
+    border: 1px solid #d3e7d9;
+    flex-shrink: 0;
+}
+
+.action-btn-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+}
+
+.action-btn-circle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   INTERFAZ CREAR/EDITAR FICHA MODERNA (SaaS Layout 2 Columnas)
+   -------------------------------------------------------------------------- */
+.form-section-card {
+    background: #ffffff;
+    border: 1px solid #e3ece6;
+    border-radius: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 4px 16px rgba(9, 38, 17, 0.03);
+    margin-bottom: 1.5rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-section-card:hover {
+    border-color: #bcd9c6;
+    box-shadow: 0 6px 20px rgba(9, 38, 17, 0.05);
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #edf3ef;
+}
+
+.form-section-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    background: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    flex-shrink: 0;
+}
+
+.form-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a2e22;
+    margin-bottom: 0.15rem;
+}
+
+.form-section-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+/* Selector visual de tipo de ficha (Público vs Comercial) */
+.type-choice-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.type-choice-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 1.15rem;
+    border: 2px solid #e2ebe5;
+    border-radius: 1rem;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.type-choice-card:hover {
+    border-color: #9fcdb0;
+    background: #fbfdfc;
+    transform: translateY(-2px);
+}
+
+.type-choice-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.type-choice-card.active,
+.type-choice-card:has(input[type="radio"]:checked) {
+    border-color: #198754;
+    background: #f0fdf4;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.12);
+}
+
+.type-choice-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: #eaf4ed;
+    color: #198754;
+    flex-shrink: 0;
+}
+
+.type-choice-card:has(input[value="COMERCIAL"]:checked) .type-choice-icon {
+    background: rgba(111, 66, 193, 0.12);
+    color: #6f42c1;
+}
+
+/* Selector de categorías en chips compactos */
+.category-pill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 0.6rem;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 0.35rem;
+    border: 1px solid #e5ede8;
+    border-radius: 1rem;
+    background: #fbfdfc;
+}
+
+.category-pill-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.75rem;
+    border: 1.5px solid #e3ece6;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.category-pill-card:hover {
+    border-color: #80bf98;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.category-pill-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.category-pill-card:has(input[type="radio"]:checked) {
+    border-color: #198754;
+    background: #ecfdf5;
+    color: #065f46;
+    box-shadow: 0 0 0 1px #198754;
+}
+
+.category-pill-icon {
+    font-size: 1rem;
+    color: #198754;
+    flex-shrink: 0;
+}
+
+.category-pill-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dropzone de fotos mejorada */
+.dropzone-modern {
+    border: 2px dashed #9fcdb0;
+    border-radius: 1rem;
+    background: #f8fcf9;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.dropzone-modern:hover {
+    background: #f0fdf4;
+    border-color: #198754;
+    transform: translateY(-2px);
+}
+
+.dropzone-modern-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #e2f3e8;
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Tarjeta de Previsualización en Vivo (Sidebar Sticky) */
+.live-preview-card {
+    background: #ffffff;
+    border: 1px solid #e3ece6;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(9, 38, 17, 0.04);
+}
+
+.live-preview-img-box {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background: #edf2ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.live-preview-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.live-preview-badge-type {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50rem;
+    backdrop-filter: blur(4px);
+}
+
+.live-preview-badge-cat {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 50rem;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+}
+
+.live-preview-body {
+    padding: 1.25rem;
+}
+
+.live-preview-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2e22;
+    margin-bottom: 0.35rem;
+}
+
+.live-preview-meta {
+    font-size: 0.78rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sticky-sidebar-box {
+    position: sticky;
+    top: calc(var(--topbar-height) + 1rem);
+}
+
+/* --------------------------------------------------------------------------
+   INTERFAZ BANDEJA DE SOLICITUDES (/admin/solicitudes)
+   -------------------------------------------------------------------------- */
+.solicitud-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #eaf4ed;
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    border: 1px solid #d3e7d9;
+}
+
+.comprobante-preview-btn {
+    border: 1px solid #d9e6de;
+    background: #fbfdfc;
+    border-radius: 10px;
+    padding: 0.35rem 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #1a5632;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.comprobante-preview-btn:hover {
+    background: #e8f4ed;
+    border-color: #198754;
+    color: #0f4022;
+    transform: translateY(-1px);
+}
+
+.comprobante-thumb-mini {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #c7dcd0;
+}
+
+.solicitudes-table-modern thead th {
+    background: #f8faf9;
+    color: #55695d;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid #e1ece5;
+    white-space: nowrap;
+}
+
+.solicitudes-table-modern tbody td {
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #edf3ef;
+    vertical-align: middle;
+}
+
+.solicitudes-table-modern tbody tr:hover td {
+    background-color: #f9fcf9;
+}
+
+
 

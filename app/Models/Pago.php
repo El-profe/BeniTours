@@ -17,7 +17,7 @@ class Pago {
     public function registrar(array $datos): int {
         $meses = filter_var($datos['meses_duracion'] ?? null, FILTER_VALIDATE_INT);
         if ($meses === false || $meses < 1 || $meses > 120) {
-            throw new \InvalidArgumentException('La duración del plan debe ser entre 1 y 120 meses.');
+            throw new \InvalidArgumentException('La duraciÃ³n del plan debe ser entre 1 y 120 meses.');
         }
         $sql = "INSERT INTO pagos (
                     id_lugar, id_tarifa, monto, meses_duracion, fecha_pago_declarada,
@@ -47,7 +47,7 @@ class Pago {
     /**
      * Listado administrativo con estados, establecimiento y vigencias asociadas
      */
-    public function listar(?string $filtroEstado = null): array {
+    public function listar(?string $filtroEstado = null, ?string $buscar = null): array {
         $sql = "SELECT p.*, l.nombre AS nombre_establecimiento, l.slug AS slug_lugar,
                        v.fecha_inicio, v.fecha_vencimiento, v.tipo_periodo,
                        a.nombre AS nombre_admin
@@ -57,10 +57,18 @@ class Pago {
                 LEFT JOIN administradores a ON p.id_administrador_confirmacion = a.id_administrador";
 
         $params = [];
-        if (!empty($filtroEstado) && in_array($filtroEstado, ['PENDIENTE', 'CONFIRMADO', 'ANULADO'])) {
-            $sql .= " WHERE p.estado = :estado";
-            $params[':estado'] = $filtroEstado;
+        $where = [];
+        if (!empty($filtroEstado) && in_array($filtroEstado, ['PENDIENTE', 'CONFIRMADO', 'ANULADO'])) { $where[] = 'p.estado = :estado'; $params[':estado'] = $filtroEstado; }
+        if ($buscar !== null && trim($buscar) !== '') {
+            $termino = trim($buscar);
+            $where[] = '(l.nombre LIKE :buscar_nom OR p.numero_comprobante LIKE :buscar_comp OR p.metodo_pago LIKE :buscar_met OR p.observaciones LIKE :buscar_obs OR CAST(p.monto AS CHAR) LIKE :buscar_monto)';
+            $params[':buscar_nom']   = '%' . $termino . '%';
+            $params[':buscar_comp']  = '%' . $termino . '%';
+            $params[':buscar_met']   = '%' . $termino . '%';
+            $params[':buscar_obs']   = '%' . $termino . '%';
+            $params[':buscar_monto'] = '%' . $termino . '%';
         }
+        if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
 
         $sql .= " ORDER BY p.id_pago DESC";
 

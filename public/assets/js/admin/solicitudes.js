@@ -131,5 +131,88 @@ document.addEventListener('DOMContentLoaded', () => {
             window.BeniTursModalCredenciales.mostrar(data);
         }
     }
+
+    // ==========================================
+    // BUSCADOR EN TIEMPO REAL (LIVE SEARCH)
+    // ==========================================
+    const inputSearch = document.getElementById('inputBuscadorSolicitudes');
+    const btnClear = document.getElementById('btnClearSearchSolicitudes');
+    const btnRestablecerLive = document.getElementById('btnRestablecerLiveSolicitudes');
+    const filaSinResultados = document.getElementById('filaSinResultadosSolicitudes');
+    const textoBusquedaFallida = document.getElementById('textoBusquedaFallidaSolicitudes');
+    const filasSolicitudes = Array.from(document.querySelectorAll('tr.solicitud-row'));
+
+    function filtrarSolicitudesEnVivo() {
+        if (!inputSearch) return;
+
+        const query = (inputSearch.value || '').trim().toLowerCase();
+
+        // Mostrar / ocultar botón de limpieza rápida
+        if (btnClear) {
+            btnClear.style.display = query !== '' ? 'block' : 'none';
+        }
+
+        let visibles = 0;
+
+        filasSolicitudes.forEach(fila => {
+            const dataSearch = fila.getAttribute('data-search') || '';
+            const dataId = fila.getAttribute('data-solicitud') || '';
+
+            let coincide = true;
+            if (query !== '') {
+                const queryLimpia = query.replace(/^#/, '');
+                coincide = dataSearch.includes(query) || (queryLimpia !== '' && dataId === queryLimpia);
+            }
+
+            if (coincide) {
+                fila.style.display = '';
+                visibles++;
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+
+        // Manejar fila de sin resultados
+        if (filaSinResultados) {
+            if (visibles === 0 && filasSolicitudes.length > 0) {
+                filaSinResultados.style.display = '';
+                if (textoBusquedaFallida) {
+                    textoBusquedaFallida.textContent = query !== '' 
+                        ? `No se encontraron resultados para "${inputSearch.value}".`
+                        : 'No hay solicitudes que coincidan.';
+                }
+            } else {
+                filaSinResultados.style.display = 'none';
+            }
+        }
+    }
+
+    if (inputSearch) {
+        inputSearch.addEventListener('input', filtrarSolicitudesEnVivo);
+        // Si al cargar ya tenía valor inicial por GET, sincronizar estado del botón
+        if (inputSearch.value.trim() !== '') {
+            if (btnClear) btnClear.style.display = 'block';
+        }
+    }
+
+    if (btnClear) {
+        btnClear.addEventListener('click', () => {
+            if (inputSearch) {
+                inputSearch.value = '';
+                inputSearch.focus();
+                filtrarSolicitudesEnVivo();
+            }
+        });
+    }
+
+    if (btnRestablecerLive) {
+        btnRestablecerLive.addEventListener('click', () => {
+            if (inputSearch) {
+                inputSearch.value = '';
+                inputSearch.focus();
+                filtrarSolicitudesEnVivo();
+            }
+        });
+    }
 });
 

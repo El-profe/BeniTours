@@ -15,7 +15,7 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titulo ?? 'Mi negocio') ?> | BeniTurs</title>
+    <title><?= htmlspecialchars($titulo ?? 'Mi negocio') ?> | BeniTours</title>
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo2.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo2.png') ?>">
     <!-- Bootstrap 5.3.3 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -33,10 +33,10 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
     <header class="business-header">
         <div class="business-header-inner">
             <!-- Marca y Logo -->
-            <a class="business-brand" href="<?= htmlspecialchars($baseUrl) ?>/negocio/dashboard" title="BeniTurs - Espacio para tu negocio">
+            <a class="business-brand" href="<?= htmlspecialchars($baseUrl) ?>/negocio/dashboard" title="BeniTours - Espacio para tu negocio">
                 <div class="business-brand-logo-badge">
                     <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png" 
-                         alt="BeniTurs" 
+                         alt="BeniTours" 
                          class="business-brand-logo"
                          height="32">
                 </div>
@@ -91,7 +91,7 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
             <div class="d-flex align-items-center gap-2" id="sidebarNegocioMobileLabel">
                 <div class="business-brand-logo-badge">
                     <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png" 
-                         alt="BeniTurs" 
+                         alt="BeniTours" 
                          class="business-brand-logo"
                          height="28">
                 </div>
@@ -150,7 +150,7 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
                     <span>Cerrar Sesión</span>
                 </a>
                 <p class="text-center text-muted extra-small mt-3 mb-0">
-                    BeniTurs &bull; Santísima Trinidad, Beni
+                    BeniTours &bull; Santísima Trinidad, Beni
                 </p>
             </div>
         </div>
@@ -159,7 +159,7 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
     <!-- Contenido Principal -->
     <main id="businessContent" class="business-content"><?= $content ?></main>
 
-    <footer class="business-footer">BeniTurs · Tu negocio, más cerca de sus visitantes.</footer>
+    <footer class="business-footer">BeniTours · Tu negocio, más cerca de sus visitantes.</footer>
 
     <!-- Bootstrap Bundle JS (Local) -->
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
@@ -167,6 +167,9 @@ $nombreNegocio = $_SESSION['negocio_nombre'] ?? 'Mi negocio';
         <!-- Leaflet 1.9.4 JS (Local) -->
         <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/leaflet/leaflet.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/leaflet/leaflet.js') ?>"></script>
         <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/negocio/ubicacion.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/negocio/ubicacion.js') ?>"></script>
+    <?php endif; ?>
+    <?php if ($seccionActual === 'promociones'): ?>
+        <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/negocio/promociones.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/negocio/promociones.js') ?>"></script>
     <?php endif; ?>
 </body>
 </html>

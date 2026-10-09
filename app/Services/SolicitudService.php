@@ -95,7 +95,7 @@ class SolicitudService {
             if (strlen($telefono) === 8) $telefono = '591' . $telefono;
             if (!preg_match('/\A591\d{8}\z/D', $telefono)) throw new RuntimeException('Teléfono boliviano inválido.');
             $config = require dirname(__DIR__, 2) . '/config/app.php';
-            $texto = "Hola {$s['nombre_solicitante']}, ¡tu negocio {$s['nombre_establecimiento']} ya está activo en BeniTurs! " .
+            $texto = "Hola {$s['nombre_solicitante']}, ¡tu negocio {$s['nombre_establecimiento']} ya está activo en BeniTours! " .
                 'Accede a tu portal para gestionar fotos y promociones: ' . rtrim($config['base_url'], '/') .
                 "/negocio/login\nUsuario: {$usuario}\nClave: {$clave}";
             $whatsapp = 'https://wa.me/' . $telefono . '?text=' . rawurlencode($texto);
@@ -145,7 +145,7 @@ class SolicitudService {
         if (strlen($telefono) === 8) $telefono = '591' . $telefono;
 
         $config = require dirname(__DIR__, 2) . '/config/app.php';
-        $texto = "Hola, se ha generado tu nueva clave de acceso para tu comercio \"{$cuenta['nombre']}\" en BeniTurs:\n" .
+        $texto = "Hola, se ha generado tu nueva clave de acceso para tu comercio \"{$cuenta['nombre']}\" en BeniTours:\n" .
             'Accede a tu portal: ' . rtrim($config['base_url'], '/') . "/negocio/login\n" .
             "Usuario: {$cuenta['usuario']}\n" .
             "Nueva Clave: {$nuevaClave}";
@@ -214,7 +214,7 @@ class SolicitudService {
             if (strlen($telefono) === 8) $telefono = '591' . $telefono;
 
             $config = require dirname(__DIR__, 2) . '/config/app.php';
-            $texto = "Hola, ¡tu negocio \"{$lugar['nombre']}\" ya está activo en BeniTurs!\n" .
+            $texto = "Hola, ¡tu negocio \"{$lugar['nombre']}\" ya está activo en BeniTours!\n" .
                 'Accede a tu portal comercial: ' . rtrim($config['base_url'], '/') . "/negocio/login\n" .
                 "Usuario: {$usuario}\n" .
                 "Clave: {$clave}\n" .

@@ -25,7 +25,11 @@ class Lugar {
                        CONCAT(COALESCE(l.latitud, ''), ',', COALESCE(l.longitud, '')) AS coordenadas_gps,
                        c.nombre AS categoria, c.icono AS categoria_icono,
                        m.nombre AS municipio, m.provincia AS municipio_provincia, m.slug AS municipio_slug,
-                       (SELECT f.nombre_archivo FROM fotografias f WHERE f.id_lugar = l.id_lugar AND f.es_principal = 1 LIMIT 1) AS imagen
+                       (SELECT f.nombre_archivo FROM fotografias f WHERE f.id_lugar = l.id_lugar AND f.es_principal = 1 LIMIT 1) AS imagen,
+                       (SELECT p.descuento_texto FROM promociones p 
+                        WHERE p.id_lugar = l.id_lugar AND p.activo = 1 
+                          AND CURDATE() BETWEEN p.fecha_inicio AND p.fecha_fin 
+                        ORDER BY p.id_promocion DESC LIMIT 1) AS promo_activa_texto
                 FROM lugares l
                 INNER JOIN categorias c ON l.id_categoria = c.id_categoria
                 INNER JOIN municipios m ON l.id_municipio = m.id_municipio
@@ -83,14 +87,21 @@ class Lugar {
     }
 
     /**
-     * Lista todos los lugares para el panel administrativo con detalles de visibilidad y municipio.
+     * Lista todos los lugares para el panel administrativo con soporte de filtros combinados.
      */
-    public function listarParaAdmin(): array {
+    public function listarParaAdmin(
+        ?string $buscar = null,
+        ?string $tipoLugar = null,
+        ?int $idCategoria = null,
+        ?int $idMunicipio = null,
+        ?int $habilitado = null,
+        ?int $esVisible = null
+    ): array {
         $visibilidad = PublicacionService::getSqlCondicionVisibilidad('l', 'pub');
-        $sql = "SELECT l.id_lugar, l.id_municipio, l.nombre, l.slug, l.tipo_lugar, l.created_at,
-                       l.latitud, l.longitud,
+        $sql = "SELECT l.id_lugar, l.id_municipio, l.id_categoria, l.nombre, l.slug, l.tipo_lugar, l.created_at,
+                       l.latitud, l.longitud, l.telefono_contacto, l.whatsapp_contacto,
                        CONCAT(COALESCE(l.latitud, ''), ',', COALESCE(l.longitud, '')) AS coordenadas_gps,
-                       c.nombre AS categoria,
+                       c.nombre AS categoria, c.icono AS categoria_icono,
                        m.nombre AS municipio, m.provincia AS municipio_provincia,
                        pub.aprobado, pub.habilitado, pub.motivo_suspension,
                        v.fecha_vencimiento,
@@ -106,9 +117,95 @@ class Lugar {
                     WHERE pg.estado = 'CONFIRMADO'
                     GROUP BY vg.id_lugar
                 ) v ON l.id_lugar = v.id_lugar
-                ORDER BY l.id_lugar DESC";
+                ";
 
-        return $this->db->query($sql)->fetchAll();
+        $where = [];
+        $params = [];
+
+        if ($buscar !== null && trim($buscar) !== '') {
+            $termino = trim($buscar);
+            $terminoId = ltrim($termino, '#');
+            if (is_numeric($terminoId)) {
+                $where[] = "(l.id_lugar = :id_buscar OR l.nombre LIKE :buscar_nom1 OR l.telefono_contacto LIKE :buscar_tel1 OR l.whatsapp_contacto LIKE :buscar_wa1)";
+                $params[':id_buscar'] = (int)$terminoId;
+                $val = '%' . $termino . '%';
+                $params[':buscar_nom1'] = $val;
+                $params[':buscar_tel1'] = $val;
+                $params[':buscar_wa1'] = $val;
+            } else {
+                $where[] = "(l.nombre LIKE :buscar_nom OR l.slug LIKE :buscar_slug OR l.direccion LIKE :buscar_dir OR l.telefono_contacto LIKE :buscar_tel OR l.whatsapp_contacto LIKE :buscar_wa OR c.nombre LIKE :buscar_cat OR m.nombre LIKE :buscar_mun)";
+                $val = '%' . $termino . '%';
+                $params[':buscar_nom'] = $val;
+                $params[':buscar_slug'] = $val;
+                $params[':buscar_dir'] = $val;
+                $params[':buscar_tel'] = $val;
+                $params[':buscar_wa'] = $val;
+                $params[':buscar_cat'] = $val;
+                $params[':buscar_mun'] = $val;
+            }
+        }
+
+        if (!empty($tipoLugar) && in_array($tipoLugar, ['PUBLICO', 'COMERCIAL'], true)) {
+            $where[] = "l.tipo_lugar = :tipo_lugar";
+            $params[':tipo_lugar'] = $tipoLugar;
+        }
+
+        if (!empty($idCategoria) && $idCategoria > 0) {
+            $where[] = "l.id_categoria = :id_categoria";
+            $params[':id_categoria'] = $idCategoria;
+        }
+
+        if (!empty($idMunicipio) && $idMunicipio > 0) {
+            $where[] = "l.id_municipio = :id_municipio";
+            $params[':id_municipio'] = $idMunicipio;
+        }
+
+        if ($habilitado !== null && in_array($habilitado, [0, 1], true)) {
+            $where[] = "pub.habilitado = :habilitado";
+            $params[':habilitado'] = $habilitado;
+        }
+
+        if ($esVisible !== null && in_array($esVisible, [0, 1], true)) {
+            if ($esVisible === 1) {
+                $where[] = $visibilidad;
+            } else {
+                $where[] = "NOT ({$visibilidad})";
+            }
+        }
+
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(' AND ', $where);
+        }
+
+        $sql .= " ORDER BY l.id_lugar DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Retorna conteos analíticos globales para las tarjetas KPI administrativas.
+     */
+    public function obtenerEstadisticasAdmin(): array {
+        $visibilidad = PublicacionService::getSqlCondicionVisibilidad('l', 'pub');
+        $sql = "SELECT 
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN l.tipo_lugar = 'COMERCIAL' THEN 1 ELSE 0 END) AS comerciales,
+                    SUM(CASE WHEN l.tipo_lugar = 'PUBLICO' THEN 1 ELSE 0 END) AS publicos,
+                    SUM(CASE WHEN {$visibilidad} THEN 1 ELSE 0 END) AS visibles,
+                    SUM(CASE WHEN pub.habilitado = 0 THEN 1 ELSE 0 END) AS deshabilitados
+                FROM lugares l
+                LEFT JOIN publicaciones pub ON l.id_lugar = pub.id_lugar";
+        $stmt = $this->db->query($sql);
+        $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return [
+            'total'          => (int)($res['total'] ?? 0),
+            'comerciales'    => (int)($res['comerciales'] ?? 0),
+            'publicos'       => (int)($res['publicos'] ?? 0),
+            'visibles'       => (int)($res['visibles'] ?? 0),
+            'deshabilitados' => (int)($res['deshabilitados'] ?? 0),
+        ];
     }
 
     /**
@@ -224,7 +321,8 @@ class Lugar {
                     telefono_contacto = :telefono,
                     whatsapp_contacto = :whatsapp,
                     email_contacto = :email,
-                    horario_atencion = :horario";
+                    horario_atencion = :horario,
+                    enlace_menu = :enlace_menu";
 
         $params = [
             ':descripcion'  => $datos['descripcion'],
@@ -234,6 +332,7 @@ class Lugar {
             ':whatsapp'     => $datos['whatsapp_contacto'] ?? null,
             ':email'        => $datos['email_contacto'] ?? null,
             ':horario'      => $datos['horario_atencion'] ?? null,
+            ':enlace_menu'  => $datos['enlace_menu'] ?? null,
             ':id'           => $id
         ];
 

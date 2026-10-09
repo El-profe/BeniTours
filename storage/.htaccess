@@ -1,5 +1,7 @@
-# Prohibir acceso web directo a los archivos almacenados
-# Las imágenes y comprobantes se sirven únicamente mediante controladores autorizados
+# storage/.htaccess
+# Bloqueo total de acceso HTTP directo a logs, archivos subidos, cachés y comprobantes
+Options -Indexes -ExecCGI
+
 <IfModule mod_authz_core.c>
     Require all denied
 </IfModule>

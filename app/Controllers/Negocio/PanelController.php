@@ -87,11 +87,19 @@ class PanelController extends Controller {
                 'cumplido' => $tienePromoActiva,
                 'enlace' => $this->config['base_url'] . '/negocio/promociones',
                 'texto_accion' => 'Lanzar promo'
+            ],
+            [
+                'id' => 'menu',
+                'titulo' => 'Menú digital o carta de productos',
+                'descripcion' => 'Permite que los visitantes consulten tu carta, lista de precios o catálogo online.',
+                'cumplido' => !empty(trim($lugar['enlace_menu'] ?? '')),
+                'enlace' => $this->config['base_url'] . '/negocio/perfil',
+                'texto_accion' => 'Añadir menú'
             ]
         ];
 
         $cumplidosCount = count(array_filter($criteriosSalud, fn($c) => $c['cumplido']));
-        $porcentajeSalud = $cumplidosCount * 20;
+        $porcentajeSalud = (int)round(($cumplidosCount / count($criteriosSalud)) * 100);
 
         // Semáforo de vigencia y cobertura publicitaria
         $diasRestantes = null;
@@ -155,6 +163,7 @@ class PanelController extends Controller {
             'diasRestantes'      => $diasRestantes,
             'criteriosSalud'     => $criteriosSalud,
             'porcentajeSalud'    => $porcentajeSalud,
+            'metricasTelemetria' => \App\Services\TelemetriaService::obtenerMetricasLugar($this->idLugar),
             'estadoVigencia'     => $estadoVigencia,
             'urlFichaPublica'    => $urlFichaPublica,
             'mensaje'            => $mensaje,
@@ -312,11 +321,13 @@ class PanelController extends Controller {
             exit();
         }
 
+        $idPromo     = (int)($_POST['id_promocion'] ?? 0);
         $titulo      = trim($_POST['titulo'] ?? '');
         $descripcion = trim($_POST['descripcion'] ?? '');
         $descuento   = trim($_POST['descuento_texto'] ?? '');
         $inicio      = trim($_POST['fecha_inicio'] ?? '');
         $fin         = trim($_POST['fecha_fin'] ?? '');
+        $quitarImg   = !empty($_POST['quitar_imagen']);
 
         if (empty($titulo) || empty($descripcion) || empty($inicio) || empty($fin)) {
             $_SESSION['negocio_error'] = 'Complete todos los campos requeridos (*).';
@@ -324,16 +335,61 @@ class PanelController extends Controller {
             exit();
         }
 
-        $this->promocionModel->crear([
-            'id_lugar'        => $this->idLugar,
-            'titulo'          => $titulo,
-            'descripcion'     => $descripcion,
-            'descuento_texto' => $descuento,
-            'fecha_inicio'    => $inicio,
-            'fecha_fin'       => $fin
-        ]);
+        $imagenArchivo = null;
+        $cambioImagen  = false;
 
-        $_SESSION['negocio_flash'] = 'Promoción guardada. Se mostrará en sus fechas cuando tu ficha esté activa.';
+        if (!empty($_FILES['foto_promocion']['tmp_name'])) {
+            try {
+                $archivoSubido = ImagenService::subirPromocion($_FILES['foto_promocion']);
+                if ($archivoSubido) {
+                    $imagenArchivo = $archivoSubido['nombre_archivo'];
+                    $cambioImagen = true;
+                }
+            } catch (\Throwable $e) {
+                $_SESSION['negocio_error'] = 'Error al subir la imagen: ' . $e->getMessage();
+                header("Location: {$this->config['base_url']}/negocio/promociones");
+                exit();
+            }
+        } elseif ($quitarImg) {
+            $imagenArchivo = null;
+            $cambioImagen = true;
+        }
+
+        if ($idPromo > 0) {
+            $promoExistente = $this->promocionModel->buscarPorId($idPromo, $this->idLugar);
+            if (!$promoExistente) {
+                $_SESSION['negocio_error'] = 'La promoción que intentas editar no existe o no te pertenece.';
+                header("Location: {$this->config['base_url']}/negocio/promociones");
+                exit();
+            }
+
+            $datosActualizar = [
+                'titulo'          => $titulo,
+                'descripcion'     => $descripcion,
+                'descuento_texto' => $descuento,
+                'fecha_inicio'    => $inicio,
+                'fecha_fin'       => $fin
+            ];
+
+            if ($cambioImagen) {
+                $datosActualizar['imagen_archivo'] = $imagenArchivo;
+            }
+
+            $this->promocionModel->actualizar($idPromo, $this->idLugar, $datosActualizar);
+            $_SESSION['negocio_flash'] = 'Promoción actualizada con éxito.';
+        } else {
+            $this->promocionModel->crear([
+                'id_lugar'        => $this->idLugar,
+                'titulo'          => $titulo,
+                'descripcion'     => $descripcion,
+                'descuento_texto' => $descuento,
+                'imagen_archivo'  => $imagenArchivo,
+                'fecha_inicio'    => $inicio,
+                'fecha_fin'       => $fin
+            ]);
+            $_SESSION['negocio_flash'] = 'Promoción guardada con éxito. Se mostrará en sus fechas cuando tu ficha esté activa.';
+        }
+
         header("Location: {$this->config['base_url']}/negocio/promociones");
         exit();
     }
@@ -349,6 +405,19 @@ class PanelController extends Controller {
 
         $this->promocionModel->cambiarEstado($idPromo, $this->idLugar, $activo);
         $_SESSION['negocio_flash'] = $activo ? 'Promoción activada.' : 'Promoción pausada.';
+        header("Location: {$this->config['base_url']}/negocio/promociones");
+        exit();
+    }
+
+    public function eliminarPromocion(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            header("Location: {$this->config['base_url']}/negocio/promociones");
+            exit();
+        }
+
+        $idPromo = (int)($_POST['id_promocion'] ?? 0);
+        $this->promocionModel->eliminar($idPromo, $this->idLugar);
+        $_SESSION['negocio_flash'] = 'Promoción eliminada correctamente.';
         header("Location: {$this->config['base_url']}/negocio/promociones");
         exit();
     }
@@ -385,6 +454,7 @@ class PanelController extends Controller {
             'telefono_contacto' => 30,
             'email_contacto' => 120,
             'horario_atencion' => 150,
+            'enlace_menu' => 255,
         ];
         $datos = [];
         foreach ($campos as $campo => $longitudMaxima) {

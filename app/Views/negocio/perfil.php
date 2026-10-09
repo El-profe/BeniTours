@@ -84,6 +84,17 @@
                                placeholder="Ej. Lunes a Sábado: 08:00 a 22:00" maxlength="200">
                     </div>
                 </div>
+
+                <div class="col-12">
+                    <label for="enlace_menu" class="form-label small fw-semibold">Menú Digital / Carta de Productos (Enlace Web o PDF)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-info-subtle text-info border-end-0"><i class="bi bi-book-half"></i></span>
+                        <input type="url" id="enlace_menu" name="enlace_menu" class="form-control" 
+                               value="<?= htmlspecialchars($lugar['enlace_menu'] ?? '') ?>" 
+                               placeholder="Ej. https://mi-menu-digital.com o enlace público a PDF en Google Drive" maxlength="255">
+                    </div>
+                    <small class="text-muted extra-small">Si agregas este enlace, los turistas verán un botón destacado para consultar tu menú o carta en tu ficha pública.</small>
+                </div>
             </div>
 
             <!-- Ubicación y Descripción -->

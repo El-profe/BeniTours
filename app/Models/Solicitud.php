@@ -54,7 +54,7 @@ class Solicitud {
         return (int)$this->db->lastInsertId();
     }
 
-    public function listar(?string $estado = null): array {
+    public function listar(?string $estado = null, ?string $buscar = null): array {
         $sql = "SELECT s.*, c.nombre AS categoria, c.icono AS categoria_icono,
                        m.nombre AS municipio, m.provincia AS municipio_provincia,
                        l.id_lugar AS id_lugar_creado, l.slug AS slug_lugar_creado,
@@ -66,10 +66,20 @@ class Solicitud {
                 LEFT JOIN cuentas_negocio cn ON cn.id_lugar = l.id_lugar";
 
         $params = [];
-        if (!empty($estado) && in_array($estado, ['PENDIENTE', 'ACEPTADA', 'RECHAZADA'])) {
-            $sql .= " WHERE s.estado = :estado";
-            $params[':estado'] = $estado;
+        $where = [];
+        if (!empty($estado) && in_array($estado, ['PENDIENTE', 'ACEPTADA', 'RECHAZADA'])) { $where[] = 's.estado = :estado'; $params[':estado'] = $estado; }
+        if ($buscar !== null && trim($buscar) !== '') {
+            $where[] = '(s.nombre_establecimiento LIKE :buscar_establecimiento
+                OR s.nombre_solicitante LIKE :buscar_solicitante
+                OR s.telefono_contacto LIKE :buscar_telefono
+                OR c.nombre LIKE :buscar_categoria)';
+            $termino = '%' . trim($buscar) . '%';
+            $params[':buscar_establecimiento'] = $termino;
+            $params[':buscar_solicitante'] = $termino;
+            $params[':buscar_telefono'] = $termino;
+            $params[':buscar_categoria'] = $termino;
         }
+        if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
 
         $sql .= " ORDER BY s.id_solicitud DESC";
 

@@ -3,7 +3,7 @@
  * Utiliza HTML5 Canvas y la API DataTransfer para reducir fotos pesadas a ~150-250 KB
  * antes de transmitirlas por la red hacia el servidor.
  * 
- * BeniTurs / Trinidad Turismo
+ * BeniTours / Trinidad Turismo
  */
 const CompresorImagen = (() => {
     'use strict';

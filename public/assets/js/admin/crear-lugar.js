@@ -104,6 +104,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (seccionComercial) {
             seccionComercial.classList.toggle('d-none', !esComercial);
         }
+        // Actualizar Badge en Live Preview
+        const previewBadge = document.getElementById('previewTypeBadge');
+        if (previewBadge) {
+            if (esComercial) {
+                previewBadge.className = 'live-preview-badge-type bg-purple text-white';
+                previewBadge.style.backgroundColor = '#6f42c1';
+                previewBadge.innerHTML = '<i class="bi bi-shop me-1"></i>Comercial';
+            } else {
+                previewBadge.className = 'live-preview-badge-type bg-success text-white';
+                previewBadge.style.backgroundColor = '#198754';
+                previewBadge.innerHTML = '<i class="bi bi-tree me-1"></i>Público';
+            }
+        }
     }
 
     radiosTipo.forEach(radio => {
@@ -116,5 +129,78 @@ document.addEventListener('DOMContentLoaded', () => {
             camposAprov.classList.toggle('d-none', !switchCrear.checked);
         }
     });
+
+    // Sincronización en Tiempo Real con la Live Preview Card
+    const inputNombre = document.getElementById('inputNombreLugar');
+    const previewTitle = document.getElementById('previewTitle');
+    const selectMunicipio = document.getElementById('selectMunicipio');
+    const previewMunicipio = document.getElementById('previewMunicipio');
+    const inputDireccion = document.getElementById('inputDireccion');
+    const previewDireccion = document.getElementById('previewDireccion');
+    const inputDesc = document.getElementById('inputDescripcionLugar');
+    const previewDesc = document.getElementById('previewDesc');
+    const radiosCat = document.querySelectorAll('input[name="id_categoria"]');
+    const previewCatBadge = document.getElementById('previewCatBadge');
+    const previewPlaceholder = document.getElementById('previewPlaceholderIcon');
+    const previewImg = document.getElementById('previewImgElement');
+
+    inputNombre?.addEventListener('input', () => {
+        const val = inputNombre.value.trim();
+        if (previewTitle) previewTitle.textContent = val || 'Nombre del Establecimiento';
+    });
+
+    selectMunicipio?.addEventListener('change', () => {
+        const txt = selectMunicipio.options[selectMunicipio.selectedIndex]?.text.split('(')[0]?.trim();
+        if (previewMunicipio) previewMunicipio.textContent = txt || 'Trinidad';
+    });
+
+    inputDireccion?.addEventListener('input', () => {
+        const val = inputDireccion.value.trim();
+        if (previewDireccion) previewDireccion.textContent = val || 'Dirección pendiente';
+    });
+
+    inputDesc?.addEventListener('input', () => {
+        const val = inputDesc.value.trim();
+        if (previewDesc) previewDesc.textContent = val || 'Descripción preliminar de la ficha turística...';
+    });
+
+    radiosCat.forEach(radio => {
+        radio.addEventListener('change', () => {
+            const catNombre = radio.dataset.nombreCat || 'General';
+            if (previewCatBadge) previewCatBadge.textContent = catNombre;
+        });
+    });
+
+    // Actualizar foto en la preview al seleccionar portada
+    const actualizarPreviewPortada = (imgSrc) => {
+        if (!previewImg) return;
+        if (imgSrc) {
+            previewImg.src = imgSrc;
+            previewImg.style.display = 'block';
+            if (previewPlaceholder) previewPlaceholder.style.display = 'none';
+        } else {
+            previewImg.style.display = 'none';
+            if (previewPlaceholder) previewPlaceholder.style.display = 'block';
+        }
+    };
+
+    // Enganchar con la selección de fotos
+    const originalElegirPortada = elegirPortada;
+    const elegirPortadaConPreview = (indice) => {
+        originalElegirPortada(indice);
+        const cardTarget = previews.querySelector(`[data-foto-indice="${indice}"] img`);
+        if (cardTarget && cardTarget.src) {
+            actualizarPreviewPortada(cardTarget.src);
+        }
+    };
+
+    // Reasignar el selector de portada interactivo
+    previews.addEventListener('click', (e) => {
+        const card = e.target.closest('.image-preview-card');
+        if (card && card.dataset.fotoIndice !== undefined) {
+            elegirPortadaConPreview(Number(card.dataset.fotoIndice));
+        }
+    });
 });
+
 

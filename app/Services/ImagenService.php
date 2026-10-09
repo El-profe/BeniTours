@@ -6,6 +6,7 @@ namespace App\Services;
  */
 class ImagenService {
     private static ?string $directorio = null;
+    private static ?string $directorioPromociones = null;
 
     public static function getDirectorioStorage(): string {
         $dir = self::$directorio ?? dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'lugares' . DIRECTORY_SEPARATOR;
@@ -15,11 +16,30 @@ class ImagenService {
         return $dir;
     }
 
+    /** Almacenamiento exclusivo para flyers e imágenes de promociones. */
+    public static function getDirectorioPromociones(): string {
+        $dir = self::$directorioPromociones ?? dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'promociones' . DIRECTORY_SEPARATOR;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        return $dir;
+    }
+
+    /** Devuelve una ruta solo para nombres internos permitidos. */
+    public static function getRutaArchivo(string $nombre): ?string {
+        if (!preg_match('/\A(lugar|promo)_[a-f0-9]{16}_[0-9]+\.(jpg|png|webp)\z/D', $nombre)) {
+            return null;
+        }
+        return str_starts_with($nombre, 'promo_')
+            ? self::getDirectorioPromociones() . $nombre
+            : self::getDirectorioStorage() . $nombre;
+    }
+
     public static function eliminarArchivo(string $nombre): bool {
-        if (!preg_match('/\Alugar_[a-f0-9]{16}_[0-9]+\.(jpg|png|webp)\z/D', $nombre)) {
+        $ruta = self::getRutaArchivo($nombre);
+        if ($ruta === null) {
             throw new \InvalidArgumentException('Nombre de fotografía inválido.');
         }
-        $ruta = self::getDirectorioStorage() . $nombre;
         if (is_link($ruta)) throw new \RuntimeException('Archivo no permitido.');
         return !is_file($ruta) || unlink($ruta);
     }
@@ -58,6 +78,37 @@ class ImagenService {
 
         if (!self::optimizarYGuardar($file['tmp_name'], $destino, $mime)) {
             throw new \RuntimeException('No se pudo guardar la fotografía en el servidor.');
+        }
+
+        return [
+            'nombre_archivo'  => $nombreServidor,
+            'nombre_original' => basename($file['name']),
+            'mime_type'       => $mime,
+            'tamano_bytes'    => (int)filesize($destino)
+        ];
+    }
+
+    /** Procesa y guarda un flyer en el directorio exclusivo de promociones. */
+    public static function subirPromocion(array $file): ?array {
+        if (empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            throw new \RuntimeException('La imagen excede el tamaÃ±o mÃ¡ximo permitido de 5 MB.');
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        $mimesPermitidos = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+        if (!array_key_exists($mime, $mimesPermitidos)) {
+            throw new \RuntimeException('Formato de imagen no admitido. Use JPG, PNG o WEBP.');
+        }
+
+        $nombreServidor = 'promo_' . bin2hex(random_bytes(8)) . '_' . time() . '.' . $mimesPermitidos[$mime];
+        $destino = self::getDirectorioPromociones() . $nombreServidor;
+        if (!self::optimizarYGuardar($file['tmp_name'], $destino, $mime)) {
+            throw new \RuntimeException('No se pudo guardar la imagen de la promociÃ³n.');
         }
 
         return [
@@ -129,4 +180,3 @@ class ImagenService {
         return $ok;
     }
 }
-

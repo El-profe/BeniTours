@@ -97,6 +97,63 @@
                 </small>
             </div>
         </div>
+    <!-- MÓDULO DE IMPACTO COMERCIAL Y CLIENTES GENERADOS (TELEMETRÍA EN VIVO) -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white border-start border-4 border-success">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+                <span class="text-success small fw-bold text-uppercase d-block mb-1">
+                    <i class="bi bi-graph-up-arrow me-1"></i> Retorno de Inversión y Visibilidad
+                </span>
+                <h5 class="fw-bold text-dark mb-0">Rendimiento de tu Ficha este Mes</h5>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 small">
+                <i class="bi bi-person-check-fill me-1"></i> <?= $metricasTelemetria['clientes_potenciales_mes'] ?> Contactos Directos este Mes
+            </span>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                    <i class="bi bi-eye text-primary fs-3 d-block mb-1"></i>
+                    <h3 class="fw-bold text-dark mb-0"><?= $metricasTelemetria['vistas_mes'] ?></h3>
+                    <small class="text-muted extra-small d-block fw-semibold">Vistas de Ficha</small>
+                    <?php if ($metricasTelemetria['variacion_vistas'] !== null): ?>
+                        <span class="badge <?= $metricasTelemetria['variacion_vistas'] >= 0 ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted' ?> rounded-pill extra-small mt-1">
+                            <?= $metricasTelemetria['variacion_vistas'] >= 0 ? '+' : '' ?><?= $metricasTelemetria['variacion_vistas'] ?>% vs mes ant.
+                        </span>
+                    <?php else: ?>
+                        <span class="extra-small text-muted mt-1 d-block">Mes inicial</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                    <i class="bi bi-whatsapp text-success fs-3 d-block mb-1"></i>
+                    <h3 class="fw-bold text-success mb-0"><?= $metricasTelemetria['whatsapp_mes'] ?></h3>
+                    <small class="text-muted extra-small d-block fw-semibold">Clics en WhatsApp</small>
+                    <span class="extra-small text-muted mt-1 d-block">Consultas directas</span>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                    <i class="bi bi-geo-alt-fill text-danger fs-3 d-block mb-1"></i>
+                    <h3 class="fw-bold text-dark mb-0"><?= $metricasTelemetria['mapa_mes'] ?></h3>
+                    <small class="text-muted extra-small d-block fw-semibold">Rutas en Mapa</small>
+                    <span class="extra-small text-muted mt-1 d-block">Clics "Cómo llegar"</span>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                    <i class="bi bi-heart-fill text-danger fs-3 d-block mb-1"></i>
+                    <h3 class="fw-bold text-dark mb-0"><?= $metricasTelemetria['favoritos_mes'] ?></h3>
+                    <small class="text-muted extra-small d-block fw-semibold">En Rutas Turísticas</small>
+                    <span class="extra-small text-muted mt-1 d-block">Guardado en Favoritos</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- FILA PRINCIPAL (2 Columnas) -->
@@ -345,7 +402,7 @@
                                 if (strlen($telRaw) === 8) $telRaw = '591' . $telRaw;
                             ?>
                             <?php if (!empty($telRaw)): ?>
-                                <a href="https://wa.me/<?= $telRaw ?>?text=<?= rawurlencode('Hola, vi su negocio en BeniTurs y deseo hacer una consulta.') ?>" 
+                                <a href="https://wa.me/<?= $telRaw ?>?text=<?= rawurlencode('Hola, vi su negocio en BeniTours y deseo hacer una consulta.') ?>" 
                                    target="_blank" 
                                    class="btn btn-outline-success btn-sm rounded-pill fw-semibold py-1">
                                     <i class="bi bi-whatsapp me-1"></i> Probar botón de WhatsApp
@@ -381,7 +438,7 @@
                 </p>
 
                 <!-- Campo de Enlace con Copiado Rápido -->
-                <label class="form-label extra-small fw-bold text-uppercase text-muted mb-1">Tu enlace en BeniTurs</label>
+                <label class="form-label extra-small fw-bold text-uppercase text-muted mb-1">Tu enlace en BeniTours</label>
                 <div class="input-group input-group-sm mb-3">
                     <input type="text" id="inputEnlaceFicha" class="form-control bg-light border-end-0 font-monospace extra-small" 
                            value="<?= htmlspecialchars($urlFichaPublica) ?>" readonly>
@@ -423,52 +480,71 @@
             </div>
             <div class="modal-body p-4 text-center">
                 
-                <!-- Área imprimible del QR -->
-                <div id="areaQrImprimible" class="p-4 border rounded-4 bg-white shadow-sm mx-auto" style="max-width: 360px;">
-                    <div class="mb-2">
-                        <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1 small text-uppercase">
-                            BeniTurs &bull; Trinidad
+                <!-- Área imprimible del QR / Afiche Oficial -->
+                <div id="areaQrImprimible" class="p-4 border rounded-4 bg-white shadow-sm mx-auto position-relative" style="max-width: 380px;">
+                    <!-- Encabezado Institucional -->
+                    <div class="text-center mb-3">
+                        <span class="badge bg-success text-white fw-bold rounded-pill px-3 py-1 small text-uppercase shadow-sm">
+                            <i class="bi bi-compass-fill me-1"></i> BeniTours &bull; Trinidad
+                        </span>
+                        <p class="text-muted extra-small mb-0 mt-1">Guía Turística y Comercial Oficial del Beni</p>
+                    </div>
+
+                    <div class="border-top border-bottom py-2 my-2 text-center">
+                        <h4 class="fw-bold text-dark mb-0"><?= htmlspecialchars($lugar['nombre']) ?></h4>
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2 py-0 extra-small fw-semibold mt-1">
+                            <?= htmlspecialchars($lugar['categoria'] ?? 'Establecimiento') ?>
                         </span>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($lugar['nombre']) ?></h5>
-                    <p class="text-muted extra-small mb-3"><?= htmlspecialchars($lugar['categoria'] ?? 'Directorio Turístico') ?></p>
 
-                    <!-- Imagen QR Generada Dinámicamente -->
+                    <!-- Código QR Dinámico en Alta Resolución -->
                     <?php 
-                        $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=" . urlencode($urlFichaPublica);
+                        $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=" . urlencode($urlFichaPublica);
                     ?>
-                    <div class="qr-container bg-white p-2 rounded-3 border d-inline-block mb-3">
+                    <div class="qr-container bg-white p-3 rounded-4 border border-2 border-success-subtle d-inline-block my-2 shadow-sm">
                         <img src="<?= htmlspecialchars($qrApiUrl) ?>" 
-                             alt="QR de <?= htmlspecialchars($lugar['nombre']) ?>" 
+                             alt="Código QR de <?= htmlspecialchars($lugar['nombre']) ?>" 
                              class="img-fluid rounded" 
                              style="width: 220px; height: 220px;">
                     </div>
 
-                    <p class="text-dark small fw-semibold mb-1">
-                        ¡Escanea con tu celular!
-                    </p>
-                    <p class="text-muted extra-small mb-0">
-                        Consulta nuestro menú, galería de fotos, horarios y promociones en la guía turística oficial.
-                    </p>
+                    <div class="text-center">
+                        <h6 class="fw-bold text-dark mb-1">
+                            <i class="bi bi-camera-fill text-success me-1"></i> ¡Escanea con tu Celular!
+                        </h6>
+                        <p class="text-muted extra-small mb-2 px-2">
+                            Descubre nuestro menú, galería de fotos, horarios de atención, promociones y ubicación exacta.
+                        </p>
+                    </div>
+
+                    <!-- Pie con Datos de Contacto Directo -->
+                    <div class="bg-light rounded-3 p-2 text-start extra-small border">
+                        <?php if (!empty($lugar['direccion'])): ?>
+                            <div class="text-truncate mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <strong>Dirección:</strong> <?= htmlspecialchars($lugar['direccion']) ?></div>
+                        <?php endif; ?>
+                        <?php if (!empty($lugar['whatsapp_contacto'])): ?>
+                            <div><i class="bi bi-whatsapp text-success me-1"></i> <strong>WhatsApp:</strong> <?= htmlspecialchars($lugar['whatsapp_contacto']) ?></div>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <p class="text-muted extra-small mt-3 mb-0">
-                    Coloca este cartel en tus mesas, cartas o mostrador de atención.
+                    <i class="bi bi-info-circle me-1"></i> Recomendado: Imprime en hoja A4 o tamaño carta y colócalo en tus mesas, mostrador o puerta de entrada.
                 </p>
             </div>
             <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
                 <button type="button" class="btn btn-light rounded-pill px-3 small fw-semibold" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="button" class="btn btn-primary rounded-pill px-4 fw-semibold" onclick="imprimirQrCartel()">
-                    <i class="bi bi-printer me-1"></i> Imprimir Cartel
+                <button type="button" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" onclick="imprimirQrCartel()">
+                    <i class="bi bi-printer me-1"></i> Imprimir Afiche Oficial
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script del Dashboard para Copiado Rápido e Impresión -->
+<!-- Script del Dashboard para Copiado Rápido e Impresión del Afiche -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const btnCopiar = document.getElementById('btnCopiarEnlaceFicha');
@@ -498,14 +574,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function imprimirQrCartel() {
     const contenido = document.getElementById('areaQrImprimible').innerHTML;
-    const ventanaImpresion = window.open('', '_blank', 'width=650,height=750');
+    const ventanaImpresion = window.open('', '_blank', 'width=800,height=900');
     ventanaImpresion.document.write(`
         <!DOCTYPE html>
-        <html>
+        <html lang="es">
         <head>
-            <title>Imprimir QR - <?= htmlspecialchars(addslashes($lugar['nombre'])) ?></title>
+            <meta charset="UTF-8">
+            <title>Afiche Oficial - <?= htmlspecialchars(addslashes($lugar['nombre'])) ?></title>
             <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css">
+            <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
             <style>
+                @page {
+                    size: A4 portrait;
+                    margin: 1.5cm;
+                }
                 body {
                     display: flex;
                     align-items: center;
@@ -513,24 +595,38 @@ function imprimirQrCartel() {
                     min-height: 100vh;
                     background: #f8f9fa;
                     font-family: system-ui, -apple-system, sans-serif;
+                    margin: 0;
+                    padding: 20px;
                 }
-                .card-qr-print {
-                    max-width: 400px;
-                    border: 2px solid #20392e;
-                    border-radius: 20px;
-                    padding: 30px;
+                .afiche-container {
+                    max-width: 480px;
+                    width: 100%;
+                    border: 3px solid #198754;
+                    border-radius: 28px;
+                    padding: 35px 25px;
                     text-align: center;
-                    background: #fff;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                    background: #ffffff;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                }
+                .afiche-container img {
+                    max-width: 260px;
+                    height: auto;
                 }
                 @media print {
-                    body { background: #fff; }
-                    .card-qr-print { border: 2px solid #000; box-shadow: none; }
+                    body {
+                        background: #ffffff !important;
+                        padding: 0 !important;
+                    }
+                    .afiche-container {
+                        box-shadow: none !important;
+                        border: 3px solid #198754 !important;
+                        page-break-inside: avoid;
+                    }
                 }
             </style>
         </head>
-        <body onload="window.print(); window.close();">
-            <div class="card-qr-print">
+        <body onload="setTimeout(() => { window.print(); window.close(); }, 400);">
+            <div class="afiche-container">
                 ${contenido}
             </div>
         </body>

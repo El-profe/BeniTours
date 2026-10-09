@@ -7,7 +7,7 @@ $qrSrc = $qrValido ? (preg_match('~\Ahttps?://~i', $qr) ? $qr : $baseUrl . $qr) 
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Renovación de Membresía</h1>
-            <p class="text-muted small mb-0">Mantén activo y visible tu negocio en la guía turística y comercial BeniTurs.</p>
+            <p class="text-muted small mb-0">Mantén activo y visible tu negocio en la guía turística y comercial BeniTours.</p>
         </div>
         <a href="<?= htmlspecialchars($baseUrl) ?>/negocio/dashboard" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
             <i class="bi bi-arrow-left me-1"></i> Volver al Panel

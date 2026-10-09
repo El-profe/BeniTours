@@ -46,16 +46,17 @@ class DashboardController extends Controller {
                                                 AND (v.max_venc IS NULL OR v.max_venc < CURDATE())")->fetchColumn();
 
         // 2. Gráfico 1: Recaudación mensual de los últimos 6 meses
-        $visitas = AnaliticaVisitasService::resumen();
-        $graficoVisitas = AnaliticaVisitasService::ultimosSeisMeses();
+        $analiticaVisitas = AnaliticaVisitasService::obtenerAnaliticaCompleta();
+        $visitas = $analiticaVisitas['resumen'];
+        $graficoVisitas = $analiticaVisitas['meses'];
 
         // 3. Gráfico 2: Distribución de lugares por categoría
-        $stmtCat = $db->query("SELECT c.nombre, COUNT(l.id_lugar) as cantidad
+        $stmtCat = $db->query("SELECT c.id_categoria, c.nombre, c.slug, c.icono, COUNT(l.id_lugar) as cantidad
                                FROM categorias c
                                LEFT JOIN lugares l ON c.id_categoria = l.id_categoria AND l.tipo_lugar = 'COMERCIAL'
                                WHERE c.activo = 1
-                               GROUP BY c.id_categoria, c.nombre
-                               ORDER BY cantidad DESC");
+                               GROUP BY c.id_categoria, c.nombre, c.slug, c.icono
+                               ORDER BY cantidad DESC, c.nombre ASC");
         $cats = $stmtCat->fetchAll(PDO::FETCH_ASSOC);
         $graficoCategorias = [
             'labels' => array_column($cats, 'nombre'),
@@ -105,28 +106,28 @@ class DashboardController extends Controller {
                 $estado = 'SIN_PAGO';
                 $badgeClase = 'bg-danger text-white';
                 $badgeTexto = 'Sin vigencia';
-                $mensaje = "Hola *{$r['nombre']}*, le saludamos del equipo de *BeniTurs Trinidad*. Notamos que aún no cuenta con una membresía comercial activa para su negocio en la guía turística. Para activar su ficha en el catálogo y mapa oficial, puede realizar su pago mensual de Bs " . number_format($r['monto_estimado'], 0) . " mediante QR o transferencia. ¿Desea que le enviemos los datos de pago?";
+                $mensaje = "Hola *{$r['nombre']}*, le saludamos del equipo de *BeniTours Trinidad*. Notamos que aún no cuenta con una membresía comercial activa para su negocio en la guía turística. Para activar su ficha en el catálogo y mapa oficial, puede realizar su pago mensual de Bs " . number_format($r['monto_estimado'], 0) . " mediante QR o transferencia. ¿Desea que le enviemos los datos de pago?";
             } elseif ($dias < 0) {
                 $estado = 'VENCIDO';
                 $diasPasados = abs($dias);
                 $badgeClase = 'bg-danger text-white';
                 $badgeTexto = "Venció hace {$diasPasados}d";
-                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTurs Trinidad*. Le recordamos que su membresía comercial en la guía turística y mapa oficial venció el {$fechaFmt}. Para reactivar la visibilidad de su negocio y promociones ante los turistas, puede realizar su renovación por transferencia o QR bancario. ¿Desea que le compartamos los datos de pago?";
+                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTours Trinidad*. Le recordamos que su membresía comercial en la guía turística y mapa oficial venció el {$fechaFmt}. Para reactivar la visibilidad de su negocio y promociones ante los turistas, puede realizar su renovación por transferencia o QR bancario. ¿Desea que le compartamos los datos de pago?";
             } elseif ($dias <= 7) {
                 $estado = 'URGENTE';
                 $badgeClase = 'bg-warning text-dark fw-bold animate-pulse';
                 $badgeTexto = $dias === 0 ? '¡Vence HOY!' : "Vence en {$dias}d";
-                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTurs Trinidad*. Le recordamos que su membresía comercial en la guía turística vence el {$fechaFmt} (en {$dias} días). Para mantener la visibilidad de su establecimiento sin ninguna interrupción, puede realizar su renovación anticipada por transferencia o QR bancario. ¿Gusta que le enviemos los datos de cuenta?";
+                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTours Trinidad*. Le recordamos que su membresía comercial en la guía turística vence el {$fechaFmt} (en {$dias} días). Para mantener la visibilidad de su establecimiento sin ninguna interrupción, puede realizar su renovación anticipada por transferencia o QR bancario. ¿Gusta que le enviemos los datos de cuenta?";
             } elseif ($dias <= 15) {
                 $estado = 'POR_VENCER';
                 $badgeClase = 'bg-info-subtle text-info-emphasis border border-info-subtle';
                 $badgeTexto = "Vence en {$dias}d";
-                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTurs Trinidad*. Le recordamos que su membresía comercial en la plataforma turística vence el {$fechaFmt} (en {$dias} días). Para asegurar la continuidad de su ficha en el catálogo y mapa interactivo, ya puede gestionar su renovación. ¿Desea que le facilitemos los datos de pago?";
+                $mensaje = "Hola *{$r['nombre']}*, le saludamos cordialmente del equipo de *BeniTours Trinidad*. Le recordamos que su membresía comercial en la plataforma turística vence el {$fechaFmt} (en {$dias} días). Para asegurar la continuidad de su ficha en el catálogo y mapa interactivo, ya puede gestionar su renovación. ¿Desea que le facilitemos los datos de pago?";
             } else {
                 $estado = 'AL_DIA';
                 $badgeClase = 'bg-success-subtle text-success border border-success-subtle';
                 $badgeTexto = "Al día ({$dias}d)";
-                $mensaje = "Hola *{$r['nombre']}*, le saludamos del equipo de *BeniTurs Trinidad*. Le agradecemos por formar parte de la guía turística oficial. Su membresía se encuentra al día con vencimiento el {$fechaFmt}. Quedamos atentos para cualquier actualización en su ficha o promociones.";
+                $mensaje = "Hola *{$r['nombre']}*, le saludamos del equipo de *BeniTours Trinidad*. Le agradecemos por formar parte de la guía turística oficial. Su membresía se encuentra al día con vencimiento el {$fechaFmt}. Quedamos atentos para cualquier actualización en su ficha o promociones.";
             }
 
             $waUrl = !empty($telefonoRaw) ? "https://wa.me/{$telefonoRaw}?text=" . rawurlencode($mensaje) : null;
@@ -154,6 +155,7 @@ class DashboardController extends Controller {
                                       INNER JOIN categorias c ON l.id_categoria = c.id_categoria 
                                       ORDER BY l.id_lugar DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 
+
         $this->render('admin/dashboard', [
             'titulo'              => 'Dashboard & Analítica',
             'adminNombre'         => $_SESSION['admin_nombre'] ?? 'Administrador',
@@ -170,6 +172,7 @@ class DashboardController extends Controller {
                 'visitasMes'         => $visitas['mes'],
             ],
             'graficoVisitas'      => $graficoVisitas,
+            'graficoVisitasDiarias' => $analiticaVisitas['dias'],
             'graficoCategorias'   => $graficoCategorias,
             'categoriasComercios' => $cats,
             'recordatoriosCobro'  => $recordatoriosCobro,

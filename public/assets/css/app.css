@@ -22,13 +22,16 @@ body {
 .page-home > .navbar-trinidad {
     position: fixed;
     inset: 0 0 auto;
-    z-index: 10;
+    /* Debe quedar por encima de los controles de las tarjetas. */
+    z-index: 1030;
     background: rgba(9, 42, 17, 0.94);
     backdrop-filter: blur(8px);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
+#inicio,
 #explorar,
+#promociones,
 #guia-trinidad,
 #transporte,
 #unirse {
@@ -50,11 +53,20 @@ body {
     width: auto;
     max-height: 52px;
     object-fit: contain;
-    transition: transform 0.25s ease;
+    transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 .navbar-logo:hover {
     transform: scale(1.03);
+}
+
+.navbar-logo--cambiando {
+    opacity: 0;
+}
+
+/* logo3 requiere una presencia visual ligeramente mayor. */
+.navbar-logo--alterno {
+    transform: scale(1.12);
 }
 
 /* Ajuste proporcional para celulares */
@@ -77,9 +89,8 @@ body {
     overflow: hidden;
     position: relative;
     isolation: isolate;
-    background: radial-gradient(circle at 80% 20%, rgba(255, 193, 7, 0.15), transparent 35%),
-                linear-gradient(135deg, rgba(9, 42, 17, 0.82) 0%, rgba(21, 87, 36, 0.88) 100%),
-                url('../img/hero-poster.webp') center/cover no-repeat;
+    /* El póster solo se muestra mientras carga el video o si este no está disponible. */
+    background: url('../img/hero-poster.webp') center/cover no-repeat;
 }
 .hero-video {
     position: absolute;
@@ -91,12 +102,7 @@ body {
     object-fit: cover;
     object-position: center center;
     pointer-events: none;
-    opacity: 0.65;
-}
-@media (max-width: 768px) {
-    .hero-video {
-        display: none !important;
-    }
+    opacity: 1;
 }
 .hero-content {
     position: relative;
@@ -129,7 +135,74 @@ body {
     box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.25) !important;
 }
 
+/* Selector de municipio: más claro, visible y cómodo de usar. */
+.municipio-filter {
+    display: flex;
+    min-height: 48px;
+    width: min(100%, 460px);
+    box-sizing: border-box;
+    border: 1px solid rgba(13, 59, 24, 0.14);
+    background: linear-gradient(135deg, #ffffff, #f1f8f3);
+    box-shadow: 0 6px 18px rgba(13, 59, 24, 0.10);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.municipio-filter:focus-within {
+    border-color: var(--trini-green-light);
+    box-shadow: 0 0 0 .22rem rgba(27, 99, 44, 0.15), 0 8px 20px rgba(13, 59, 24, 0.12);
+    transform: translateY(-1px);
+}
+
+.municipio-filter-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    margin-right: .55rem;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--trini-green-light);
+}
+
+.municipio-filter-label {
+    color: var(--trini-green);
+}
+
+#selectMunicipio {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+    color: var(--trini-green) !important;
+    cursor: pointer;
+}
+
+#selectMunicipio:focus {
+    box-shadow: none;
+}
+
 @media (max-width: 575.98px) {
+    .municipio-filter {
+        width: min(100%, 350px);
+    }
+
+    #selectMunicipio {
+        font-size: .88rem;
+    }
+}
+
+/* La distancia se muestra abajo a la derecha de la imagen de cada tarjeta. */
+.distance-badge-position {
+    z-index: 2;
+}
+
+@media (max-width: 575.98px) {
+
+    #btnFlotanteItinerario {
+        margin: 1rem !important;
+        min-width: 0;
+    }
+
 
     .hero-content {
         padding-right: 1rem !important;
@@ -326,7 +399,7 @@ body {
     }
 }
 
-/* Footer público BeniTurs. */
+/* Footer público BeniTours. */
 .site-footer {
     position: relative;
     overflow: hidden;
@@ -383,6 +456,25 @@ body {
     width: 100%;
     height: clamp(260px, 45vw, 380px);
     border: 0;
+}
+
+.menu-drive-card {
+    background: linear-gradient(135deg, #f7fbf8, #eef7f0);
+}
+
+.menu-drive-card p {
+    max-width: 27rem;
+}
+
+.menu-drive-icon {
+    display: inline-grid;
+    width: 3.4rem;
+    height: 3.4rem;
+    place-items: center;
+    border-radius: 1rem;
+    color: #d84840;
+    background: #fff0ef;
+    font-size: 1.65rem;
 }
 
 .hero-cta {
@@ -910,4 +1002,304 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     -webkit-user-drag: none !important;
     user-drag: none !important;
     -webkit-touch-callout: none !important; /* Bloquea el menú de 'Guardar imagen' en móviles iOS y Android */
+}
+
+/* ==========================================================================
+   Estilos de Navegación Activa y Promociones - BeniTours
+   ========================================================================== */
+.navbar-trinidad .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+.navbar-trinidad .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.navbar-trinidad .nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(255, 193, 7, 0.25) !important;
+    font-weight: 700 !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.5);
+}
+
+.navbar-trinidad .nav-link.active i {
+    color: var(--trini-gold) !important;
+}
+
+/* Sección y Tarjetas de Promociones */
+.seccion-promociones {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .72) 0%, rgba(244, 251, 246, .68) 100%);
+}
+
+.card-promocion {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid rgba(25, 135, 84, 0.15) !important;
+    background: #ffffff;
+}
+
+.card-promocion:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(13, 59, 24, 0.12) !important;
+}
+
+.promo-discount-tag {
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.35) !important;
+}
+
+/* Carrusel de promociones: la tarjeta central marca la promoción activa. */
+.promo-carousel {
+    overflow: hidden;
+    touch-action: pan-y;
+}
+
+.promo-carousel-controls {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.promo-carousel-control {
+    position: absolute;
+    top: calc(50% - 24px);
+    z-index: 1;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background: rgba(237, 234, 230, 0.663);
+    pointer-events: auto;
+}
+
+.promo-carousel-control:hover,
+.promo-carousel-control:focus {
+    background: transparent !important;
+}
+
+.promo-carousel-control-prev {
+    /* Alineado sobre la quinta tarjeta (la más alejada a la izquierda). */
+    left: max(.5rem, calc(50% - 529px));
+}
+
+.promo-carousel-control-next {
+    /* Alineado sobre la quinta tarjeta (la más alejada a la derecha). */
+    right: max(.5rem, calc(50% - 529px));
+}
+
+.promo-carousel-stage {
+    position: relative;
+    height: 485px;
+}
+
+.promo-carousel-card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: min(360px, calc(100% - 2rem));
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) scale(.82);
+    transition: transform .6s cubic-bezier(.22, .61, .36, 1), opacity .45s ease, filter .45s ease;
+}
+
+.promo-carousel-card.is-active {
+    z-index: 3;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) scale(1);
+}
+
+.promo-carousel-card.is-before,
+.promo-carousel-card.is-after {
+    z-index: 2;
+    opacity: 1;
+    pointer-events: auto;
+    filter: none;
+}
+
+.promo-carousel-card.is-before {
+    transform: translateX(calc(-50% - 285px)) scale(.84);
+}
+
+.promo-carousel-card.is-after {
+    transform: translateX(calc(-50% + 285px)) scale(.84);
+}
+
+/* Dos tarjetas adicionales quedan detrás de las laterales, para una vista de 5. */
+.promo-carousel-card.is-back-before,
+.promo-carousel-card.is-back-after {
+    z-index: 1;
+    opacity: 1;
+    pointer-events: auto;
+    filter: none;
+}
+
+.promo-carousel-card.is-back-before {
+    transform: translateX(calc(-50% - 505px)) scale(.64);
+}
+
+.promo-carousel-card.is-back-after {
+    transform: translateX(calc(-50% + 505px)) scale(.64);
+}
+
+.promo-carousel-card .card {
+    height: 100%;
+}
+
+.promo-carousel-card.is-active .card-promocion {
+    box-shadow: 0 18px 35px rgba(13, 59, 24, .18) !important;
+}
+
+.promo-carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: .45rem;
+    margin-top: 1rem;
+}
+
+.promo-carousel-indicators button {
+    width: .55rem;
+    height: .55rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #b7c4ba;
+    transition: width .25s ease, background-color .25s ease;
+}
+
+.promo-carousel-indicators button.is-active {
+    width: 1.55rem;
+    border-radius: 99px;
+    background: #198754;
+}
+
+@media (max-width: 767.98px) {
+    .promo-carousel-stage {
+        height: 470px;
+    }
+
+    .promo-carousel-card.is-before,
+    .promo-carousel-card.is-after,
+    .promo-carousel-card.is-back-before,
+    .promo-carousel-card.is-back-after {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .promo-carousel-control {
+        top: calc(50% - 22px);
+        width: 44px;
+        height: 44px;
+    }
+
+    .promo-carousel-control-prev {
+        left: .5rem;
+    }
+
+    .promo-carousel-control-next {
+        right: .5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .promo-carousel-card,
+    .promo-carousel-indicators button {
+        transition: none;
+    }
+}
+
+/* Ajustes visuales de tarjetas y Modal de Promociones */
+.promo-card-img-container {
+    transition: transform .25s ease;
+}
+.promo-card-img-container img {
+    transition: transform .3s cubic-bezier(.22, .61, .36, 1);
+}
+.card-promocion:hover .promo-card-img-container img {
+    transform: scale(1.03);
+}
+.promo-modal-image-box {
+    border: 1px solid rgba(25, 135, 84, 0.15);
+}
+#modalPromoMapa {
+    min-height: 180px;
+    z-index: 1;
+}
+
+.promo-modal-header-badges {
+    display: flex;
+    min-width: 0;
+    gap: .5rem;
+    align-items: center;
+}
+
+@media (max-width: 575.98px) {
+    #modalDetallePromocion .modal-header {
+        align-items: flex-start !important;
+        padding: .9rem 1rem !important;
+    }
+
+    .promo-modal-header-badges {
+        flex: 1 1 auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .4rem;
+        max-width: calc(100% - 2.25rem);
+    }
+
+    .promo-modal-header-badges .badge {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #modalDetallePromocion .modal-header .btn-close {
+        flex: 0 0 auto;
+        margin-top: .2rem;
+    }
+}
+
+/* ==========================================================================
+   Botón Ver Más Lugares del Catálogo y Animación de Tarjetas
+   ========================================================================== */
+.btn-ver-mas-catalogo {
+    border-width: 2px !important;
+    font-size: 0.95rem;
+    transition: all 0.25s ease-in-out;
+    background-color: #ffffff;
+    color: var(--trini-green);
+    border-color: var(--trini-green);
+}
+
+.btn-ver-mas-catalogo:hover {
+    background-color: var(--trini-green);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.2rem rgba(25, 135, 84, 0.2) !important;
+}
+
+.btn-ver-mas-catalogo:active {
+    transform: translateY(0);
+}
+
+.card-fade-in {
+    animation: fadeInCard 0.4s ease-out forwards;
+}
+
+@keyframes fadeInCard {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

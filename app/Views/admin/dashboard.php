@@ -25,75 +25,149 @@
         </div>
     </div>
 
-    <!-- 1. Cuadrícula de Indicadores Clave (KPIs) -->
+    <!-- 1. Cuadrícula de Indicadores Clave de Plataforma (KPIs Principales) -->
     <div class="row g-3 mb-4">
-        <!-- Ingresos del Mes -->
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="admin-card admin-metric-card metric-success p-3 h-100">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Visitantes hoy</span>
-                <h4 class="fw-bold text-success mt-1 mb-0"><?= $kpis['visitasHoy'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1">
-                    Navegadores únicos
-                </small>
-            </div>
-        </div>
-
-        <!-- Comercios al Día -->
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="admin-card admin-metric-card metric-primary p-3 h-100">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Visitantes del mes</span>
-                <h4 class="fw-bold text-primary mt-1 mb-0"><?= $kpis['visitasMes'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1">Navegadores únicos</small>
-            </div>
-        </div>
-
-        <?php $coloresCategorias = ['success', 'primary', 'warning', 'danger', 'info', 'dark']; ?>
-        <?php foreach ($categoriasComercios as $indice => $categoria): ?>
-            <div class="col-6 col-md-4 col-xl-2">
-                <div class="admin-card admin-metric-card metric-<?= $coloresCategorias[$indice % count($coloresCategorias)] ?> p-3 h-100">
-                    <span class="text-muted extra-small fw-bold text-uppercase d-block text-truncate" style="font-size: 0.65rem;" title="<?= htmlspecialchars($categoria['nombre']) ?>"><?= htmlspecialchars($categoria['nombre']) ?></span>
-                    <h4 class="fw-bold text-<?= $coloresCategorias[$indice % count($coloresCategorias)] ?> mt-1 mb-0"><?= (int)$categoria['cantidad'] ?></h4>
-                    <small class="text-muted extra-small d-block mt-1">comercios registrados</small>
+        <!-- Visitantes Hoy -->
+        <div class="col-6 col-md-4 col-xl">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Visitantes Hoy</span>
+                    <div class="dash-metric-icon dash-icon-emerald">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark"><?= number_format($kpis['visitasHoy'] ?? 0) ?></div>
+                <div class="dash-metric-sub">
+                    <span class="text-success fw-semibold"><i class="bi bi-broadcast"></i> En vivo</span>
+                    <span>Navegadores únicos</span>
                 </div>
             </div>
-        <?php endforeach; ?>
+        </div>
 
-        <!-- Por Vencer (≤ 15 días) -->
-        <div class="d-none">
-            <div class="admin-card p-3 h-100 border-start border-warning border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Por Vencer (≤15d)</span>
-                <h4 class="fw-bold text-warning mt-1 mb-0"><?= $kpis['comerciosPorVencer'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1">Recordatorio cobro</small>
+        <!-- Visitantes del Mes -->
+        <div class="col-6 col-md-4 col-xl">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Visitantes del Mes</span>
+                    <div class="dash-metric-icon dash-icon-blue">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark"><?= number_format($kpis['visitasMes'] ?? 0) ?></div>
+                <div class="dash-metric-sub">
+                    <span class="text-primary fw-semibold"><i class="bi bi-graph-up-arrow"></i> Mensual</span>
+                    <span>Tráfico acumulado</span>
+                </div>
             </div>
         </div>
 
-        <!-- Vencidos / Sin Cobertura -->
-        <div class="d-none">
-            <div class="admin-card p-3 h-100 border-start border-danger border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Vencidos / S/Cobro</span>
-                <h4 class="fw-bold text-danger mt-1 mb-0"><?= $kpis['comerciosVencidos'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1">Requieren reactivación</small>
+        <!-- Comercios Afiliados -->
+        <div class="col-6 col-md-4 col-xl">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Comercios Afiliados</span>
+                    <div class="dash-metric-icon dash-icon-purple">
+                        <i class="bi bi-shop-window"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark"><?= number_format($kpis['totalComercios'] ?? 0) ?></div>
+                <div class="dash-metric-sub">
+                    <span class="text-purple fw-semibold"><i class="bi bi-shield-check"></i> Activos</span>
+                    <span><?= $kpis['totalLugares'] ?? 0 ?> fichas en total</span>
+                </div>
             </div>
         </div>
 
-        <!-- Solicitudes Pendientes -->
-        <div class="d-none">
-            <div class="admin-card p-3 h-100 border-start border-info border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Solicitudes Web</span>
-                <h4 class="fw-bold text-dark mt-1 mb-0"><?= $kpis['totalSolicitudes'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1">En cuarentena</small>
+        <!-- Atractivos Públicos -->
+        <div class="col-6 col-md-4 col-xl">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Atractivos Públicos</span>
+                    <div class="dash-metric-icon dash-icon-teal">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark"><?= number_format($kpis['totalPublicos'] ?? 0) ?></div>
+                <div class="dash-metric-sub">
+                    <span class="text-info fw-semibold"><i class="bi bi-pin-map"></i> Turismo</span>
+                    <span>Libre acceso</span>
+                </div>
             </div>
         </div>
 
-        <!-- Total Fichas Catálogo -->
-        <div class="d-none">
-            <div class="admin-card p-3 h-100 border-start border-dark border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase d-block" style="font-size: 0.65rem;">Padrón Total</span>
-                <h4 class="fw-bold text-dark mt-1 mb-0"><?= $kpis['totalLugares'] ?></h4>
-                <small class="text-muted extra-small d-block mt-1"><?= $kpis['totalPublicos'] ?> púb &bull; <?= $kpis['totalComercios'] ?> com</small>
+        <!-- Solicitudes Web -->
+        <div class="col-12 col-md-4 col-xl">
+            <div class="dash-hero-metric <?= ($kpis['totalSolicitudes'] > 0) ? 'border-warning' : '' ?>">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Solicitudes Web</span>
+                    <div class="dash-metric-icon dash-icon-amber position-relative">
+                        <i class="bi bi-inbox-fill"></i>
+                        <?php if ($kpis['totalSolicitudes'] > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="dash-metric-number <?= ($kpis['totalSolicitudes'] > 0) ? 'text-warning' : 'text-dark' ?>">
+                    <?= number_format($kpis['totalSolicitudes'] ?? 0) ?>
+                </div>
+                <div class="dash-metric-sub">
+                    <?php if ($kpis['totalSolicitudes'] > 0): ?>
+                        <span class="text-danger fw-semibold"><i class="bi bi-exclamation-circle-fill"></i> Pendientes</span>
+                        <a href="<?= htmlspecialchars($baseUrl) ?>/admin/solicitudes" class="text-decoration-none small text-dark fw-bold">Revisar &rarr;</a>
+                    <?php else: ?>
+                        <span class="text-muted"><i class="bi bi-check2-all text-success"></i> Al día</span>
+                        <span>Sin trámites</span>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- 1.1 Comercios por Categoría (Acceso Directo Filtrado) -->
+    <?php if (!empty($categoriasComercios)): ?>
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="text-uppercase fw-bold text-muted extra-small" style="letter-spacing: 0.5px;">
+                <i class="bi bi-tags-fill me-1 text-success"></i> Comercios Registrados por Rubro
+            </span>
+            <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares" class="small text-decoration-none text-muted fw-semibold">
+                Ver todos <i class="bi bi-chevron-right small"></i>
+            </a>
+        </div>
+        <div class="row g-2">
+            <?php 
+            $paletteClasses = [
+                'dash-icon-emerald', 
+                'dash-icon-blue', 
+                'dash-icon-purple', 
+                'dash-icon-teal', 
+                'dash-icon-amber', 
+                'dash-icon-rose'
+            ];
+            foreach ($categoriasComercios as $idx => $cat): 
+                $iconClass = !empty($cat['icono']) ? $cat['icono'] : 'bi-tag-fill';
+                $colorTheme = $paletteClasses[$idx % count($paletteClasses)];
+            ?>
+                <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                    <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares?categoria=<?= (int)$cat['id_categoria'] ?>" class="dash-cat-card text-decoration-none d-block">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="dash-cat-card-icon <?= $colorTheme ?>">
+                                <i class="bi <?= htmlspecialchars($iconClass) ?>"></i>
+                            </div>
+                            <span class="dash-cat-card-title text-truncate" title="<?= htmlspecialchars($cat['nombre']) ?>">
+                                <?= htmlspecialchars($cat['nombre']) ?>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-baseline justify-content-between">
+                            <span class="dash-cat-card-count"><?= (int)$cat['cantidad'] ?></span>
+                            <span class="extra-small text-muted">negocios</span>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- 2. Alerta de Cobranzas y Renovaciones Pendientes -->
     <?php if ($kpis['comerciosPorVencer'] > 0 || $kpis['comerciosVencidos'] > 0): ?>
@@ -352,32 +426,11 @@
             </div>
         </div>
 
-        <!-- Tarjeta Informativa Lateral -->
+        <!-- Gráfico de visitas recientes -->
         <div class="col-lg-4">
             <div class="admin-card p-3 p-md-4 h-100">
-                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-compass me-2 text-warning"></i>Guía de contenido público</h6>
-                <ul class="list-unstyled small mb-3 d-flex flex-column gap-2 text-muted">
-                    <li class="d-flex gap-2">
-                        <i class="bi bi-check-circle-fill text-success fs-6 flex-shrink-0"></i>
-                        <span><strong>Información clara:</strong> verifica que el nombre, dirección y horario de cada ficha estén actualizados.</span>
-                    </li>
-                    <li class="d-flex gap-2">
-                        <i class="bi bi-image text-warning fs-6 flex-shrink-0"></i>
-                        <span><strong>Imágenes de calidad:</strong> una foto principal bien iluminada ayuda a que los visitantes encuentren el lugar.</span>
-                    </li>
-                    <li class="d-flex gap-2">
-                        <i class="bi bi-geo-alt-fill text-success fs-6 flex-shrink-0"></i>
-                        <span><strong>Ubicación precisa:</strong> revisa las coordenadas para que el mapa lleve a los visitantes al punto correcto.</span>
-                    </li>
-                </ul>
-
-                <div class="p-3 bg-light rounded-3 border">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted extra-small" style="font-size: 0.68rem;">ZONA HORARIA DEL SERVIDOR:</small>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle">GMT -4</span>
-                    </div>
-                    <strong class="text-dark small"><i class="bi bi-globe-americas me-1 text-success"></i> America/La_Paz (Trinidad)</strong>
-                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3"><div><h6 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up-arrow me-2 text-success"></i>Visitas recientes</h6><small class="text-muted">Últimos 14 días</small></div><span class="badge bg-success-subtle text-success"><?= array_sum($graficoVisitasDiarias['valores']) ?> visitas</span></div>
+                <div style="height: 245px; position:relative"><canvas id="chartVisitasDiarias"></canvas></div>
             </div>
         </div>
     </div>
@@ -449,6 +502,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+        });
+    }
+
+    const ctxVisitasDiarias = document.getElementById('chartVisitasDiarias')?.getContext('2d');
+    if (ctxVisitasDiarias && window.Chart) {
+        new Chart(ctxVisitasDiarias, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($graficoVisitasDiarias['labels'], JSON_UNESCAPED_UNICODE) ?>,
+                datasets: [{ label: 'Visitas', data: <?= json_encode($graficoVisitasDiarias['valores']) ?>, backgroundColor: 'rgba(25, 135, 84, 0.72)', borderColor: '#198754', borderWidth: 1, borderRadius: 5 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} visitas` } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
         });
     }
 

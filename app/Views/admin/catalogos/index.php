@@ -6,7 +6,7 @@
                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">
                     <i class="bi bi-sliders2 me-1"></i> Configuración Global
                 </span>
-                <span class="text-muted small">BeniTurs &bull; Catálogos Maestros</span>
+                <span class="text-muted small">BeniTours &bull; Catálogos Maestros</span>
             </div>
             <h1 class="h3 fw-bold text-dark mb-0">Parámetros y Catálogos del Sistema</h1>
             <small class="text-muted">Añade y administra categorías turísticas, municipios del departamento y planes comerciales de suscripción.</small>

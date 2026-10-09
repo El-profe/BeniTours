@@ -1,0 +1,11 @@
+# bin/.htaccess
+# Bloqueo total de acceso HTTP directo a scripts de mantenimiento de consola
+Options -Indexes -ExecCGI
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

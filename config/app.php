@@ -8,8 +8,11 @@ $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $isLocal = ($host === 'localhost' || str_starts_with($host, 'localhost:') || str_contains($host, '127.0.0.1'));
 
 if ($isLocal) {
-    // 1. Entorno local (Laragon / XAMPP): SIEMPRE usar rutas locales de localhost
-    $envBaseUrl = 'http://' . $host . '/trinidad_turismo/public';
+    // 1. Entorno local (Laragon / XAMPP): detectar la carpeta real del proyecto.
+    // Ej.: /benitours/public/index.php => http://localhost/benitours/public
+    $scriptDirectory = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+    $localPath = rtrim($scriptDirectory, '/.');
+    $envBaseUrl = 'http://' . $host . ($localPath !== '' ? $localPath : '/benitours/public');
 } else {
     // 2. Entorno remoto (InfinityFree, VPS, etc.)
     $envBaseUrl = env('BENITURS_BASE_URL');

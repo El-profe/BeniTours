@@ -1,18 +1,83 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Manejo del menú colapsable en móvil
+    // 1. Manejo del menú de navegación, enlaces activos y ScrollSpy
+    const navLinks = Array.from(document.querySelectorAll('#navbarMain .nav-link'));
     const menu = document.getElementById('navbarMain');
-    menu?.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            if (!menu.classList.contains('show') || !window.bootstrap?.Collapse) return;
-            const destination = new URL(link.href);
-            if (destination.pathname === location.pathname && destination.search === location.search && destination.hash) {
-                menu.addEventListener('hidden.bs.collapse', () => {
-                    document.getElementById(destination.hash.slice(1))?.scrollIntoView({ block: 'start' });
-                }, { once: true });
+
+    function activarEnlace(enlace) {
+        if (!enlace) return;
+        navLinks.forEach(l => l.classList.remove('active'));
+        enlace.classList.add('active');
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const catSlug = link.getAttribute('data-categoria-slug');
+            const destHash = link.getAttribute('href')?.split('#')[1];
+
+            // Si es Hoteles en la misma página de catálogo, activar filtro dinámico
+            if (catSlug && (location.pathname.endsWith('/') || location.pathname.endsWith('/catalogo') || location.pathname.includes('index.php'))) {
+                const chipHotel = document.querySelector(`#explorar button[data-categoria="2"]`) ||
+                                  Array.from(document.querySelectorAll('#explorar button[data-categoria]')).find(c => {
+                                      const title = (c.getAttribute('title') || '').toLowerCase();
+                                      return title.includes('hotel') || title.includes('alojam');
+                                  });
+                if (chipHotel) {
+                    e.preventDefault();
+                    chipHotel.click();
+                    document.getElementById('explorar')?.scrollIntoView({ behavior: 'smooth' });
+                    activarEnlace(link);
+                    if (menu?.classList.contains('show') && window.bootstrap?.Collapse) {
+                        window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+                    }
+                    return;
+                }
             }
-            window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+
+            activarEnlace(link);
+
+            // Manejo de navegación suave y cierre de menú colapsable en móvil
+            if (destHash && document.getElementById(destHash)) {
+                if (menu?.classList.contains('show') && window.bootstrap?.Collapse) {
+                    e.preventDefault();
+                    menu.addEventListener('hidden.bs.collapse', () => {
+                        document.getElementById(destHash)?.scrollIntoView({ behavior: 'smooth' });
+                    }, { once: true });
+                    window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+                }
+            }
         });
     });
+
+    // ScrollSpy interactivo para actualizar el enlace activo al desplazarse
+    const seccionesObservadas = [
+        { id: 'inicio', linkAttr: 'inicio' },
+        { id: 'explorar', linkAttr: 'explorar' },
+        { id: 'guia-trinidad', linkAttr: 'guia-trinidad' },
+        { id: 'promociones', linkAttr: 'promociones' }
+    ];
+
+    let tickingScroll = false;
+    window.addEventListener('scroll', () => {
+        if (tickingScroll) return;
+        tickingScroll = true;
+        requestAnimationFrame(() => {
+            tickingScroll = false;
+            const scrollPos = window.scrollY + 220;
+            let seccionActual = 'inicio';
+
+            for (const sec of seccionesObservadas) {
+                const el = document.getElementById(sec.id);
+                if (el && el.offsetTop <= scrollPos) {
+                    seccionActual = sec.linkAttr;
+                }
+            }
+
+            const targetLink = document.querySelector(`#navbarMain .nav-link[data-nav-link="${seccionActual}"]`);
+            if (targetLink && !targetLink.classList.contains('active')) {
+                activarEnlace(targetLink);
+            }
+        });
+    }, { passive: true });
 
     // 2. Elementos del DOM del catálogo
     const inputBuscar = document.getElementById('inputBuscarHero');
@@ -46,6 +111,68 @@ document.addEventListener('DOMContentLoaded', () => {
     let solicitudUbicacion = 0;
     let ordenOriginalTarjetas = Array.from(contenedor.querySelectorAll('.tarjeta-lugar-col'));
     let modoVistaActual = 'grid'; // 'grid' | 'mapa'
+
+    // Control de límite de 3 filas iniciales (9 tarjetas) y botón Ver más
+    const LIMITE_FILAS_INICIAL = 9;
+    let catalogoExpandido = false;
+    const contenedorVerMas = document.getElementById('contenedorVerMasLugares');
+    const btnVerMas = document.getElementById('btnVerMasLugares');
+    const textoVerMas = document.getElementById('textoVerMasLugares');
+    const iconoVerMas = document.getElementById('iconoVerMasLugares');
+
+    function actualizarVisibilidadPorFilas() {
+        if (!contenedor) return;
+        const tarjetas = Array.from(contenedor.querySelectorAll('.tarjeta-lugar-col'));
+        const tarjetasCandidatas = tarjetas.filter(t => t.dataset.ocultaRadio !== '1');
+        const total = tarjetasCandidatas.length;
+
+        if (total <= LIMITE_FILAS_INICIAL) {
+            if (contenedorVerMas) contenedorVerMas.classList.add('d-none');
+            tarjetasCandidatas.forEach(t => {
+                t.classList.remove('d-none', 'tarjeta-oculta-fila', 'card-fade-in');
+            });
+            return;
+        }
+
+        if (modoVistaActual !== 'mapa' && contenedorVerMas) {
+            contenedorVerMas.classList.remove('d-none');
+        }
+
+        if (catalogoExpandido) {
+            tarjetasCandidatas.forEach(t => {
+                const estabaOculta = t.classList.contains('d-none') || t.classList.contains('tarjeta-oculta-fila');
+                t.classList.remove('d-none', 'tarjeta-oculta-fila');
+                if (estabaOculta) {
+                    t.classList.add('card-fade-in');
+                }
+            });
+            if (textoVerMas) textoVerMas.textContent = 'Ver menos lugares';
+            if (iconoVerMas) iconoVerMas.className = 'bi bi-chevron-up me-2';
+        } else {
+            tarjetasCandidatas.forEach((t, idx) => {
+                t.classList.remove('card-fade-in');
+                if (idx < LIMITE_FILAS_INICIAL) {
+                    t.classList.remove('d-none', 'tarjeta-oculta-fila');
+                } else {
+                    t.classList.add('d-none', 'tarjeta-oculta-fila');
+                }
+            });
+            const restantes = total - LIMITE_FILAS_INICIAL;
+            if (textoVerMas) textoVerMas.textContent = `Ver más lugares (${restantes} restantes)`;
+            if (iconoVerMas) iconoVerMas.className = 'bi bi-chevron-down me-2';
+        }
+    }
+
+    btnVerMas?.addEventListener('click', () => {
+        catalogoExpandido = !catalogoExpandido;
+        actualizarVisibilidadPorFilas();
+        if (!catalogoExpandido) {
+            contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
+    // Aplicar límite inicial de 3 filas
+    actualizarVisibilidadPorFilas();
     const RADIO_BUSQUEDA_KM = 1.0; // Radio de búsqueda: 1 km
 
     // Variables de Leaflet
@@ -150,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (distanciaKm <= RADIO_BUSQUEDA_KM) {
                     lugaresEnRadio++;
+                    tarjeta.dataset.ocultaRadio = '0';
                     tarjeta.classList.remove('d-none');
                     if (contenedorBadge) {
                         contenedorBadge.innerHTML = `
@@ -159,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         `;
                     }
                 } else {
+                    tarjeta.dataset.ocultaRadio = '1';
                     tarjeta.classList.add('d-none');
                     if (contenedorBadge) contenedorBadge.innerHTML = '';
                 }
@@ -166,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             tarjeta.dataset.distancia = 999999;
+            tarjeta.dataset.ocultaRadio = '1';
             tarjeta.classList.add('d-none');
             if (contenedorBadge) contenedorBadge.innerHTML = '';
         });
@@ -176,6 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         tarjetas.forEach(t => gridLugares.appendChild(t));
+        catalogoExpandido = false;
+        actualizarVisibilidadPorFilas();
 
         // Aviso en caso de no haber lugares dentro del radio de 1 km
         let avisoVacio = document.getElementById('avisoSinLugaresRadio');
@@ -226,8 +358,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const contenedorBadge = tarjeta.querySelector('.badge-distancia-container');
             if (contenedorBadge) contenedorBadge.innerHTML = '';
             delete tarjeta.dataset.distancia;
+            delete tarjeta.dataset.ocultaRadio;
             gridLugares.appendChild(tarjeta);
         });
+
+        catalogoExpandido = false;
+        actualizarVisibilidadPorFilas();
 
         const avisoVacio = document.getElementById('avisoSinLugaresRadio');
         if (avisoVacio) avisoVacio.classList.add('d-none');
@@ -385,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> | BeniTurs Trinidad'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> | BeniTours Trinidad'
         }).addTo(mapa);
 
         marcadoresLayer = L.featureGroup().addTo(mapa);
@@ -495,7 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let whatsappRaw = (lug.whatsapp_contacto || '').replace(/\D/g, '');
             if (whatsappRaw.length === 8) whatsappRaw = '591' + whatsappRaw;
-            const msgWa = encodeURIComponent(`Hola, vi la información de ${lug.nombre} en BeniTurs y quisiera hacer una consulta.`);
+            const msgWa = encodeURIComponent(`Hola, vi la información de ${lug.nombre} en BeniTours y quisiera hacer una consulta.`);
             const waBtnHtml = whatsappRaw
                 ? `<a href="https://wa.me/${whatsappRaw}?text=${msgWa}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-pill px-2 py-1 extra-small" title="Contactar por WhatsApp"><i class="bi bi-whatsapp"></i></a>`
                 : '';
@@ -560,6 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modoVistaActual = nuevoModo;
         if (nuevoModo === 'mapa') {
             gridLugares.classList.add('d-none');
+            contenedorVerMas?.classList.add('d-none');
             mapaWrapper?.classList.remove('d-none');
             btnVistaGrid?.classList.remove('active');
             btnVistaGrid?.classList.add('text-secondary');
@@ -582,6 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnVistaMapa?.classList.add('text-secondary');
             btnVistaGrid?.classList.add('active');
             btnVistaGrid?.classList.remove('text-secondary');
+            actualizarVisibilidadPorFilas();
         }
     }
 
@@ -696,6 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="text-secondary small">Intenta buscar con otra palabra clave o selecciona otra categoría.</p>
                 </div>
             `;
+            if (contenedorVerMas) contenedorVerMas.classList.add('d-none');
             return;
         }
 
@@ -718,6 +857,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="bi bi-clock me-1 text-warning"></i> ${escapeHtml(lug.horario_atencion)}
                 </div>
             ` : '';
+            const estadoHorarioHtml = lug.estado_horario ? `
+                <span class="badge ${lug.estado_horario.abierto ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} rounded-pill extra-small flex-shrink-0">
+                    ${escapeHtml(lug.estado_horario.texto)}
+                </span>
+            ` : '';
 
             const munBadge = lug.municipio ? ` · <i class="bi bi-geo-alt text-warning"></i> ${escapeHtml(lug.municipio)}` : '';
             const munHeader = lug.municipio ? ` · ${escapeHtml(lug.municipio)}` : '';
@@ -734,6 +878,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 rounded-pill fw-bold shadow-sm">
                             <i class="bi ${lug.categoria_icono} me-1"></i> ${escapeHtml(lug.categoria)}${munBadge}
                         </span>
+                        ${lug.promo_activa_texto ? `
+                            <span class="badge bg-danger text-white position-absolute bottom-0 start-0 m-3 rounded-pill fw-bold shadow-sm" style="z-index: 5;">
+                                <i class="bi bi-tag-fill me-1"></i> ${escapeHtml(lug.promo_activa_texto)}
+                            </span>
+                        ` : ''}
+                        <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
                     </div>
                 `;
             } else {
@@ -746,6 +896,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="extra-small text-white-50 text-uppercase fw-semibold tracking-wide">
                             ${escapeHtml(lug.categoria)}${munHeader}
                         </span>
+                        ${lug.promo_activa_texto ? `
+                            <div class="mt-2">
+                                <span class="badge bg-danger text-white rounded-pill fw-bold shadow-sm px-3 py-1">
+                                    <i class="bi bi-tag-fill me-1"></i> Promo: ${escapeHtml(lug.promo_activa_texto)}
+                                </span>
+                            </div>
+                        ` : ''}
+                        <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
                     </div>
                 `;
             }
@@ -758,8 +916,23 @@ document.addEventListener('DOMContentLoaded', () => {
                      data-municipio="${escapeHtml(lug.id_municipio || 1)}"
                      data-coordenadas="${escapeHtml(lug.coordenadas_gps || '')}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative place-card">
+                        <button type="button"
+                                class="btn btn-light bg-white bg-opacity-75 rounded-circle shadow-sm position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center p-0 border-0"
+                                style="width: 38px; height: 38px; z-index: 10;"
+                                data-btn-favorito
+                                data-id="${escapeHtml(lug.id_lugar)}"
+                                data-nombre="${escapeHtml(lug.nombre)}"
+                                data-slug="${escapeHtml(lug.slug)}"
+                                data-categoria="${escapeHtml(lug.categoria)}"
+                                data-imagen="${escapeHtml(lug.imagen || '')}"
+                                data-municipio="${escapeHtml(lug.municipio || '')}"
+                                data-url="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}"
+                                title="Guardar en mi itinerario"
+                                aria-label="Guardar en mi itinerario"
+                                aria-pressed="false">
+                            <i class="bi bi-heart text-secondary fs-6"></i>
+                        </button>
                         ${cabeceraHtml}
-                        <div class="badge-distancia-container position-absolute top-0 end-0 m-3"></div>
                         <div class="card-body p-4 d-flex flex-column">
                             ${lug.imagen ? `
                                 <h5 class="fw-bold text-dark text-truncate mb-2">${escapeHtml(lug.nombre)}</h5>
@@ -767,8 +940,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="card-text text-secondary small flex-grow-1 line-clamp-3 mb-3">
                                 ${escapeHtml(desc)}
                             </p>
-                            ${horarioHtml ? `<div class="place-meta border-top pt-3 mb-3 small">
+                            ${horarioHtml ? `<div class="place-meta border-top pt-3 mb-3 small d-flex justify-content-between align-items-center gap-2">
                                 ${horarioHtml}
+                                ${estadoHorarioHtml}
                             </div>` : ''}
                             <div class="d-flex gap-2">
                                 <a href="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}" 
@@ -782,6 +956,12 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             contenedor.insertAdjacentHTML('beforeend', cardHtml);
         });
+
+        catalogoExpandido = false;
+        actualizarVisibilidadPorFilas();
+
+        // Las tarjetas se recrean al filtrar; recuperar de inmediato el estado de cada corazón.
+        window.BeniTursItinerario?.actualizar();
     }
 
     function escapeHtml(str) {
@@ -793,6 +973,280 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // Protección de Imágenes contra Descarga (Anti-Save)
     // =========================================================================
+    // Carrusel de promociones: cada tarjeta ocupa su propia posición.
+    const promoCarousel = document.querySelector('[data-promo-carousel]');
+    if (promoCarousel) {
+        const cards = Array.from(promoCarousel.querySelectorAll('[data-promo-card]'));
+        const indicators = Array.from(promoCarousel.querySelectorAll('[data-promo-to]'));
+        let activeIndex = 0;
+        let timerId;
+        const autoPlayDelay = 4000;
+
+        const modulo = (value, total) => ((value % total) + total) % total;
+        const renderPromo = (nextIndex) => {
+            activeIndex = modulo(nextIndex, cards.length);
+            cards.forEach((card, index) => {
+                const offset = modulo(index - activeIndex, cards.length);
+                card.classList.toggle('is-active', index === activeIndex);
+                card.classList.toggle('is-before', offset === cards.length - 1 && index !== activeIndex);
+                card.classList.toggle('is-after', offset === 1 && index !== activeIndex);
+                card.classList.toggle('is-back-before', cards.length >= 5 && offset === cards.length - 2);
+                card.classList.toggle('is-back-after', cards.length >= 5 && offset === 2);
+                card.setAttribute('aria-hidden', index === activeIndex ? 'false' : 'true');
+            });
+            indicators.forEach((indicator, index) => {
+                const selected = index === activeIndex;
+                indicator.classList.toggle('is-active', selected);
+                indicator.setAttribute('aria-current', selected ? 'true' : 'false');
+            });
+        };
+        const stopAutoPlay = () => window.clearInterval(timerId);
+        const startAutoPlay = () => {
+            stopAutoPlay();
+            const modalEl = document.getElementById('modalDetallePromocion');
+            const isModalOpen = modalEl && (modalEl.classList.contains('show') || modalEl.style.display === 'block');
+            if (cards.length > 1 && !document.hidden && !isModalOpen) {
+                timerId = window.setInterval(() => renderPromo(activeIndex + 1), autoPlayDelay);
+            }
+        };
+
+        promoCarousel.closest('.seccion-promociones')?.querySelectorAll('[data-promo-direction]').forEach((button) => {
+            button.addEventListener('click', () => {
+                renderPromo(activeIndex + (button.dataset.promoDirection === 'next' ? 1 : -1));
+                startAutoPlay();
+            });
+        });
+        indicators.forEach((indicator) => indicator.addEventListener('click', () => {
+            renderPromo(Number(indicator.dataset.promoTo));
+            startAutoPlay();
+        }));
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        });
+        renderPromo(0);
+        startAutoPlay();
+
+        // =========================================================================
+        // Modal interactivo de Detalle de Promoción
+        // =========================================================================
+        const modalPromoEl = document.getElementById('modalDetallePromocion');
+        let promoMap = null;
+        let promoMarker = null;
+
+        function abrirModalPromocion(cardEl) {
+            if (!modalPromoEl || !cardEl) return;
+            const rawData = cardEl.getAttribute('data-promo-data');
+            if (!rawData) return;
+
+            let data;
+            try {
+                data = JSON.parse(rawData);
+            } catch (err) {
+                console.error('Error al leer datos de la promoción:', err);
+                return;
+            }
+            if (data.id_lugar) {
+                window.BeniTursItinerario?.registrarEvento(data.id_lugar, 'PROMOCION');
+            }
+
+            // 1. Fotografía completa y fondo envolvente
+            const imgEl = document.getElementById('modalPromoImg');
+            const backdropEl = document.getElementById('modalPromoImgBackdrop');
+            const noImgEl = document.getElementById('modalPromoNoImg');
+            const placeholderNombre = document.getElementById('modalPromoPlaceholderNombre');
+
+            if (data.imagen) {
+                if (imgEl) {
+                    imgEl.src = data.imagen;
+                    imgEl.alt = data.titulo || 'Promoción';
+                    imgEl.classList.remove('d-none');
+                    imgEl.onerror = () => {
+                        imgEl.classList.add('d-none');
+                        if (backdropEl) backdropEl.classList.add('d-none');
+                        if (noImgEl) noImgEl.classList.remove('d-none');
+                        if (placeholderNombre) placeholderNombre.textContent = data.lugar_nombre || '';
+                    };
+                }
+                if (backdropEl) {
+                    backdropEl.style.backgroundImage = `url('${data.imagen}')`;
+                    backdropEl.classList.remove('d-none');
+                }
+                if (noImgEl) noImgEl.classList.add('d-none');
+            } else {
+                if (imgEl) imgEl.classList.add('d-none');
+                if (backdropEl) backdropEl.classList.add('d-none');
+                if (noImgEl) noImgEl.classList.remove('d-none');
+                if (placeholderNombre) placeholderNombre.textContent = data.lugar_nombre || '';
+            }
+
+            // 2. Textos e insignias informativas
+            const catIconEl = document.getElementById('modalPromoCatIcono');
+            if (catIconEl) catIconEl.className = `bi ${data.categoria_icono || 'bi-tag'} me-1`;
+            const catTxtEl = document.getElementById('modalPromoCatTexto');
+            if (catTxtEl) catTxtEl.textContent = data.categoria_nombre || 'Promoción';
+
+            const descTagEl = document.getElementById('modalPromoDescuentoTag');
+            const descTxtEl = document.getElementById('modalPromoDescuentoTexto');
+            if (data.descuento_texto) {
+                if (descTxtEl) descTxtEl.textContent = data.descuento_texto;
+                if (descTagEl) descTagEl.classList.remove('d-none');
+            } else if (descTagEl) {
+                descTagEl.classList.add('d-none');
+            }
+
+            const tituloEl = document.getElementById('modalPromoTitulo');
+            if (tituloEl) tituloEl.textContent = data.titulo || '';
+
+            const lugarNombreEl = document.getElementById('modalPromoLugarNombre');
+            if (lugarNombreEl) lugarNombreEl.textContent = data.lugar_nombre || '';
+
+            const lugarMunEl = document.getElementById('modalPromoLugarMunicipio');
+            if (lugarMunEl) lugarMunEl.textContent = data.municipio_nombre || 'Trinidad';
+
+            const fechaFinEl = document.getElementById('modalPromoFechaFin');
+            const vigenciaContainer = document.getElementById('modalPromoVigenciaContainer');
+            if (data.fecha_fin_fmt) {
+                if (fechaFinEl) fechaFinEl.textContent = data.fecha_fin_fmt;
+                if (vigenciaContainer) vigenciaContainer.classList.remove('d-none');
+            } else if (vigenciaContainer) {
+                vigenciaContainer.classList.add('d-none');
+            }
+
+            const descEl = document.getElementById('modalPromoDescripcion');
+            if (descEl) descEl.textContent = data.descripcion || '';
+
+            const dirEl = document.getElementById('modalPromoLugarDireccion');
+            if (dirEl) dirEl.textContent = data.lugar_direccion || '';
+
+            // 3. Botones de acción
+            const btnWa = document.getElementById('modalPromoBtnWa');
+            if (btnWa) {
+                if (data.wa_contacto) {
+                    btnWa.href = `https://wa.me/${data.wa_contacto}?text=${data.wa_texto || ''}`;
+                    btnWa.onclick = () => {
+                        window.BeniTursItinerario?.registrarEvento(data.id_lugar, 'WHATSAPP');
+                    };
+                    btnWa.classList.remove('d-none');
+                } else {
+                    btnWa.classList.add('d-none');
+                }
+            }
+
+            const btnFicha = document.getElementById('modalPromoBtnFicha');
+            if (btnFicha) {
+                btnFicha.href = data.url_ficha || `${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(data.lugar_slug || '')}`;
+            }
+
+            const btnComoLlegar = document.getElementById('modalPromoBtnComoLlegar');
+            if (btnComoLlegar) {
+                const latNum = parseFloat(data.latitud);
+                const lngNum = parseFloat(data.longitud);
+                if (!isNaN(latNum) && !isNaN(lngNum) && (latNum !== 0 || lngNum !== 0)) {
+                    btnComoLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${latNum},${lngNum}`;
+                    btnComoLlegar.classList.remove('d-none');
+                } else if (data.lugar_direccion) {
+                    btnComoLlegar.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((data.lugar_nombre || '') + ' ' + (data.lugar_direccion || '') + ' ' + (data.municipio_nombre || 'Trinidad'))}`;
+                    btnComoLlegar.classList.remove('d-none');
+                } else {
+                    btnComoLlegar.classList.add('d-none');
+                }
+            }
+
+            // 4. Mapa interactivo de ubicación con Leaflet
+            const mapaContainer = document.getElementById('modalPromoMapa');
+            const fallbackContainer = document.getElementById('modalPromoMapaFallback');
+            const dirAltEl = document.getElementById('modalPromoLugarDireccionAlt');
+
+            const latNum = parseFloat(data.latitud);
+            const lngNum = parseFloat(data.longitud);
+            const tieneCoords = !isNaN(latNum) && !isNaN(lngNum) && (latNum !== 0 || lngNum !== 0);
+
+            if (tieneCoords && window.L) {
+                if (mapaContainer) mapaContainer.classList.remove('d-none');
+                if (fallbackContainer) fallbackContainer.classList.add('d-none');
+
+                if (!promoMap) {
+                    promoMap = L.map('modalPromoMapa', {
+                        zoomControl: true,
+                        scrollWheelZoom: false
+                    }).setView([latNum, lngNum], 16);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(promoMap);
+
+                    const customIcon = L.divIcon({
+                        className: 'beniturs-map-marker',
+                        html: `<div class="beniturs-marker-pin pin-hotel"><i class="bi ${data.categoria_icono || 'bi-geo-alt'}"></i></div>`,
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 36],
+                        popupAnchor: [0, -34]
+                    });
+
+                    promoMarker = L.marker([latNum, lngNum], { icon: customIcon }).addTo(promoMap);
+                } else {
+                    promoMap.setView([latNum, lngNum], 16);
+                    if (promoMarker) {
+                        promoMarker.setLatLng([latNum, lngNum]);
+                    } else {
+                        promoMarker = L.marker([latNum, lngNum]).addTo(promoMap);
+                    }
+                }
+
+                // El mini mapa no abre un popup: en un contenedor de 180px este se
+                // recortaba y ocultaba la ubicación. El nombre ya se muestra arriba.
+                if (promoMarker) {
+                    promoMarker.unbindPopup();
+                    promoMap.closePopup();
+                }
+            } else {
+                if (mapaContainer) mapaContainer.classList.add('d-none');
+                if (fallbackContainer) {
+                    fallbackContainer.classList.remove('d-none');
+                    if (dirAltEl) dirAltEl.textContent = data.lugar_direccion || 'Dirección no registrada';
+                }
+            }
+
+            // 5. Pausar autoplay del carrusel y mostrar el modal
+            stopAutoPlay();
+            if (window.bootstrap?.Modal) {
+                window.bootstrap.Modal.getOrCreateInstance(modalPromoEl).show();
+            }
+        }
+
+        // Delegación de clic para abrir el modal desde tarjetas del carrusel
+        promoCarousel.addEventListener('click', (e) => {
+            const trigger = e.target.closest('[data-promo-trigger="modal"]');
+            if (trigger) {
+                e.preventDefault();
+                const card = trigger.closest('[data-promo-card]');
+                if (card) {
+                    abrirModalPromocion(card);
+                }
+            }
+        });
+
+        // Eventos del modal para recalcular dimensiones del mapa y reanudar autoplay al cerrar
+        if (modalPromoEl) {
+            modalPromoEl.addEventListener('shown.bs.modal', () => {
+                if (promoMap) {
+                    promoMap.invalidateSize();
+                    if (promoMarker) {
+                        promoMap.panTo(promoMarker.getLatLng(), { animate: false });
+                    }
+                }
+            });
+            modalPromoEl.addEventListener('hidden.bs.modal', () => {
+                startAutoPlay();
+            });
+        }
+    }
+
     document.addEventListener('contextmenu', (e) => {
         if (e.target.closest('img, video, .place-card, .hero-video, .gallery-item, .beniturs-popup-img')) {
             e.preventDefault();

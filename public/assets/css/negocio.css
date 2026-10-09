@@ -574,6 +574,181 @@ body.business-portal {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
+/* Creador de promociones */
+.promo-create-modal {
+    max-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1.25rem;
+}
+
+.promo-create-modal .modal-body {
+    overflow-y: auto !important;
+    max-height: calc(85vh - 150px);
+}
+
+.promo-create-modal .modal-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: #f8faf9;
+    border-top: 1px solid #e2ece5;
+}
+
+.promo-create-header {
+    color: #fff;
+    background: linear-gradient(120deg, #0d512f, #198754 68%, #48a76c);
+}
+
+.promo-create-header .btn-close {
+    filter: invert(1);
+}
+
+.promo-create-header-icon {
+    display: grid;
+    width: 2.8rem;
+    height: 2.8rem;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: .9rem;
+    background: rgba(255, 255, 255, .16);
+    font-size: 1.3rem;
+}
+
+.promo-form-preview {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #d9ebe0;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #f7fcf8, #edf8f0);
+}
+
+.promo-form-preview-image {
+    display: grid;
+    width: 4.5rem;
+    height: 4.5rem;
+    flex: 0 0 auto;
+    place-items: center;
+    overflow: hidden;
+    border-radius: .85rem;
+    color: #1b7a42;
+    background: #dcefe2;
+    font-size: 1.6rem;
+}
+
+.promo-form-preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.promo-form-preview-content {
+    display: grid;
+    min-width: 0;
+    gap: .18rem;
+}
+
+.promo-form-preview-label {
+    color: #65766d;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.promo-form-preview-badge {
+    width: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    color: #8b251e;
+    background: #ffe2df;
+    font-size: .72rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.promo-form-preview-content strong,
+.promo-form-preview-content small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.promo-form-preview-content strong { color: #20392e; }
+.promo-form-preview-content small { color: #65766d; font-size: .78rem; }
+
+.promo-form-section-title {
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    margin-bottom: .9rem;
+}
+
+.promo-form-section-title > span {
+    display: grid;
+    width: 1.7rem;
+    height: 1.7rem;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--business-green);
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.promo-form-section-title div { display: grid; line-height: 1.15; }
+.promo-form-section-title strong { color: #20392e; font-size: .92rem; }
+.promo-form-section-title small { color: #65766d; font-size: .76rem; }
+
+.promo-form-control {
+    min-height: 2.75rem;
+    border-color: #d6e5db;
+    border-radius: .75rem;
+}
+
+.promo-form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .13);
+}
+
+.promo-upload-zone {
+    display: grid;
+    gap: .25rem;
+    place-items: center;
+    min-height: 8.5rem;
+    padding: 1rem;
+    border: 2px dashed #bad7c4;
+    border-radius: 1rem;
+    color: #39724e;
+    background: #fafdfb;
+    cursor: pointer;
+    text-align: center;
+    transition: .2s ease;
+}
+
+.promo-upload-zone:hover,
+.promo-upload-zone.is-selected {
+    border-color: #198754;
+    background: #eef9f1;
+    transform: translateY(-1px);
+}
+
+.promo-upload-zone > i { color: #198754; font-size: 1.7rem; }
+.promo-upload-zone small { color: #65766d; font-size: .76rem; }
+
+@media (max-width: 575.98px) {
+    .promo-create-modal { border-radius: 1rem; }
+    .promo-form-preview { align-items: flex-start; }
+    .promo-form-preview-content { width: calc(100% - 5.5rem); }
+}
+
 /* --- Barra Lateral Móvil para Negocios (Offcanvas) --- */
 .mobile-business-sidebar {
     width: 295px !important;
