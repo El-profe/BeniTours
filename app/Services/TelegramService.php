@@ -21,6 +21,12 @@ class TelegramService {
             && preg_match('/\A-?[1-9]\d*\z/D', (string)($c['admin_chat_id'] ?? '')) === 1;
     }
 
+    /** Comprueba token y conectividad sin enviar mensajes ni modificar datos. */
+    public static function verificarConexion(): string {
+        $respuesta = self::api('getMe', []);
+        return (string)($respuesta['result']['username'] ?? '');
+    }
+
     private static function api(string $metodo, array $datos): array {
         if (self::$transporte !== null) return (self::$transporte)($metodo, $datos);
         if (!self::configurado()) throw new RuntimeException('Telegram no está configurado.');

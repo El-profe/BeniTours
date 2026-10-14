@@ -257,7 +257,7 @@
                         <!-- Método de Cobro y Nº Comprobante -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small text-dark">Método de Cobro *</label>
-                            <select name="metodo_pago" class="form-select form-select-sm">
+                            <select name="metodo_pago" id="selectMetodoPagoLugar" class="form-select form-select-sm">
                                 <option value="EFECTIVO" selected>💵 Efectivo (Cobrado en mano)</option>
                                 <option value="QR">📱 QR Simple</option>
                                 <option value="TRANSFERENCIA">🏦 Transferencia Bancaria</option>
@@ -266,6 +266,34 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small text-dark">Nº Recibo / Talonario</label>
                             <input type="text" name="numero_comprobante" class="form-control form-control-sm" placeholder="Ej. REC-001 (Opcional)">
+                        </div>
+
+                        <?php
+                            $qrPathLugar = !empty($cobro['qr_url']) ? $cobro['qr_url'] : '/assets/img/QR-Prueba.jpeg';
+                            $qrFullPathLugar = $baseUrl . $qrPathLugar;
+                        ?>
+                        <div class="col-12" id="panelQrMembresia" hidden>
+                            <div class="qr-membresia-panel rounded-4 p-3 p-md-4">
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-auto text-center">
+                                        <div class="bg-white rounded-4 border shadow-sm p-2 d-inline-block">
+                                            <img src="<?= htmlspecialchars($qrFullPathLugar) ?>" alt="QR para el cobro de membresía" class="img-fluid rounded-3" style="width: 180px; height: 180px; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <span class="badge rounded-pill px-3 py-2 mb-2 bg-primary">
+                                            <i class="bi bi-qr-code-scan me-1"></i> Pago por QR
+                                        </span>
+                                        <h3 class="h6 fw-bold text-dark mb-2">Escanea el QR para cobrar la membresía</h3>
+                                        <p class="small text-muted mb-2">Confirma el pago antes de guardar la ficha comercial.</p>
+                                        <div class="small text-dark">
+                                            <strong class="d-block"><?= htmlspecialchars($cobro['banco'] ?? 'Banco Unión / Ganadero') ?></strong>
+                                            Titular: <?= htmlspecialchars($cobro['titular'] ?? 'Directorio BeniTours') ?><br>
+                                            Cuenta: <span class="font-monospace fw-semibold"><?= htmlspecialchars($cobro['cuenta'] ?? 'No configurada') ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -484,18 +512,22 @@
     border-color: #dee2e6;
 }
 .card-plan-lugar:hover {
-    border-color: #198754;
+    border-color: #2A9D8F;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 .card-plan-lugar.active {
-    border-color: #198754 !important;
-    background-color: rgba(25, 135, 84, 0.05);
+    border-color: #2A9D8F !important;
+    background-color: rgba(42, 157, 143, 0.05);
 }
 .btn-modo-lugar.active {
     background-color: #ffffff !important;
-    color: #198754 !important;
+    color: #217E73 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.qr-membresia-panel {
+    background: linear-gradient(135deg, #EEF5F7, #DDF4F1);
+    border: 1px solid #9BD9D0;
 }
 </style>
 
@@ -634,5 +666,13 @@ function actualizarDesgloseAhorroLugar(meses, monto, ahorro) {
 
 document.addEventListener('DOMContentLoaded', () => {
     actualizarDesgloseAhorroLugar(1, TARIFA_BASE_LUGAR, 0);
+
+    const metodoPago = document.getElementById('selectMetodoPagoLugar');
+    const panelQr = document.getElementById('panelQrMembresia');
+    const actualizarPanelQr = () => {
+        panelQr.hidden = metodoPago.value !== 'QR';
+    };
+    metodoPago.addEventListener('change', actualizarPanelQr);
+    actualizarPanelQr();
 });
 </script>

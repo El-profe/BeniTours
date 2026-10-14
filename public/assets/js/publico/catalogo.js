@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const seccionesObservadas = [
         { id: 'inicio', linkAttr: 'inicio' },
         { id: 'explorar', linkAttr: 'explorar' },
-        { id: 'guia-trinidad', linkAttr: 'guia-trinidad' },
-        { id: 'promociones', linkAttr: 'promociones' }
+        { id: 'promociones', linkAttr: 'promociones' },
+        { id: 'guia-trinidad', linkAttr: 'guia-trinidad' }
     ];
 
     let tickingScroll = false;
@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (whatsappRaw.length === 8) whatsappRaw = '591' + whatsappRaw;
             const msgWa = encodeURIComponent(`Hola, vi la información de ${lug.nombre} en BeniTours y quisiera hacer una consulta.`);
             const waBtnHtml = whatsappRaw
-                ? `<a href="https://wa.me/${whatsappRaw}?text=${msgWa}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success rounded-pill px-2 py-1 extra-small" title="Contactar por WhatsApp"><i class="bi bi-whatsapp"></i></a>`
+                ? `<a href="https://wa.me/${whatsappRaw}?text=${msgWa}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-teal rounded-pill px-2 py-1 extra-small" title="Contactar por WhatsApp"><i class="bi bi-whatsapp"></i></a>`
                 : '';
 
             const googleMapsDir = `https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}`;
@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${imgHtml}
                     <div class="p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="badge bg-light text-success border border-success-subtle rounded-pill extra-small px-2 py-1">
+                            <span class="badge bg-light text-teal border border-teal-subtle rounded-pill extra-small px-2 py-1">
                                 <i class="bi ${icono} me-1"></i>${escapeHtml(lug.categoria || '')}
                             </span>
                             ${distHtml}
@@ -653,11 +653,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${horarioHtml}
                         <div class="d-flex gap-1 mt-2">
                             <a href="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}" 
-                               class="btn btn-sm btn-success text-white rounded-pill px-3 py-1 flex-grow-1 fw-semibold extra-small"
+                               class="btn btn-sm btn-teal-action text-white rounded-pill px-3 py-1 flex-grow-1 fw-semibold extra-small"
                                style="color: #ffffff !important; text-decoration: none;">
                                 Ver Ficha <i class="bi bi-arrow-right ms-1 text-white"></i>
                             </a>
-                            <a href="${googleMapsDir}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 extra-small" title="Cómo llegar (Google Maps)">
+                            <a href="${googleMapsDir}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-teal rounded-pill px-2 py-1 extra-small" title="Cómo llegar (Google Maps)">
                                 <i class="bi bi-map-fill"></i>
                             </a>
                             ${waBtnHtml}
@@ -858,7 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             ` : '';
             const estadoHorarioHtml = lug.estado_horario ? `
-                <span class="badge ${lug.estado_horario.abierto ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} rounded-pill extra-small flex-shrink-0">
+                <span class="badge ${lug.estado_horario.abierto ? 'bg-teal-subtle text-teal border border-teal-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle'} rounded-pill extra-small flex-shrink-0">
                     ${escapeHtml(lug.estado_horario.texto)}
                 </span>
             ` : '';
@@ -946,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>` : ''}
                             <div class="d-flex gap-2">
                                 <a href="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}" 
-                                   class="btn btn-success rounded-pill w-100 fw-semibold btn-sm py-2">
+                                   class="btn btn-teal-action rounded-pill w-100 fw-semibold btn-sm py-2">
                                     Ver Ficha <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>

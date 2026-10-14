@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const panelMapa = document.getElementById('ubicacionMapa');
     const estadoMapa = document.getElementById('estadoMapaNuevaFicha');
     const botonesModo = document.querySelectorAll('[data-location-mode]');
+    const objectUrlsFotos = new Set();
     let mapa;
     let marcador;
 
@@ -18,9 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     inputFotos?.addEventListener('change', async () => {
+        objectUrlsFotos.forEach((url) => URL.revokeObjectURL(url));
+        objectUrlsFotos.clear();
+
         let archivos = Array.from(inputFotos.files || []).slice(0, 6);
         if (!archivos.length) {
             previews.replaceChildren();
+            actualizarPreviewPortada('');
             return;
         }
 
@@ -45,15 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
             tarjeta.setAttribute('aria-label', `Elegir ${archivo.name} como portada`);
             const imagen = document.createElement('img');
             imagen.alt = `Previsualización de ${archivo.name}`;
-            imagen.src = URL.createObjectURL(archivo);
-            imagen.addEventListener('load', () => URL.revokeObjectURL(imagen.src), { once: true });
+            const objectUrl = URL.createObjectURL(archivo);
+            objectUrlsFotos.add(objectUrl);
+            imagen.src = objectUrl;
             const etiqueta = document.createElement('span');
             etiqueta.innerHTML = '<i class="bi bi-star-fill"></i> Portada';
             tarjeta.append(imagen, etiqueta);
-            tarjeta.addEventListener('click', () => elegirPortada(indice));
             previews.append(tarjeta);
         });
-        elegirPortada(0);
+        elegirPortadaConPreview(0);
     });
 
     const colocarMarcador = (latitud, longitud, actualizarCampo = true) => {
@@ -113,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 previewBadge.innerHTML = '<i class="bi bi-shop me-1"></i>Comercial';
             } else {
                 previewBadge.className = 'live-preview-badge-type bg-success text-white';
-                previewBadge.style.backgroundColor = '#198754';
+                previewBadge.style.backgroundColor = '#2A9D8F';
                 previewBadge.innerHTML = '<i class="bi bi-tree me-1"></i>Público';
             }
         }
@@ -200,6 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (card && card.dataset.fotoIndice !== undefined) {
             elegirPortadaConPreview(Number(card.dataset.fotoIndice));
         }
+    });
+
+    window.addEventListener('beforeunload', () => {
+        objectUrlsFotos.forEach((url) => URL.revokeObjectURL(url));
     });
 });
 

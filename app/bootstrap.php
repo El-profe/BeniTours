@@ -3,49 +3,8 @@
  * Inicialización del entorno de la aplicación BeniTours / Trinidad Turismo.
  */
 
-// 1. Definición del helper universal env() y carga de archivo .env si existe
-if (!function_exists('env')) {
-    function env(string $key, mixed $default = null): mixed {
-        $val = getenv($key);
-        if ($val === false || $val === null) {
-            $val = $_ENV[$key] ?? $_SERVER[$key] ?? null;
-        }
-        if ($val === null || $val === false) {
-            return $default;
-        }
-        return match (strtolower((string)$val)) {
-            'true', '(true)' => true,
-            'false', '(false)' => false,
-            'empty', '(empty)' => '',
-            'null', '(null)' => null,
-            default => $val,
-        };
-    }
-}
-
-$envFile = dirname(__DIR__) . '/.env';
-if (file_exists($envFile) && is_readable($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines !== false) {
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '' || str_starts_with($line, '#')) {
-                continue;
-            }
-            if (str_contains($line, '=')) {
-                [$k, $v] = explode('=', $line, 2);
-                $k = trim($k);
-                $v = trim($v);
-                if (preg_match('/^"(.*)"$/s', $v, $m) || preg_match("/^'(.*)'$/s", $v, $m)) {
-                    $v = $m[1];
-                }
-                putenv("{$k}={$v}");
-                $_ENV[$k] = $v;
-                $_SERVER[$k] = $v;
-            }
-        }
-    }
-}
+// 1. Carga del entorno compartida por la aplicación, CLI y webhook de Telegram.
+require_once __DIR__ . '/bootstrap_env.php';
 
 // 2. Configuración de errores y manejador global según el entorno
 $appEnv = env('APP_ENV', 'local');

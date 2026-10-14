@@ -75,6 +75,8 @@ class CatalogoController extends Controller {
         $promocionModel = new Promocion();
         $promociones = $promocionModel->listarVigentesPublicas((int)$lugar['id_lugar']);
         $fotografias = (new Fotografia())->listarPorLugar((int)$lugar['id_lugar']);
+
+
         $imgUrl = !empty($lugar['imagen'])
             ? "{$this->config['base_url']}/imagen?f=" . urlencode($lugar['imagen'])
             : "{$this->config['base_url']}/assets/img/logo2.png";
@@ -86,12 +88,12 @@ class CatalogoController extends Controller {
         ];
 
         $this->render('publico/catalogo/detalle', [
-            'titulo'      => $lugar['nombre'],
-            'lugar'       => $lugar,
-            'fotografias' => $fotografias,
-            'mapa'        => MapaService::desdeCoordenadas($lugar['coordenadas_gps'] ?? null),
-            'promociones' => $promociones,
-            'ogMeta'      => $ogMeta
+            'titulo'            => $lugar['nombre'],
+            'lugar'             => $lugar,
+            'fotografias'       => $fotografias,
+            'mapa'              => MapaService::desdeCoordenadas($lugar['coordenadas_gps'] ?? null),
+            'promociones'       => $promociones,
+            'ogMeta'            => $ogMeta
         ], 'publico');
     }
 

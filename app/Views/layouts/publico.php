@@ -24,11 +24,11 @@
     <!-- Estilos propios -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/css/app.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/app.css') ?>">
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light<?= !empty($heroPantallaCompleta) ? ' page-home' : '' ?>">
+<body class="d-flex flex-column min-vh-100 bg-light<?= !empty($heroPantallaCompleta) ? ' page-home' : '' ?><?= !empty($bodyClass) ? ' ' . htmlspecialchars($bodyClass) : '' ?>">
 
     <!-- Navegación Superior -->
     <nav class="navbar navbar-expand-xl navbar-dark navbar-trinidad sticky-top shadow-sm py-2">
-        <div class="container">
+        <div class="container-fluid px-2 px-lg-3">
             <a class="navbar-brand d-flex align-items-center" href="<?= htmlspecialchars($baseUrl) ?>/">
                 <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo.png') ?>"
                     alt="BeniTours" 
@@ -37,6 +37,7 @@
                     <?php if (!empty($heroPantallaCompleta)): ?>
                         data-logo-principal="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo.png') ?>"
                         data-logo-alterno="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo3.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo3.png') ?>"
+                        data-logo-institucional="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo4.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo4.png') ?>"
                     <?php endif; ?>>
             </a>
             
@@ -51,6 +52,11 @@
                             <i class="bi bi-house-door me-1"></i> Inicio
                         </a>
                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#guia-trinidad" data-nav-link="guia-trinidad">
+                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i> Guía del Viajero
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#explorar" data-nav-link="explorar" data-catalogo-todos>
                             <i class="bi bi-geo-alt me-1" aria-hidden="true"></i> Lugares
@@ -62,18 +68,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#guia-trinidad" data-nav-link="guia-trinidad">
-                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i> Guía del Viajero
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#promociones" data-nav-link="promociones">
                             <i class="bi bi-tag-fill me-1 " aria-hidden="true"></i> Promociones
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#transporte" data-nav-link="transporte">
-                            <i class="bi bi-scooter me-1" aria-hidden="true"></i> Transporte
                         </a>
                     </li>
                     
@@ -85,24 +81,6 @@
                         <span class="d-none d-sm-inline">Mi Ruta</span>
                         <span class="badge bg-danger rounded-pill contador-itinerario d-none">0</span>
                     </button>
-                    <div class="dropdown">
-                        <button class="btn btn-warning btn-sm rounded-pill fw-bold px-3 shadow-sm text-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-shop me-1"></i> Negocios
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow rounded-4 border-0 mt-2 py-2">
-                            <li>
-                                <a class="dropdown-item py-2 px-3 fw-semibold text-dark" href="<?= htmlspecialchars($baseUrl) ?>/solicitar-incorporacion">
-                                    <i class="bi bi-plus-circle-fill text-success me-2"></i> Publicar mi Negocio
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <a class="dropdown-item py-2 px-3 small text-secondary" href="<?= htmlspecialchars($baseUrl) ?>/negocio/login">
-                                    <i class="bi bi-box-arrow-in-right text-primary me-2"></i> Iniciar Sesión de Comercio
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
@@ -146,6 +124,11 @@
                     <p class="small text-white-50 mb-1"><i class="bi bi-clock me-2 text-warning"></i>Zona horaria: America/La_Paz</p>
                     <p class="small text-white-50 mb-1"><i class="bi bi-currency-exchange me-2 text-warning"></i>Moneda: Bolivianos (Bs)</p>
                     <p class="small text-white-50 mb-0"><i class="bi bi-thermometer-sun me-2 text-warning"></i>Clima: Tropical cálido húmedo</p>
+                    <nav class="site-footer-social mt-3" aria-label="Redes sociales de BeniTours">
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de BeniTours" title="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+                        <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok de BeniTours" title="TikTok"><i class="bi bi-tiktok" aria-hidden="true"></i></a>
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook de BeniTours" title="Facebook"><i class="bi bi-facebook" aria-hidden="true"></i></a>
+                    </nav>
                 </div>
             </div>
 
@@ -162,8 +145,29 @@
     <!-- Leaflet 1.9.4 JS (Local) -->
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/leaflet/leaflet.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/leaflet/leaflet.js') ?>"></script>
 
+    <!-- Botón Flotante para Negocios (Esquina Inferior) -->
+    <div class="dropdown position-fixed bottom-0 end-0 m-3 m-md-4" style="z-index: 1045;">
+        <button class="btn btn-teal-action rounded-pill fw-bold px-3 py-2 shadow-lg text-white dropdown-toggle d-flex align-items-center gap-2 border border-white border-opacity-25" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.92rem; backdrop-filter: blur(8px);">
+            <i class="bi bi-shop fs-5"></i>
+            <span class="d-none d-sm-inline">Negocios</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 border-0 mb-2 py-2" style="min-width: 230px;">
+            <li>
+                <a class="dropdown-item py-2 px-3 fw-semibold text-dark" href="<?= htmlspecialchars($baseUrl) ?>/solicitar-incorporacion">
+                    <i class="bi bi-plus-circle-fill text-teal me-2"></i> Publicar mi Negocio
+                </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+                <a class="dropdown-item py-2 px-3 small text-secondary" href="<?= htmlspecialchars($baseUrl) ?>/negocio/login">
+                    <i class="bi bi-box-arrow-in-right text-teal me-2"></i> Iniciar Sesión de Comercio
+                </a>
+            </li>
+        </ul>
+    </div>
+
     <!-- Botón Flotante para Mi Itinerario -->
-    <button type="button" id="btnFlotanteItinerario" class="btn btn-success rounded-pill shadow-lg position-fixed bottom-0 end-0 m-4 py-2 px-3 align-items-center gap-2 d-none" style="z-index: 1040;" data-bs-toggle="modal" data-bs-target="#modalItinerario" title="Ver mi ruta planificada">
+    <button type="button" id="btnFlotanteItinerario" class="btn btn-teal-action rounded-pill shadow-lg position-fixed bottom-0 start-0 m-3 m-md-4 py-2 px-3 align-items-center gap-2 d-none" style="z-index: 1040;" data-bs-toggle="modal" data-bs-target="#modalItinerario" title="Ver mi ruta planificada">
         <i class="bi bi-heart-fill text-danger fs-5"></i>
         <span class="fw-bold d-none d-sm-inline">Mi Itinerario</span>
         <span class="badge bg-white text-dark rounded-pill contador-itinerario">0</span>
@@ -173,7 +177,7 @@
     <div class="modal fade" id="modalItinerario" tabindex="-1" aria-labelledby="modalItinerarioLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-bottom bg-success text-white py-3">
+                <div class="modal-header border-bottom modal-header-teal text-white py-3">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-compass-fill fs-5"></i>
                         <h5 class="modal-title fw-bold mb-0" id="modalItinerarioLabel">Mi Ruta Turística en el Beni</h5>
@@ -192,7 +196,7 @@
                     <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" id="btnVaciarItinerario">
                         <i class="bi bi-trash me-1"></i> Vaciar
                     </button>
-                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3 fw-bold" id="btnCompartirItinerarioWa">
+                    <button type="button" class="btn btn-teal-action btn-sm rounded-pill px-3 fw-bold" id="btnCompartirItinerarioWa">
                         <i class="bi bi-whatsapp me-1"></i> Compartir Ruta por WhatsApp
                     </button>
                 </div>
@@ -206,26 +210,35 @@
             baseUrl: '<?= htmlspecialchars($baseUrl) ?>'
         };
 
-        // En la portada alterna continuamente entre el logo principal y logo3.
+        // En la portada rota los logotipos de BeniTours y la institución aliada.
         document.addEventListener('DOMContentLoaded', () => {
             const logo = document.querySelector('.navbar-logo[data-logo-alterno]');
             if (!logo) return;
 
-            [logo.dataset.logoPrincipal, logo.dataset.logoAlterno].forEach((ruta) => {
+            const logotipos = [
+                { ruta: logo.dataset.logoPrincipal, esAlterno: false, alt: 'BeniTours' },
+                { ruta: logo.dataset.logoAlterno, esAlterno: true, alt: 'BeniTours' },
+                { ruta: logo.dataset.logoInstitucional, esAlterno: false, alt: 'Plan UABJB 19 Municipios del Beni' }
+            ].filter(({ ruta }) => ruta);
+
+            logotipos.forEach(({ ruta }) => {
                 const imagen = new Image();
                 imagen.src = ruta;
             });
 
-            let mostrandoAlterno = false;
+            let indiceLogo = 0;
             window.setInterval(() => {
                 logo.classList.add('navbar-logo--cambiando');
                 window.setTimeout(() => {
-                    mostrandoAlterno = !mostrandoAlterno;
-                    logo.src = mostrandoAlterno ? logo.dataset.logoAlterno : logo.dataset.logoPrincipal;
-                    logo.classList.toggle('navbar-logo--alterno', mostrandoAlterno);
+                    indiceLogo = (indiceLogo + 1) % logotipos.length;
+                    const siguiente = logotipos[indiceLogo];
+                    logo.src = siguiente.ruta;
+                    logo.alt = siguiente.alt;
+                    logo.classList.toggle('navbar-logo--alterno', siguiente.esAlterno);
                     logo.classList.remove('navbar-logo--cambiando');
                 }, 250);
             }, 10000);
+
         });
     </script>
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/shared/http.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/shared/http.js') ?>"></script>

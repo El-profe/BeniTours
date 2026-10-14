@@ -216,30 +216,32 @@
                         Buscar
                     </button>
                 </div>
-                <?php if (!empty($buscar) || !empty($filtroActual)): ?>
-                    <a class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;" href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos" title="Limpiar búsqueda y filtros">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    </a>
-                <?php endif; ?>
+                <button type="button" 
+                        class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
+                        id="btnResetFiltrosPagos" 
+                        style="width: 38px; height: 38px; display: <?= (!empty($buscar) || !empty($filtroActual)) ? 'flex' : 'none' ?>;" 
+                        title="Limpiar búsqueda y filtros">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
             </form>
 
             <!-- Filtros de Estado en Pastillas (Pills) -->
-            <div class="d-flex align-items-center gap-1 flex-wrap">
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos<?= !empty($buscar) ? '?buscar=' . urlencode($buscar) : '' ?>" class="filter-pill-btn text-decoration-none <?= empty($filtroActual) ? 'active' : '' ?>">
+            <div class="d-flex align-items-center gap-1 flex-wrap" id="contenedorFiltrosEstadoPagos">
+                <button type="button" class="filter-pill-btn <?= empty($filtroActual) ? 'active' : '' ?>" data-filtro-estado="">
                     Todos los Pagos
-                </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos?estado=PENDIENTE<?= !empty($buscar) ? '&buscar=' . urlencode($buscar) : '' ?>" class="filter-pill-btn text-decoration-none <?= $filtroActual === 'PENDIENTE' ? 'active' : '' ?>">
+                </button>
+                <button type="button" class="filter-pill-btn <?= $filtroActual === 'PENDIENTE' ? 'active' : '' ?>" data-filtro-estado="PENDIENTE">
                     Pendientes
                     <?php if ($estadisticas['pendienteCantidad'] > 0): ?>
                         <span class="badge rounded-pill ms-1 bg-warning text-dark"><?= $estadisticas['pendienteCantidad'] ?></span>
                     <?php endif; ?>
-                </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos?estado=CONFIRMADO<?= !empty($buscar) ? '&buscar=' . urlencode($buscar) : '' ?>" class="filter-pill-btn text-decoration-none <?= $filtroActual === 'CONFIRMADO' ? 'active' : '' ?>">
+                </button>
+                <button type="button" class="filter-pill-btn <?= $filtroActual === 'CONFIRMADO' ? 'active' : '' ?>" data-filtro-estado="CONFIRMADO">
                     Confirmados
-                </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos?estado=ANULADO<?= !empty($buscar) ? '&buscar=' . urlencode($buscar) : '' ?>" class="filter-pill-btn text-decoration-none <?= $filtroActual === 'ANULADO' ? 'active' : '' ?>">
+                </button>
+                <button type="button" class="filter-pill-btn <?= $filtroActual === 'ANULADO' ? 'active' : '' ?>" data-filtro-estado="ANULADO">
                     Anulados
-                </a>
+                </button>
             </div>
 
         </div>
@@ -396,7 +398,18 @@
                                             </div>
                                         </div>
                                     <?php else: ?>
-                                        <span class="badge bg-light text-muted border extra-small">Procesado</span>
+                                        <div class="d-inline-flex gap-2 align-items-center justify-content-end">
+                                            <a href="<?= htmlspecialchars($baseUrl) ?>/admin/pagos/recibo?id=<?= (int)$p['id_pago'] ?>" 
+                                               class="btn-recibo-action text-decoration-none" 
+                                               target="_blank"
+                                               title="Ver e Imprimir Recibo Oficial">
+                                                <i class="bi bi-receipt"></i>
+                                                <span>Recibo</span>
+                                            </a>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                                <i class="bi bi-check2"></i> Procesado
+                                            </span>
+                                        </div>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -506,8 +519,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const ingresos = <?= json_encode($graficoIngresos['valores']) ?>;
         const pagosMes = <?= json_encode($graficoIngresos['pagos']) ?>;
         const gradiente = contexto.createLinearGradient(0, 0, 0, 260);
-        gradiente.addColorStop(0, 'rgba(25, 135, 84, 0.48)');
-        gradiente.addColorStop(1, 'rgba(25, 135, 84, 0.03)');
+        gradiente.addColorStop(0, 'rgba(42, 157, 143, 0.48)');
+        gradiente.addColorStop(1, 'rgba(42, 157, 143, 0.03)');
 
         new Chart(contexto, {
             type: 'bar',
@@ -517,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     label: 'Ingresos confirmados',
                     data: ingresos,
                     backgroundColor: gradiente,
-                    borderColor: '#198754',
+                    borderColor: '#2A9D8F',
                     borderWidth: 2,
                     borderRadius: 8,
                     maxBarThickness: 54
@@ -551,21 +564,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // BUSCADOR EN TIEMPO REAL (LIVE SEARCH)
     // ==========================================
+    // ==========================================
+    // BUSCADOR Y FILTRADO EN TIEMPO REAL (SIN RECARGAR PÁGINA)
+    // ==========================================
+    const formBuscarPagos = document.getElementById('formBuscarPagos');
     const inputSearchPagos = document.getElementById('inputBuscadorPagos');
     const btnClearPagos = document.getElementById('btnClearSearchPagos');
+    const btnResetFiltrosPagos = document.getElementById('btnResetFiltrosPagos');
     const btnRestablecerLivePagos = document.getElementById('btnRestablecerLivePagos');
     const filaSinResultadosPagos = document.getElementById('filaSinResultadosPagos');
     const textoBusquedaFallidaPagos = document.getElementById('textoBusquedaFallidaPagos');
     const filasPagos = Array.from(document.querySelectorAll('tr.pago-row'));
+    const botonesFiltroEstado = Array.from(document.querySelectorAll('#contenedorFiltrosEstadoPagos [data-filtro-estado]'));
+    
+    let estadoSeleccionado = (new URLSearchParams(window.location.search)).get('estado') || '';
 
-    function filtrarPagosEnVivo() {
-        if (!inputSearchPagos) return;
+    function aplicarFiltrosPagos() {
+        const query = (inputSearchPagos ? inputSearchPagos.value : '').trim().toLowerCase();
 
-        const query = (inputSearchPagos.value || '').trim().toLowerCase();
-
-        // Mostrar / ocultar botón de limpieza rápida
+        // Visibilidad botón de limpieza en el input
         if (btnClearPagos) {
             btnClearPagos.style.display = query !== '' ? 'block' : 'none';
+        }
+
+        // Visibilidad botón reset global
+        if (btnResetFiltrosPagos) {
+            btnResetFiltrosPagos.style.display = (query !== '' || estadoSeleccionado !== '') ? 'flex' : 'none';
         }
 
         let visibles = 0;
@@ -573,14 +597,22 @@ document.addEventListener('DOMContentLoaded', () => {
         filasPagos.forEach(fila => {
             const dataSearch = fila.getAttribute('data-search') || '';
             const dataId = fila.getAttribute('data-pago') || '';
+            const dataEstado = fila.getAttribute('data-estado') || '';
 
-            let coincide = true;
+            // 1. Filtro por texto
+            let coincideTexto = true;
             if (query !== '') {
                 const queryLimpia = query.replace(/^#/, '');
-                coincide = dataSearch.includes(query) || (queryLimpia !== '' && dataId === queryLimpia);
+                coincideTexto = dataSearch.includes(query) || (queryLimpia !== '' && dataId === queryLimpia);
             }
 
-            if (coincide) {
+            // 2. Filtro por estado
+            let coincideEstado = true;
+            if (estadoSeleccionado !== '') {
+                coincideEstado = (dataEstado === estadoSeleccionado);
+            }
+
+            if (coincideTexto && coincideEstado) {
                 fila.style.display = '';
                 visibles++;
             } else {
@@ -588,46 +620,96 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Manejar fila de sin resultados
+        // Mostrar / Ocultar mensaje sin resultados
         if (filaSinResultadosPagos) {
             if (visibles === 0 && filasPagos.length > 0) {
                 filaSinResultadosPagos.style.display = '';
                 if (textoBusquedaFallidaPagos) {
-                    textoBusquedaFallidaPagos.textContent = query !== '' 
-                        ? `No se encontraron pagos para "${inputSearchPagos.value}".`
-                        : 'No hay pagos que coincidan con la búsqueda.';
+                    let mensaje = 'No se encontraron pagos';
+                    if (query !== '' && estadoSeleccionado !== '') {
+                        mensaje = `No se encontraron pagos con estado "${estadoSeleccionado}" para "${inputSearchPagos.value}".`;
+                    } else if (query !== '') {
+                        mensaje = `No se encontraron pagos para "${inputSearchPagos.value}".`;
+                    } else if (estadoSeleccionado !== '') {
+                        mensaje = `No hay pagos con estado "${estadoSeleccionado}".`;
+                    }
+                    textoBusquedaFallidaPagos.textContent = mensaje;
                 }
             } else {
                 filaSinResultadosPagos.style.display = 'none';
             }
         }
+
+        // Actualizar URL sin recargar la página (para poder copiar o compartir si se desea)
+        const params = new URLSearchParams();
+        if (estadoSeleccionado) params.set('estado', estadoSeleccionado);
+        if (query) params.set('buscar', inputSearchPagos.value.trim());
+        const nuevoQuery = params.toString();
+        const nuevaUrl = window.location.pathname + (nuevoQuery ? '?' + nuevoQuery : '');
+        window.history.replaceState({}, '', nuevaUrl);
     }
 
+    // Evitar que el formulario recargue la página
+    if (formBuscarPagos) {
+        formBuscarPagos.addEventListener('submit', (e) => {
+            e.preventDefault();
+            aplicarFiltrosPagos();
+        });
+    }
+
+    // Búsqueda en vivo al teclear
     if (inputSearchPagos) {
-        inputSearchPagos.addEventListener('input', filtrarPagosEnVivo);
-        if (inputSearchPagos.value.trim() !== '') {
-            if (btnClearPagos) btnClearPagos.style.display = 'block';
-        }
+        inputSearchPagos.addEventListener('input', aplicarFiltrosPagos);
     }
 
+    // Limpiar texto de búsqueda
     if (btnClearPagos) {
         btnClearPagos.addEventListener('click', () => {
             if (inputSearchPagos) {
                 inputSearchPagos.value = '';
                 inputSearchPagos.focus();
-                filtrarPagosEnVivo();
+                aplicarFiltrosPagos();
             }
         });
     }
 
+    // Interacción con los botones de pastilla (Pills)
+    botonesFiltroEstado.forEach(btn => {
+        btn.addEventListener('click', () => {
+            botonesFiltroEstado.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            estadoSeleccionado = btn.getAttribute('data-filtro-estado') || '';
+            aplicarFiltrosPagos();
+        });
+    });
+
+    // Botón de reset global (recargar/limpiar todo)
+    if (btnResetFiltrosPagos) {
+        btnResetFiltrosPagos.addEventListener('click', () => {
+            if (inputSearchPagos) inputSearchPagos.value = '';
+            estadoSeleccionado = '';
+            botonesFiltroEstado.forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-filtro-estado') === '');
+            });
+            aplicarFiltrosPagos();
+        });
+    }
+
+    // Botón restablecer dentro del estado vacío
     if (btnRestablecerLivePagos) {
         btnRestablecerLivePagos.addEventListener('click', () => {
-            if (inputSearchPagos) {
-                inputSearchPagos.value = '';
-                inputSearchPagos.focus();
-                filtrarPagosEnVivo();
-            }
+            if (inputSearchPagos) inputSearchPagos.value = '';
+            estadoSeleccionado = '';
+            botonesFiltroEstado.forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-filtro-estado') === '');
+            });
+            aplicarFiltrosPagos();
         });
+    }
+
+    // Ejecutar filtro inicial si viene con parámetros
+    if (inputSearchPagos && inputSearchPagos.value.trim() !== '') {
+        aplicarFiltrosPagos();
     }
 });
 </script>

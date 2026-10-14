@@ -29,6 +29,7 @@ class AuthController extends Controller {
 
         $this->render('negocio/login', [
             'titulo'          => 'Portal de Negocios y Comercios',
+            'bodyClass'       => 'page-login',
             'error'           => $error,
             'usuarioAnterior' => $usuarioAnterior,
             'csrfToken'       => CsrfMiddleware::obtenerToken()

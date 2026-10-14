@@ -27,7 +27,8 @@ class PagoController extends Controller {
     public function index(): void {
         $filtroEstado = trim($_GET['estado'] ?? '');
         $buscar = trim($_GET['buscar'] ?? '');
-        $pagos = $this->pagoModel->listar($filtroEstado ?: null, $buscar ?: null);
+        // Obtenemos todos los registros para permitir filtrado instantáneo sin recargar la página
+        $pagos = $this->pagoModel->listar(null, null);
 
         // Identificar publicaciones comerciales próximas a vencer (en los siguientes 5 días) (RF-29)
         $db = Database::getConnection();
@@ -100,7 +101,7 @@ class PagoController extends Controller {
         $db = Database::getConnection();
         
         // Listar establecimientos comerciales con su ultimo vencimiento registrado
-        $sqlComercios = "SELECT l.id_lugar, l.nombre, s.plan_solicitado,
+        $sqlComercios = "SELECT l.id_lugar, l.nombre, l.whatsapp_contacto, l.telefono_contacto, l.direccion, s.plan_solicitado,
                                 (SELECT MAX(v.fecha_vencimiento) FROM vigencias v
                                  INNER JOIN pagos p ON p.id_pago = v.id_pago
                                  WHERE v.id_lugar = l.id_lugar AND p.estado = 'CONFIRMADO') AS ultimo_vencimiento
@@ -116,12 +117,15 @@ class PagoController extends Controller {
         $error = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_error']);
 
+        $configComercial = require dirname(__DIR__, 3) . '/config/comercial.php';
+
         $this->render('admin/pagos/crear', [
             'titulo'              => 'Registrar Pago Comercial',
             'comercios'           => $comercios,
             'idLugarSeleccionado' => $idLugarSeleccionado,
             'tarifa'              => $tarifa,
             'planesActivos'       => $planesActivos,
+            'cobro'               => $configComercial,
             'error'               => $error,
             'csrfToken'           => CsrfMiddleware::obtenerToken()
         ], 'admin');
@@ -178,6 +182,20 @@ class PagoController extends Controller {
             $observaciones = !empty($observaciones) ? "{$etiquetaAhorro} {$observaciones}" : $etiquetaAhorro;
         }
 
+        // Soporte para subida de archivo / foto de comprobante (Cámara o archivo)
+        $comprobanteArchivo = null;
+        if (!empty($_FILES['comprobante_archivo']['tmp_name'])) {
+            try {
+                $comprobanteArchivo = \App\Services\ComprobanteService::subir($_FILES['comprobante_archivo']);
+            } catch (\Throwable $e) {
+                $_SESSION['admin_error'] = 'Error en el comprobante: ' . $e->getMessage();
+                header("Location: {$this->config['base_url']}/admin/pagos/crear");
+                exit();
+            }
+        }
+
+        $confirmarInmediato = !empty($_POST['confirmar_inmediato']);
+
         try {
             $lugar = (new \App\Models\Lugar())->buscarPorId($idLugar);
             if (!$lugar || $lugar['tipo_lugar'] !== 'COMERCIAL') {
@@ -187,6 +205,12 @@ class PagoController extends Controller {
             if (!$fecha || $fecha->format('Y-m-d') !== $fechaDeclarada) {
                 throw new \RuntimeException('La fecha declarada no es válida.');
             }
+
+            if (empty($comprobante)) {
+                $prefijo = (str_starts_with($metodo, 'Efectivo')) ? 'REC-EF-' : 'PAG-';
+                $comprobante = $prefijo . date('Ymd-His');
+            }
+
             $idPago = $this->pagoModel->registrar([
                 'id_lugar'              => $idLugar,
                 'id_tarifa'             => $idTarifa,
@@ -194,19 +218,61 @@ class PagoController extends Controller {
                 'meses_duracion'        => $meses,
                 'fecha_pago_declarada'  => $fechaDeclarada,
                 'numero_comprobante'    => $comprobante,
+                'comprobante_archivo'   => $comprobanteArchivo,
                 'metodo_pago'           => $metodo,
                 'observaciones'         => $observaciones
             ]);
             try { (new \App\Models\OperacionAdmin())->registrar($idLugar, (int)$_SESSION['admin_id'], 'PAGO_REGISTRADO', "Pago #{$idPago} registrado por Bs " . number_format($monto, 2), 'pago', $idPago); } catch (\Throwable $ignored) {}
+
+            // Si se marcó confirmar de inmediato (ej. cobro en efectivo en caja)
+            if ($confirmarInmediato) {
+                PagoService::confirmarPago($idPago, (int)$_SESSION['admin_id']);
+                try { (new \App\Models\OperacionAdmin())->registrar($idLugar, (int)$_SESSION['admin_id'], 'PAGO_CONFIRMADO', "Pago #{$idPago} confirmado automáticamente en caja.", 'pago', $idPago); } catch (\Throwable $ignored) {}
+            }
+
         } catch (\Throwable $e) {
+            if ($comprobanteArchivo) {
+                try { \App\Services\ComprobanteService::eliminar($comprobanteArchivo); } catch (\Throwable $ig) {}
+            }
             $_SESSION['admin_error'] = 'No se pudo registrar el pago: ' . $e->getMessage();
             header("Location: {$this->config['base_url']}/admin/pagos/crear");
             exit();
         }
 
-        $_SESSION['admin_flash'] = "Pago #{$idPago} registrado exitosamente por {$meses} mes(es) en estado PENDIENTE.";
+        $estadoTexto = $confirmarInmediato ? 'CONFIRMADO' : 'PENDIENTE';
+        $_SESSION['admin_flash'] = "Pago #{$idPago} registrado exitosamente por {$meses} mes(es) en estado {$estadoTexto}.";
+        
+        // Si el usuario solicitó emitir recibo o ver comprobante, redirigimos a la vista de recibo
+        if (!empty($_POST['emitir_recibo'])) {
+            header("Location: {$this->config['base_url']}/admin/pagos/recibo?id={$idPago}&auto_print=1");
+            exit();
+        }
+
         header("Location: {$this->config['base_url']}/admin/pagos");
         exit();
+    }
+
+    public function recibo(): void {
+        $idPago = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+        if (!$idPago || $idPago < 1) {
+            http_response_code(404);
+            exit('Pago no encontrado.');
+        }
+
+        $pago = $this->pagoModel->buscarPorId($idPago);
+        if (!$pago) {
+            http_response_code(404);
+            exit('Pago no encontrado.');
+        }
+
+        $configComercial = require dirname(__DIR__, 3) . '/config/comercial.php';
+
+        $this->render('admin/pagos/recibo', [
+            'titulo'          => 'Recibo de Pago Oficial - #' . $pago['id_pago'],
+            'pago'            => $pago,
+            'cobro'           => $configComercial,
+            'autoPrint'       => !empty($_GET['auto_print'])
+        ], 'admin');
     }
 
     public function confirmar(): void {

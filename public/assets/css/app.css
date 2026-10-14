@@ -1,33 +1,68 @@
-/* Paleta Institucional Inspirada en el Beni */
+/* Paleta Institucional Inspirada en el Beni - Río Mamoré & Teal Amazónico */
 :root {
-    --trini-green: #0d3b18;
-    --trini-green-light: #1b632c;
-    --trini-gold: #ffc107;
-    --trini-gold-hover: #e0a800;
-    --trini-bg-body: #f8faf9;
-    --trini-card-border: #e9ecef;
+    --trini-green: #0f3b43;
+    --trini-green-light: #0d9488;
+    --trini-green-dark: #09252a;
+    --trini-gold: #f97316;
+    --trini-gold-hover: #ea580c;
+    --trini-bg-body: #f7faf9;
+    --trini-card-border: #e2e8f0;
 }
 
 body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #2b2f33;
+    color: #132a2f;
     background-color: var(--trini-bg-body);
 }
 
-/* Navbar */
+/* Navbar Flotante Moderno con esquinas semi curvas, alargado y separación lateral */
 .navbar-trinidad {
     background-color: var(--trini-green);
+    transition: all 0.3s ease;
 }
+
+body > .navbar-trinidad,
 .page-home > .navbar-trinidad {
     position: fixed;
-    inset: 0 0 auto;
-    /* Debe quedar por encima de los controles de las tarjetas. */
+    top: 14px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+    max-width: 1580px;
+    margin-inline: auto;
     z-index: 1030;
-    background: rgba(9, 42, 17, 0.94);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(15, 59, 67, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    border-radius: 24px;
+    box-shadow: 0 10px 35px rgba(9, 37, 42, 0.38) !important;
+    padding: 0.65rem 1.6rem !important;
 }
+
+/* Compensar el espacio superior en páginas que no son la portada principal */
+body:not(.page-home) {
+    padding-top: 86px;
+}
+
+@media (max-width: 768px) {
+    body > .navbar-trinidad,
+    .page-home > .navbar-trinidad {
+        top: 8px;
+        left: 10px;
+        right: 10px;
+        border-radius: 18px;
+        padding: 0.45rem 0.85rem !important;
+    }
+    body:not(.page-home) {
+        padding-top: 76px;
+    }
+}
+
+
+
+
 
 #inicio,
 #explorar,
@@ -41,16 +76,90 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background-color: rgba(255, 193, 7, 0.2);
-    color: var(--trini-gold);
+    background-color: rgba(13, 148, 136, 0.2);
+    color: var(--trini-green-light);
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
+/* Botón de acción Negocios en Navbar */
+.btn-teal-action {
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease;
+}
+.btn-teal-action:hover, .btn-teal-action:focus {
+    background-color: #0f766e !important;
+    border-color: #0f766e !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35) !important;
+}
+
+/* Clases utilitarias Paleta Río Mamoré & Teal */
+.btn-outline-teal {
+    border-color: #0d9488 !important;
+    color: #0d9488 !important;
+    background-color: transparent !important;
+    transition: all 0.2s ease;
+}
+.btn-outline-teal:hover, .btn-outline-teal:focus {
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25) !important;
+}
+
+.text-teal {
+    color: #0d9488 !important;
+}
+
+.bg-teal-subtle {
+    background-color: #e6fffa !important;
+}
+
+.border-teal-subtle {
+    border-color: #99f6e4 !important;
+}
+
+.badge-teal {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+}
+
+.modal-header-teal {
+    background: linear-gradient(135deg, #09252a 0%, #0f3b43 55%, #0d9488 100%) !important;
+    border-bottom: 1px solid rgba(45, 212, 191, 0.2) !important;
+}
+
+/* Elementos Hero con Paleta Río Mamoré & Teal */
+.hero-badge-teal {
+    background: rgba(15, 59, 67, 0.85) !important;
+    color: #2dd4bf !important;
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    backdrop-filter: blur(8px);
+    letter-spacing: 0.05em;
+}
+
+.text-teal-highlight {
+    color: #2dd4bf !important;
+    text-shadow: 0 2px 10px rgba(45, 212, 191, 0.35);
+}
 /* Logo en la barra de navegación */
+.navbar-brand {
+    /* Reserva el mismo espacio para ambos logos y evita que el menu se desplace al alternarlos. */
+    width: 190px;
+    flex: 0 0 190px;
+    justify-content: center;
+    overflow: visible;
+}
+
 .navbar-logo {
     height: 52px;
-    width: auto;
+    width: 100%;
     max-height: 52px;
     object-fit: contain;
     transition: transform 0.25s ease, opacity 0.25s ease;
@@ -71,11 +180,46 @@ body {
 
 /* Ajuste proporcional para celulares */
 @media (max-width: 576px) {
+    .navbar-brand {
+        width: 155px;
+        flex-basis: 155px;
+    }
+
     .navbar-logo {
         height: 44px;
         max-height: 44px;
     }
 }
+
+/* Dropdown de la barra de navegación */
+/* Dropdowns Generales y Barra de Navegación */
+.dropdown-menu {
+    border: 1px solid rgba(15, 59, 67, 0.12) !important;
+}
+
+.dropdown-item {
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.85rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #e6fffa !important;
+    color: #0f3b43 !important;
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.35);
+}
+
 /* Hero */
 .hero-trinidad {
     width: 100%;
@@ -116,7 +260,8 @@ body {
 }
 @media (max-width: 1199.98px) {
     .page-home .navbar-collapse {
-        background: rgba(9, 42, 17, 0.97);
+        background: rgba(15, 59, 67, 0.98);
+        border: 1px solid rgba(45, 212, 191, 0.2);
         border-radius: 1rem;
         padding: 1rem;
         margin-top: 0.5rem;
@@ -141,15 +286,15 @@ body {
     min-height: 48px;
     width: min(100%, 460px);
     box-sizing: border-box;
-    border: 1px solid rgba(13, 59, 24, 0.14);
-    background: linear-gradient(135deg, #ffffff, #f1f8f3);
-    box-shadow: 0 6px 18px rgba(13, 59, 24, 0.10);
+    border: 1px solid rgba(15, 59, 67, 0.16);
+    background: linear-gradient(135deg, #ffffff, #f0fdfa);
+    box-shadow: 0 6px 18px rgba(15, 59, 67, 0.08);
     transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 .municipio-filter:focus-within {
     border-color: var(--trini-green-light);
-    box-shadow: 0 0 0 .22rem rgba(27, 99, 44, 0.15), 0 8px 20px rgba(13, 59, 24, 0.12);
+    box-shadow: 0 0 0 .22rem rgba(13, 148, 136, 0.18), 0 8px 20px rgba(15, 59, 67, 0.12);
     transform: translateY(-1px);
 }
 
@@ -279,16 +424,19 @@ body {
 
 /* Place Cards */
 .place-card {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    border: 1px solid rgba(15, 59, 67, 0.08) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
 }
 .place-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 1rem 1.8rem rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(15, 59, 67, 0.12) !important;
+    border-color: rgba(13, 148, 136, 0.3) !important;
 }
 
 .card-header-place {
-    background: linear-gradient(135deg, var(--trini-green) 0%, var(--trini-green-light) 100%);
+    background: linear-gradient(135deg, var(--trini-green) 0%, #164e56 100%);
 }
 
 .place-icon-bubble {
@@ -299,19 +447,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 12px rgba(15, 59, 67, 0.15);
 }
 
 .badge-publico {
-    background-color: #198754;
+    background-color: #0d9488;
     color: #ffffff;
     padding: 0.4rem 0.8rem;
     font-size: 0.72rem;
+    font-weight: 600;
 }
 .badge-comercio {
-    background-color: var(--trini-gold);
-    color: #212529;
+    background-color: #f97316;
+    color: #ffffff;
     padding: 0.4rem 0.8rem;
     font-size: 0.72rem;
+    font-weight: 600;
 }
 
 .icon-circle {
@@ -342,9 +493,9 @@ body {
 }
 
 .guide-card-transport {
-    --guide-color: #ffc107;
-    --guide-text: #292109;
-    --guide-copy: #3e320d;
+    --guide-color: #0d9488;
+    --guide-text: #ffffff;
+    --guide-copy: #ccfbf1;
 }
 
 .guide-card-sunset {
@@ -395,7 +546,7 @@ body {
     }
 
     .guide-card-transport:hover .icon-circle {
-        color: #856000 !important;
+        color: #0f766e !important;
     }
 }
 
@@ -404,22 +555,25 @@ body {
     position: relative;
     overflow: hidden;
     color: #ffffff;
-    background: radial-gradient(circle at 88% 5%, rgba(255, 193, 7, .2), transparent 25%), linear-gradient(135deg, #061f0d, #0d4d27 58%, #0b3820);
+    background: radial-gradient(circle at 88% 5%, rgba(13, 148, 136, .22), transparent 28%), linear-gradient(135deg, #09252a, #0f3b43 58%, #0d4650);
 }
 .site-footer::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .35; background-image: radial-gradient(rgba(255,255,255,.13) 1px, transparent 1px); background-size: 22px 22px; }
 .site-footer-inner { position: relative; padding-top: 3.5rem; padding-bottom: 1.5rem; }
 .site-footer-logo { width: auto; height: 58px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 7px 14px rgba(0, 0, 0, .22)); }
-.site-footer h5 span { color: var(--trini-gold); }
+.site-footer h5 span { color: #2dd4bf; }
 .site-footer-tagline { color: rgba(255,255,255,.62); font-size: .72rem; letter-spacing: .04em; }
 .site-footer p { color: rgba(255,255,255,.72) !important; max-width: 520px; line-height: 1.7; }
 .site-footer-location { display: inline-flex; align-items: center; padding: .48rem .85rem; border: 1px solid rgba(255,255,255,.18); border-radius: 50rem; background: rgba(255,255,255,.08); color: #ffffff; font-size: .8rem; }
-.site-footer-location .bi { color: #ffc107 !important; }
+.site-footer-location .bi { color: #2dd4bf !important; }
 .site-footer h6 { color: #ffffff; letter-spacing: .08em; }
 .site-footer-links a { display: inline-flex; align-items: center; color: rgba(255,255,255,.7); text-decoration: none; transition: transform .18s ease, color .18s ease; }
 .site-footer-links a:hover { color: #ffffff; transform: translateX(4px); }
-.site-footer-links .bi, .site-footer .text-warning { color: #ffc107 !important; }
+.site-footer-links .bi, .site-footer .text-warning { color: #2dd4bf !important; }
 .site-footer-bottom { border-top: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.6); }
-.site-footer-bottom .bi { color: #ffc107; }
+.site-footer-bottom .bi { color: #2dd4bf; }
+.site-footer-social { display: flex; align-items: center; gap: .65rem; }
+.site-footer-social a { display: inline-grid; width: 2.3rem; height: 2.3rem; place-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; color: #ffffff; background: rgba(255,255,255,.08); font-size: 1.05rem; text-decoration: none; transition: transform .18s ease, background-color .18s ease, border-color .18s ease; }
+.site-footer-social a:hover, .site-footer-social a:focus-visible { color: #ffffff; background: rgba(13, 148, 136, .35); border-color: #2dd4bf; transform: translateY(-3px); outline: none; }
 
 /* Vaivén vertical continuo al situar el cursor sobre una tarjeta. */
 @keyframes guide-card-wave {
@@ -478,9 +632,31 @@ body {
 }
 
 .hero-cta {
-    background: linear-gradient(135deg, #092a11 0%, #155724 100%);
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    background: linear-gradient(135deg, #09252a 0%, #0f3b43 50%, #0d9488 100%);
+    border: 1px solid rgba(45, 212, 191, 0.25);
+    box-shadow: 0 16px 36px rgba(15, 59, 67, 0.2);
 }
+
+.hero-cta .lead {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.hero-cta .btn-cta-negocio {
+    background-color: #f97316 !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.hero-cta .btn-cta-negocio:hover {
+    background-color: #ea580c !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4) !important;
+}
+
+
 
 .extra-small {
     font-size: 0.75rem;
@@ -537,22 +713,22 @@ body {
    COLORES INDIVIDUALES POR CATEGORÍA
    -------------------------------------------------------------------------- */
 
-/* 1. Todos (Verde Bosque Institucional) */
+/* 1. Todos (Río Mamoré & Teal Amazónico) */
 .chip-filter-icon.cat-color-all {
-    background-color: #0d6b2e;
-    border-color: #075421;
+    background-color: #0f3b43;
+    border-color: #09252a;
     color: #ffffff;
 }
 .chip-filter-icon.cat-color-all:hover {
-    background-color: #e2f5e8;
-    border-color: #8bd7a7;
-    color: #0d6b2e;
+    background-color: #e6fffa;
+    border-color: #5eead4;
+    color: #0f3b43;
 }
 .chip-filter-icon.cat-color-all.active {
-    background: linear-gradient(135deg, #06431c 0%, #0d6b2e 100%);
-    border-color: #0d3b18;
+    background: linear-gradient(135deg, #09252a 0%, #0d9488 100%);
+    border-color: #0f3b43;
     color: #ffffff !important;
-    box-shadow: 0 8px 20px rgba(13, 59, 24, 0.35);
+    box-shadow: 0 8px 20px rgba(15, 59, 67, 0.35);
 }
 
 /* 2. Naturaleza / Atractivos (Verde Esmeralda) */
@@ -836,12 +1012,12 @@ body {
 .view-switcher-group .btn.active {
     background-color: var(--trini-green);
     color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(13, 59, 24, 0.25);
+    box-shadow: 0 2px 6px rgba(15, 59, 67, 0.35);
 }
 
 .map-catalog-card {
     transition: box-shadow 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(15, 59, 67, 0.12) !important;
 }
 
 /* Pines personalizados en Leaflet */
@@ -878,9 +1054,9 @@ body {
 }
 
 /* Colores de pines por categoría */
-.pin-nature { background: #198754; }
-.pin-gastro { background: #fd7e14; }
-.pin-hotel  { background: #0d6efd; }
+.pin-nature { background: #0d9488; }
+.pin-gastro { background: #f97316; }
+.pin-hotel  { background: #0284c7; }
 .pin-night  { background: #8b5cf6; }
 .pin-museum { background: #eab308; }
 .pin-water  { background: #06b6d4; }
@@ -1021,34 +1197,37 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 .navbar-trinidad .nav-link.active {
     color: #ffffff !important;
-    background-color: rgba(255, 193, 7, 0.25) !important;
+    background-color: rgba(13, 148, 136, 0.28) !important;
     font-weight: 700 !important;
-    box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.45);
 }
 
 .navbar-trinidad .nav-link.active i {
-    color: var(--trini-gold) !important;
+    color: #2dd4bf !important;
 }
 
 /* Sección y Tarjetas de Promociones */
 .seccion-promociones {
-    background: linear-gradient(180deg, rgba(255, 255, 255, .72) 0%, rgba(244, 251, 246, .68) 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
 }
 
 .card-promocion {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: 1px solid rgba(25, 135, 84, 0.15) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    border: 1px solid rgba(13, 148, 136, 0.18) !important;
     background: #ffffff;
+    border-radius: 16px !important;
 }
 
 .card-promocion:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(13, 59, 24, 0.12) !important;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(15, 59, 67, 0.12) !important;
+    border-color: rgba(13, 148, 136, 0.35) !important;
 }
 
 .promo-discount-tag {
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.35) !important;
+    background-color: #f97316 !important;
+    box-shadow: 0 4px 10px rgba(249, 115, 22, 0.35) !important;
 }
 
 /* Carrusel de promociones: la tarjeta central marca la promoción activa. */
@@ -1152,7 +1331,7 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 }
 
 .promo-carousel-card.is-active .card-promocion {
-    box-shadow: 0 18px 35px rgba(13, 59, 24, .18) !important;
+    box-shadow: 0 18px 35px rgba(15, 59, 67, .18) !important;
 }
 
 .promo-carousel-indicators {
@@ -1168,14 +1347,14 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: #b7c4ba;
+    background: #cbd5e1;
     transition: width .25s ease, background-color .25s ease;
 }
 
 .promo-carousel-indicators button.is-active {
     width: 1.55rem;
     border-radius: 99px;
-    background: #198754;
+    background: #0d9488;
 }
 
 @media (max-width: 767.98px) {

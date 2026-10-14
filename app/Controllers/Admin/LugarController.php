@@ -81,6 +81,7 @@ class LugarController extends Controller {
         $municipios = $this->municipioModel->listarActivos();
         $tarifas    = (new Tarifa())->listarPlanesActivos();
         $tarifaVigente = (new Tarifa())->obtenerTarifaVigente();
+        $configComercial = require dirname(__DIR__, 3) . '/config/comercial.php';
         $error = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_error']);
 
@@ -90,6 +91,7 @@ class LugarController extends Controller {
             'municipios'    => $municipios,
             'tarifas'       => $tarifas,
             'tarifaVigente' => $tarifaVigente,
+            'cobro'         => $configComercial,
             'error'         => $error,
             'csrfToken'     => CsrfMiddleware::obtenerToken()
         ], 'admin');

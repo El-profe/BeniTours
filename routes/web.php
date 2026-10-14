@@ -65,12 +65,14 @@ $router->post('/admin/pagos/guardar', [PagoController::class, 'guardar']);
 $router->post('/admin/pagos/confirmar', [PagoController::class, 'confirmar']);
 $router->post('/admin/pagos/anular', [PagoController::class, 'anular']);
 $router->get('/admin/pagos/comprobante', [PagoController::class, 'comprobante']);
+$router->get('/admin/pagos/recibo', [PagoController::class, 'recibo']);
 $router->post('/admin/pagos/rechazar-eliminar', [PagoController::class, 'rechazarEliminar']);
 
 // Reportes Analíticos
 $router->get('/admin/reportes', [\App\Controllers\Admin\ReporteController::class, 'index']);
 $router->get('/admin/reportes/comercio', [\App\Controllers\Admin\ReporteController::class, 'comercioIndividual']);
 $router->get('/admin/reportes/exportar', [\App\Controllers\Admin\ReporteController::class, 'exportar']);
+$router->get('/admin/reportes/imprimir', [\App\Controllers\Admin\ReporteController::class, 'imprimir']);
 
 // Parámetros y Catálogos (Categorías, Municipios, Planes)
 $router->get('/admin/catalogos', [\App\Controllers\Admin\CatalogoController::class, 'index']);
@@ -100,3 +102,5 @@ $router->get('/negocio/perfil', [\App\Controllers\Negocio\PanelController::class
 $router->post('/negocio/perfil/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarPerfil']);
 $router->get('/negocio/renovar', [\App\Controllers\Negocio\PanelController::class, 'renovar']);
 $router->post('/negocio/renovar/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarRenovacion']);
+
+

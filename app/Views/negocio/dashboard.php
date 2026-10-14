@@ -97,6 +97,7 @@
                 </small>
             </div>
         </div>
+    </div>
     <!-- MÓDULO DE IMPACTO COMERCIAL Y CLIENTES GENERADOS (TELEMETRÍA EN VIVO) -->
     <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white border-start border-4 border-success">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
@@ -285,6 +286,67 @@
                 <?php endif; ?>
             </div>
 
+            <!-- MÓDULO: Radiomóviles, Paradas, Tarifario y Despacho (Debajo de Promociones) -->
+            <div class="d-none">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <span class="text-primary small fw-bold text-uppercase d-block mb-1">
+                            <i class="bi bi-taxi-front-fill me-1"></i> Servicio de Transporte y Radiomóvil
+                        </span>
+                        <h5 class="fw-bold text-dark mb-0">Flota, Paradas Oficiales y Tarifario</h5>
+                    </div>
+                    <div>
+                        <a href="<?= htmlspecialchars($baseUrl) ?>/negocio/transporte" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
+                            <i class="bi bi-gear-fill me-1"></i> Administrar Transporte
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                                <i class="bi bi-car-front-fill text-primary fs-3"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-0"><?= $totalMoviles ?? 0 ?></h4>
+                            <small class="text-muted extra-small d-block fw-semibold">Móviles Registrados</small>
+                            <span class="badge bg-success-subtle text-success rounded-pill extra-small mt-1">
+                                <?= $movilesDisponibles ?? 0 ?> disponibles ahora
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                                <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-0"><?= $totalParadas ?? 0 ?></h4>
+                            <small class="text-muted extra-small d-block fw-semibold">Paradas Estratégicas</small>
+                            <span class="extra-small text-muted mt-1 d-block">Terminal, Aeropuerto, Central</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded-4 bg-light text-center h-100 border">
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                                <i class="bi bi-cash-coin text-success fs-3"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-0"><?= $totalTarifas ?? 0 ?></h4>
+                            <small class="text-muted extra-small d-block fw-semibold">Tarifas Cargadas</small>
+                            <span class="extra-small text-muted mt-1 d-block">Fijo urbano y Expresos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i> Puedes gestionar qué choferes están de turno, editar tus tarifas a otras provincias y actualizar las paradas físicas.
+                    </small>
+                    <a href="<?= htmlspecialchars($baseUrl) ?>/negocio/transporte" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                        Ir al panel de despacho &rarr;
+                    </a>
+                </div>
+            </div>
+
             <!-- Accesos Rápidos Principales -->
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
                 <h5 class="fw-bold text-dark mb-3">
@@ -338,6 +400,21 @@
                             </div>
                         </a>
                     </div>
+
+                    <div class="col-12 col-md-12 mt-2">
+                        <a href="<?= htmlspecialchars($baseUrl) ?>/negocio/transporte" class="btn btn-primary-subtle border border-primary-subtle text-primary rounded-4 p-2 p-sm-3 text-start d-flex align-items-center justify-content-between w-100 text-decoration-none shadow-sm-hover">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 bg-primary text-white p-2 fs-4 flex-shrink-0">
+                                    <i class="bi bi-taxi-front"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block fw-bold">Control de Flota y Tarifas de Radiomóvil</strong>
+                                    <small class="text-muted extra-small">Gestiona paradas estratégicas, choferes disponibles y tarifas de expresos</small>
+                                </div>
+                            </div>
+                            <span class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold d-none d-sm-inline-block">Abrir &rarr;</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -363,7 +440,12 @@
                             <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($lugar['imagen']) ?>" 
                                  alt="<?= htmlspecialchars($lugar['nombre']) ?>" 
                                  class="w-100 h-100 object-fit-cover"
+                                 onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');"
                                  loading="lazy">
+                            <div class="preview-image-fallback d-none w-100 h-100 flex-column align-items-center justify-content-center text-white-50 bg-secondary">
+                                <i class="bi bi-image display-6 mb-1"></i>
+                                <span class="extra-small">No se pudo cargar la portada</span>
+                            </div>
                         <?php else: ?>
                             <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white-50 bg-secondary">
                                 <i class="bi bi-camera display-5 mb-1"></i>
@@ -601,7 +683,7 @@ function imprimirQrCartel() {
                 .afiche-container {
                     max-width: 480px;
                     width: 100%;
-                    border: 3px solid #198754;
+                    border: 3px solid #2A9D8F;
                     border-radius: 28px;
                     padding: 35px 25px;
                     text-align: center;
@@ -619,7 +701,7 @@ function imprimirQrCartel() {
                     }
                     .afiche-container {
                         box-shadow: none !important;
-                        border: 3px solid #198754 !important;
+                        border: 3px solid #2A9D8F !important;
                         page-break-inside: avoid;
                     }
                 }

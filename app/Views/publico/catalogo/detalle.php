@@ -9,8 +9,8 @@
 <div class="container py-4 my-2">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= htmlspecialchars($baseUrl) ?>/" class="text-success text-decoration-none"><i class="bi bi-house-door"></i> Inicio</a></li>
-            <li class="breadcrumb-item"><a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="text-success text-decoration-none">Catálogo</a></li>
+            <li class="breadcrumb-item"><a href="<?= htmlspecialchars($baseUrl) ?>/" class="text-teal text-decoration-none"><i class="bi bi-house-door"></i> Inicio</a></li>
+            <li class="breadcrumb-item"><a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="text-teal text-decoration-none">Catálogo</a></li>
             <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($lugar['nombre']) ?></li>
         </ol>
     </nav>
@@ -52,7 +52,7 @@
                 <?php else: ?>
                     <div class="p-5 text-center hero-beni text-white">
                         <div class="place-icon-bubble mx-auto mb-3 shadow">
-                            <i class="bi <?= htmlspecialchars($lugar['categoria_icono'] ?? 'bi-geo-alt') ?> fs-1 text-success" aria-hidden="true"></i>
+                            <i class="bi <?= htmlspecialchars($lugar['categoria_icono'] ?? 'bi-geo-alt') ?> fs-1 text-teal" aria-hidden="true"></i>
                         </div>
                         <p class="mb-0">Fotografías no disponibles por el momento</p>
                     </div>
@@ -77,7 +77,7 @@
                 <?php endif; ?>
                 <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= $queryMaps ?>" target="_blank" rel="noopener noreferrer" 
                    onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MAPA')"
-                   class="btn btn-outline-success rounded-pill px-4 mt-2 align-self-start">
+                   class="btn btn-outline-teal rounded-pill px-4 mt-2 align-self-start">
                     <i class="bi bi-map-fill me-2" aria-hidden="true"></i> Cómo llegar
                 </a>
             </section>
@@ -103,7 +103,7 @@
                         </h2>
                         <a href="<?= htmlspecialchars($lugar['enlace_menu']) ?>" target="_blank" rel="noopener noreferrer" 
                            onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MENU')"
-                           class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">
+                           class="btn btn-sm btn-outline-teal rounded-pill px-3 fw-semibold">
                             <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en pantalla completa
                         </a>
                     </div>
@@ -189,12 +189,12 @@
                     $telefonoRaw = preg_replace('/[^\d+]/', '', $lugar['telefono_contacto'] ?? '');
                 ?>
                 <div class="border-top pt-4 mb-4">
-                    <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-chat-dots me-2 text-success" aria-hidden="true"></i>Contacto Directo</h2>
+                    <h2 class="h5 fw-bold text-dark mb-3"><i class="bi bi-chat-dots me-2 text-teal" aria-hidden="true"></i>Contacto Directo</h2>
                     <div class="d-grid gap-2">
                         <?php if (!empty($whatsappRaw)): ?>
                             <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $mensajeWa ?>" target="_blank" rel="noopener noreferrer" 
                                 onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'WHATSAPP')"
-                                class="btn btn-success rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                class="btn btn-teal-action rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-whatsapp fs-5"></i> Contactar por WhatsApp
                             </a>
                         <?php endif; ?>
@@ -240,7 +240,7 @@
                                 <?php if (!empty($whatsappRaw)): ?>
                                     <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $textoWaDetalle ?>" 
                                        target="_blank" rel="noopener noreferrer"
-                                       class="btn btn-sm btn-success rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-1 shadow-sm mt-1">
+                                       class="btn btn-sm btn-teal-action rounded-pill w-100 fw-bold d-flex align-items-center justify-content-center gap-1 shadow-sm mt-1">
                                         <i class="bi bi-whatsapp"></i> Pedir / Aprovechar Oferta
                                     </a>
                                 <?php endif; ?>
@@ -248,6 +248,108 @@
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+
+                <!-- SECCIÓN DE RADIOMÓVIL Y TRANSPORTE (Debajo de Promociones - Desktop) -->
+                <?php if (!empty($tarifasTransporte) || !empty($paradasTransporte) || !empty($movilesTransporte)): ?>
+                    <div class="border-top pt-4 mb-4 d-none d-lg-block">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 fw-bold text-dark mb-0">
+                                <i class="bi bi-taxi-front-fill text-primary me-2" aria-hidden="true"></i>Servicio de Radiomóvil
+                            </h2>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 extra-small fw-bold">
+                                Tarifario Oficial
+                            </span>
+                        </div>
+
+                        <!-- Botón Rápido Pedir Móvil -->
+                        <?php if (!empty($whatsappRaw)): ?>
+                            <?php 
+                                $txtPedirMovil = rawurlencode("Hola, me comunico con la central de {$lugar['nombre']}. Necesito solicitar un radiomóvil en mi ubicación actual hacia: ");
+                            ?>
+                            <div class="mb-3">
+                                <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $txtPedirMovil ?>" target="_blank" rel="noopener noreferrer"
+                                   onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'WHATSAPP')"
+                                   class="btn btn-primary rounded-pill w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-whatsapp fs-5"></i> Solicitar Móvil a la Central
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($movilesTransporte)): ?>
+                            <div class="mb-3">
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-taxi-front-fill me-1 text-primary"></i>Moviles activos</strong>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <?php foreach ($movilesTransporte as $movil): ?>
+                                        <?php $disponible = ($movil['estado'] ?? '') === 'DISPONIBLE'; ?>
+                                        <span class="badge rounded-pill px-3 py-2 <?= $disponible ? 'bg-success' : 'bg-secondary' ?>">
+                                            <?= htmlspecialchars($movil['numero_movil']) ?>: <?= $disponible ? 'Disponible' : htmlspecialchars(str_replace('_', ' ', $movil['estado'])) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Tarifario -->
+                        <?php if (!empty($tarifasTransporte)): ?>
+                            <div class="mb-3">
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-cash-coin me-1 text-success"></i>Tarifas y Expresos</strong>
+                                <div class="list-group list-group-flush rounded-4 border overflow-hidden">
+                                    <?php foreach ($tarifasTransporte as $tar): ?>
+                                        <div class="list-group-item p-2 px-3 bg-light-subtle d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="extra-small fw-bold text-dark">
+                                                    <?= htmlspecialchars($tar['origen']) ?> &rarr; <span class="text-primary"><?= htmlspecialchars($tar['destino']) ?></span>
+                                                </div>
+                                                <div class="extra-small text-muted">
+                                                    <?= htmlspecialchars($tar['tipo_servicio'] === 'EXPRESO_PROVINCIAL' ? 'Expreso Provincial' : ($tar['tipo_servicio'] === 'AEROPUERTO_TERMINAL' ? 'Aeropuerto/Terminal' : 'Urbano Fijo')) ?>
+                                                    <?php if (!empty($tar['descripcion'])): ?> &bull; <?= htmlspecialchars($tar['descripcion']) ?><?php endif; ?>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success text-white rounded-pill px-2 py-1 small fw-bold">
+                                                    Bs <?= number_format($tar['precio_base'], 2) ?>
+                                                </span>
+                                                <?php if (!empty($tar['precio_nocturno'])): ?>
+                                                    <div class="extra-small text-muted" title="Precio nocturno">Noc: Bs <?= number_format($tar['precio_nocturno'], 2) ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Paradas Oficiales -->
+                        <?php if (!empty($paradasTransporte)): ?>
+                            <div>
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-geo-alt-fill me-1 text-danger"></i>Paradas y Casetas Oficiales</strong>
+                                <div class="d-flex flex-column gap-2">
+                                    <?php foreach ($paradasTransporte as $par): ?>
+                                        <div class="p-2 px-3 rounded-3 border bg-white small">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <strong class="text-dark"><?= htmlspecialchars($par['nombre']) ?></strong>
+                                                <span class="badge rounded-pill extra-small <?= $par['tipo'] === 'TERMINAL' ? 'bg-primary' : ($par['tipo'] === 'AEROPUERTO' ? 'bg-info text-dark' : 'bg-secondary') ?>">
+                                                    <?= htmlspecialchars($par['tipo']) ?>
+                                                </span>
+                                            </div>
+                                            <?php if (!empty($par['direccion'])): ?>
+                                                <div class="extra-small text-muted"><i class="bi bi-geo me-1"></i><?= htmlspecialchars($par['direccion']) ?></div>
+                                            <?php endif; ?>
+                                            <?php if (!empty($par['latitud']) && !empty($par['longitud'])): ?>
+                                                <div class="mt-1">
+                                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= $par['latitud'] ?>,<?= $par['longitud'] ?>" target="_blank" rel="noopener noreferrer" class="extra-small text-danger text-decoration-none fw-semibold">
+                                                        <i class="bi bi-map-fill me-1"></i>Ver ubicación en mapa &rarr;
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
                 <a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="btn btn-light btn-sm w-100 rounded-pill text-muted d-none d-lg-block">
                     <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver al Directorio
                 </a>
@@ -273,7 +375,7 @@
                     <?php endif; ?>
                     <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= $queryMaps ?>" target="_blank" rel="noopener noreferrer"
                        onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MAPA')"
-                       class="btn btn-outline-success rounded-pill px-4 mt-2">
+                       class="btn btn-outline-teal rounded-pill px-4 mt-2">
                         <i class="bi bi-map-fill me-2" aria-hidden="true"></i>Cómo llegar
                     </a>
                 </section>
@@ -289,7 +391,7 @@
                             <h2 id="tituloMenuMovil" class="h5 fw-bold text-dark mb-0"><i class="bi bi-book-half me-2 text-warning" aria-hidden="true"></i>Menú / Carta</h2>
                             <a href="<?= htmlspecialchars($urlMenuMovil, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"
                                onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'MENU')"
-                               class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">Abrir menú</a>
+                               class="btn btn-sm btn-outline-teal rounded-pill px-3 fw-semibold">Abrir menú</a>
                         </div>
                         <?php if ($esImagenMovil): ?>
                             <div class="rounded-4 overflow-hidden border text-center bg-light p-2"><img src="<?= htmlspecialchars($urlMenuMovil) ?>" alt="Menú de <?= htmlspecialchars($lugar['nombre']) ?>" class="img-fluid rounded-3 w-100" loading="lazy"></div>
@@ -318,6 +420,98 @@
                         <?php endforeach; ?>
                     </section>
                 <?php endif; ?>
+
+                <!-- SECCIÓN DE RADIOMÓVIL Y TRANSPORTE (Debajo de Promociones - Móvil) -->
+                <?php if (!empty($tarifasTransporte) || !empty($paradasTransporte) || !empty($movilesTransporte)): ?>
+                    <section class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4" aria-labelledby="tituloTransporteMovil">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 id="tituloTransporteMovil" class="h5 fw-bold text-dark mb-0">
+                                <i class="bi bi-taxi-front-fill text-primary me-2" aria-hidden="true"></i>Servicio de Radiomóvil
+                            </h2>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 extra-small fw-bold">
+                                Oficial
+                            </span>
+                        </div>
+
+                        <?php if (!empty($whatsappRaw)): ?>
+                            <?php 
+                                $txtPedirMovilMovil = rawurlencode("Hola, me comunico con la central de {$lugar['nombre']}. Necesito solicitar un radiomóvil en mi ubicación actual hacia: ");
+                            ?>
+                            <div class="mb-3">
+                                <a href="https://wa.me/<?= $whatsappRaw ?>?text=<?= $txtPedirMovilMovil ?>" target="_blank" rel="noopener noreferrer"
+                                   onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$lugar['id_lugar'] ?>, 'WHATSAPP')"
+                                   class="btn btn-primary rounded-pill w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-whatsapp fs-5"></i> Pedir Móvil por WhatsApp
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($movilesTransporte)): ?>
+                            <div class="mb-3">
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-taxi-front-fill me-1 text-primary"></i>Moviles activos</strong>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <?php foreach ($movilesTransporte as $movil): ?>
+                                        <?php $disponible = ($movil['estado'] ?? '') === 'DISPONIBLE'; ?>
+                                        <span class="badge rounded-pill px-3 py-2 <?= $disponible ? 'bg-success' : 'bg-secondary' ?>">
+                                            <?= htmlspecialchars($movil['numero_movil']) ?>: <?= $disponible ? 'Disponible' : htmlspecialchars(str_replace('_', ' ', $movil['estado'])) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($tarifasTransporte)): ?>
+                            <div class="mb-3">
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-cash-coin me-1 text-success"></i>Tarifas y Expresos</strong>
+                                <div class="list-group list-group-flush rounded-4 border overflow-hidden">
+                                    <?php foreach ($tarifasTransporte as $tar): ?>
+                                        <div class="list-group-item p-2 px-3 bg-light-subtle d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="extra-small fw-bold text-dark">
+                                                    <?= htmlspecialchars($tar['origen']) ?> &rarr; <span class="text-primary"><?= htmlspecialchars($tar['destino']) ?></span>
+                                                </div>
+                                                <div class="extra-small text-muted">
+                                                    <?= htmlspecialchars($tar['tipo_servicio'] === 'EXPRESO_PROVINCIAL' ? 'Expreso' : ($tar['tipo_servicio'] === 'AEROPUERTO_TERMINAL' ? 'Aeropuerto/Terminal' : 'Urbano')) ?>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success text-white rounded-pill px-2 py-1 small fw-bold">
+                                                    Bs <?= number_format($tar['precio_base'], 2) ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($paradasTransporte)): ?>
+                            <div>
+                                <strong class="small text-dark d-block mb-2"><i class="bi bi-geo-alt-fill me-1 text-danger"></i>Paradas Oficiales</strong>
+                                <div class="d-flex flex-column gap-2">
+                                    <?php foreach ($paradasTransporte as $par): ?>
+                                        <div class="p-2 px-3 rounded-3 border bg-light small">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <strong class="text-dark"><?= htmlspecialchars($par['nombre']) ?></strong>
+                                                <span class="badge rounded-pill extra-small <?= $par['tipo'] === 'TERMINAL' ? 'bg-primary' : ($par['tipo'] === 'AEROPUERTO' ? 'bg-info text-dark' : 'bg-secondary') ?>">
+                                                    <?= htmlspecialchars($par['tipo']) ?>
+                                                </span>
+                                            </div>
+                                            <?php if (!empty($par['latitud']) && !empty($par['longitud'])): ?>
+                                                <div class="mt-1">
+                                                    <a href="https://www.google.com/maps/search/?api=1&query=<?= $par['latitud'] ?>,<?= $par['longitud'] ?>" target="_blank" rel="noopener noreferrer" class="extra-small text-danger text-decoration-none fw-semibold">
+                                                        <i class="bi bi-map-fill me-1"></i>Ver en mapa &rarr;
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+                <?php endif; ?>
+
                 <a href="<?= htmlspecialchars($baseUrl) ?>/#explorar" class="btn btn-light btn-sm w-100 rounded-pill text-muted mb-2"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Volver al Directorio</a>
             </div>
         </div>

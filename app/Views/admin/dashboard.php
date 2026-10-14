@@ -446,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const valoresIngresos = <?= json_encode($graficoVisitas['valores']) ?>;
 
         const gradient = ctxIngresos.createLinearGradient(0, 0, 0, 240);
-        gradient.addColorStop(0, 'rgba(25, 135, 84, 0.45)');
-        gradient.addColorStop(1, 'rgba(25, 135, 84, 0.02)');
+        gradient.addColorStop(0, 'rgba(42, 157, 143, 0.45)');
+        gradient.addColorStop(1, 'rgba(42, 157, 143, 0.02)');
 
         new Chart(ctxIngresos, {
             type: 'line',
@@ -456,12 +456,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Visitantes únicos',
                     data: valoresIngresos,
-                    borderColor: '#198754',
+                    borderColor: '#2A9D8F',
                     backgroundColor: gradient,
                     borderWidth: 2.5,
                     fill: true,
                     tension: 0.35,
-                    pointBackgroundColor: '#198754',
+                    pointBackgroundColor: '#2A9D8F',
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointRadius: 4.5,
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#092611',
+                        backgroundColor: '#0E4D5E',
                         padding: 10,
                         titleFont: { size: 12 },
                         bodyFont: { size: 13, weight: 'bold' },
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'bar',
             data: {
                 labels: <?= json_encode($graficoVisitasDiarias['labels'], JSON_UNESCAPED_UNICODE) ?>,
-                datasets: [{ label: 'Visitas', data: <?= json_encode($graficoVisitasDiarias['valores']) ?>, backgroundColor: 'rgba(25, 135, 84, 0.72)', borderColor: '#198754', borderWidth: 1, borderRadius: 5 }]
+                datasets: [{ label: 'Visitas', data: <?= json_encode($graficoVisitasDiarias['valores']) ?>, backgroundColor: 'rgba(42, 157, 143, 0.72)', borderColor: '#2A9D8F', borderWidth: 1, borderRadius: 5 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} visitas` } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
         });
@@ -524,13 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const valoresCat = <?= json_encode($graficoCategorias['valores']) ?>;
 
         const paletaColores = [
-            '#198754', // Verde Esmeralda (Atractivos)
+            '#2A9D8F', // Teal Amazónico (Atractivos)
             '#0d6efd', // Azul (Hoteles)
-            '#fd7e14', // Naranja (Gastronomía)
+            '#FF6F3C', // Papaya Tropical (Gastronomía)
             '#6f42c1', // Violeta (Vida Nocturna)
             '#d63384', // Rosa (Comercio)
             '#ffc107', // Amarillo Oro
-            '#20c997'  // Verde Agua
+            '#46B7AA'  // Teal Amaz\u00f3nico claro
         ];
 
         new Chart(ctxCat, {
@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#092611',
+                        backgroundColor: '#0E4D5E',
                         padding: 10,
                         callbacks: {
                             label: function(context) {

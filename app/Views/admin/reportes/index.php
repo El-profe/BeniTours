@@ -9,19 +9,40 @@ arsort($porCategoria);
 $tabActivo = $filtros['tab'] ?? 'finanzas';
 ?>
 <style>
-.report-summary { background: linear-gradient(120deg, #103b28, #1a6a46); color: white; border-radius: 18px; }
-.report-summary small { color: #dcf1e4; }
-.report-bar { height: 9px; background: #e5eee8; border-radius: 8px; overflow: hidden; }
-.report-bar span { display: block; height: 100%; background: #198754; }
+.report-summary { background: linear-gradient(120deg, #0E4D5E, #2A9D8F); color: white; border-radius: 18px; }
+.report-summary small { color: #DDF4F1; }
+.report-bar { height: 9px; background: #E2F2F0; border-radius: 8px; overflow: hidden; }
+.report-bar span { display: block; height: 100%; background: #2A9D8F; }
 .report-kpi { color: #ffffff; border-radius: 16px; box-shadow: 0 10px 22px rgba(21, 42, 31, 0.12); transition: transform .2s ease, box-shadow .2s ease; }
 .report-kpi:hover { transform: translateY(-3px); box-shadow: 0 15px 28px rgba(21, 42, 31, 0.18); }
-.report-kpi-current { background: linear-gradient(135deg, #087a3a, #16a05a); }
-.report-kpi-compare { background: linear-gradient(135deg, #0756bf, #1687e7); }
-.report-kpi-pending { background: linear-gradient(135deg, #b86b00, #eca70d); }
+.report-kpi-current { background: linear-gradient(135deg, #0E4D5E, #2A9D8F); }
+.report-kpi-compare { background: linear-gradient(135deg, #1A6072, #46B7AA); }
+.report-kpi-pending { background: linear-gradient(135deg, #C94B23, #FF8A5C); }
 .report-kpi-lost { background: linear-gradient(135deg, #ad2139, #df4d64); }
 .report-kpi-ticket { background: linear-gradient(135deg, #6940a2, #996bd1); }
 .report-kpi-rate { background: linear-gradient(135deg, #087d99, #12abc9); }
 .report-risk-card { background: linear-gradient(145deg, #ffffff, #fff5f6); border: 1px solid #f2d6db; border-radius: 18px; box-shadow: 0 4px 16px rgba(111, 30, 46, 0.08); }
+
+/* KPI Cards Modernas estilo SaaS (limpias, con burbujas de icono y sin bordes gruesos toscos) */
+.dash-metric-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+}
+.dash-metric-sub {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.74rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+.dash-icon-teal {
+    background: rgba(42, 157, 143, 0.14);
+    color: #217E73;
+}
 
 /* Pestañas */
 .nav-reportes .nav-link {
@@ -33,13 +54,13 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
     transition: all .2s ease;
 }
 .nav-reportes .nav-link.active {
-    background-color: #198754;
+    background-color: #2A9D8F;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.25);
+    box-shadow: 0 4px 12px rgba(42, 157, 143, 0.25);
 }
 .nav-reportes .nav-link:hover:not(.active) {
-    background-color: #e8f5e9;
-    color: #198754;
+    background-color: #E2F2F0;
+    color: #217E73;
 }
 
 /* Tarjetas de Pioneros */
@@ -64,9 +85,9 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
     font-weight: 600;
 }
 .btn-preset.active {
-    background-color: #198754;
+    background-color: #2A9D8F;
     color: #fff;
-    border-color: #198754;
+    border-color: #2A9D8F;
 }
 
 /* Botones selector de período de tráfico */
@@ -84,7 +105,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
 
 /* Modal de Informe Individual */
 .modal-header-comercio {
-    background: linear-gradient(135deg, #103b28, #198754);
+    background: linear-gradient(135deg, #0E4D5E, #2A9D8F);
     color: #ffffff;
 }
 
@@ -125,168 +146,139 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                     <li><h6 class="dropdown-header">Reportes Financieros</h6></li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=financiero&desde=<?= urlencode($filtros['desde']) ?>&hasta=<?= urlencode($filtros['hasta']) ?>&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>&metodo=<?= urlencode($filtros['metodo']) ?>">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="financiero" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=financiero">
                             <i class="bi bi-cash-stack text-success me-2"></i>Balance de Ingresos Filtrado
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=vigencias&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>&estado_vigencia=<?= urlencode($filtros['estado_vigencia']) ?>">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="vigencias" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=vigencias">
                             <i class="bi bi-clock-history text-primary me-2"></i>Control de Vigencias
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=proyeccion&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="proyeccion" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=proyeccion">
                             <i class="bi bi-graph-up-arrow text-info me-2"></i>Proyección de Cobranzas (30-90d)
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=rendimiento&desde=<?= urlencode($filtros['desde']) ?>&hasta=<?= urlencode($filtros['hasta']) ?>">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="rendimiento" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=rendimiento">
                             <i class="bi bi-bullseye text-danger me-2"></i>Ranking de Rendimiento y Conversión
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li><h6 class="dropdown-header">Directorio y Antigüedad</h6></li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=antiguedad&id_categoria=<?= (int)$filtros['categoria'] ?>&buscar=<?= urlencode($filtros['buscar']) ?>">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="antiguedad" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=antiguedad">
                             <i class="bi bi-award text-warning me-2"></i>Ranking de Comercios por Antigüedad
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=lugares">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="lugares" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=lugares">
                             <i class="bi bi-geo-alt text-info me-2"></i>Padrón Completo de Lugares
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item small" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=solicitudes">
+                        <a class="dropdown-item small" data-reporte-enlace data-reporte-accion="exportar" data-reporte-tipo="solicitudes" href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes/exportar?tipo=solicitudes">
                             <i class="bi bi-inbox text-secondary me-2"></i>Histórico de Solicitudes
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <!-- Botón Imprimir -->
-            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none" onclick="window.print()">
-                <i class="bi bi-printer me-1"></i> Imprimir Informe
-            </button>
+            <!-- Menú de impresión en Modal -->
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-printer me-1"></i> Imprimir Informe
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                    <li><h6 class="dropdown-header">Reportes Financieros</h6></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('financiero')"><i class="bi bi-cash-stack text-success me-2"></i>Balance de Ingresos Filtrado</a></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('vigencias')"><i class="bi bi-clock-history text-primary me-2"></i>Control de Vigencias</a></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('proyeccion')"><i class="bi bi-graph-up-arrow text-info me-2"></i>Proyección de Cobranzas (30-90d)</a></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('rendimiento')"><i class="bi bi-bullseye text-danger me-2"></i>Ranking de Rendimiento y Conversión</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Directorio y Antigüedad</h6></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('antiguedad')"><i class="bi bi-award text-warning me-2"></i>Ranking de Comercios por Antigüedad</a></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('lugares')"><i class="bi bi-geo-alt text-info me-2"></i>Padrón Completo de Lugares</a></li>
+                    <li><a class="dropdown-item small" href="javascript:void(0)" onclick="abrirModalImprimir('solicitudes')"><i class="bi bi-inbox text-secondary me-2"></i>Histórico de Solicitudes</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- 1. Cuadrícula de KPIs Globales -->
+    <!-- 1. Cuadrícula de KPIs Globales (Diseño Moderno SaaS) -->
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase">Ingresos Totales (Histórico)</span>
-                <h3 class="fw-bold text-dark mt-2 mb-1">Bs <?= number_format($kpis['total_recaudado'], 2) ?></h3>
-                <small class="text-success extra-small fw-semibold"><i class="bi bi-shield-check me-1"></i>Abonos confirmados</small>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase">Recaudación Mes Actual</span>
-                <h3 class="fw-bold text-primary mt-2 mb-1">Bs <?= number_format($kpis['total_mes'], 2) ?></h3>
-                <small class="text-muted extra-small">Proyección esperada: <strong>Bs <?= number_format($kpis['proyeccion_mes'], 2) ?></strong></small>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase">Comercios al Día</span>
-                <h3 class="fw-bold text-dark mt-2 mb-1"><?= $kpis['comercios_activos'] ?></h3>
-                <small class="text-muted extra-small">Fichas con vigencia activa en catálogo</small>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
-                <span class="text-muted extra-small fw-bold text-uppercase">Por vencer (próximos 7 días)</span>
-                <h3 class="fw-bold text-warning mt-2 mb-1"><?= $kpis['comercios_por_vencer'] ?></h3>
-                <small class="text-muted extra-small">Requieren seguimiento de renovación</small>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. Barra Principal de Búsqueda y Filtros Multifactor -->
-    <div class="admin-card p-3 mb-4 report-filters">
-        <form action="<?= htmlspecialchars($baseUrl) ?>/admin/reportes" method="GET" id="formFiltrosReportes">
-            <input type="hidden" name="tab" id="inputTabActivo" value="<?= htmlspecialchars($tabActivo) ?>">
-            <input type="hidden" name="buscar" id="buscarServidor" value="<?= htmlspecialchars($filtros['buscar']) ?>">
-
-            <!-- Fila Superior: Buscador en Vivo y Presets -->
-            <div class="row g-2 align-items-center mb-3">
-                <!-- Botonera de Presets de Fecha -->
-                <div class="col-12">
-                    <div class="d-flex gap-1 flex-wrap align-items-center">
-                        <span class="extra-small text-muted fw-bold me-1">Rangos:</span>
-                        <button type="button" onclick="aplicarPreset('hoy')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'hoy' ? 'active' : '' ?>">Hoy</button>
-                        <button type="button" onclick="aplicarPreset('semana')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'semana' ? 'active' : '' ?>">Esta Semana</button>
-                        <button type="button" onclick="aplicarPreset('mes')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'mes' ? 'active' : '' ?>">Este Mes</button>
-                        <button type="button" onclick="aplicarPreset('mes_anterior')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'mes_anterior' ? 'active' : '' ?>">Mes Pasado</button>
-                        <button type="button" onclick="aplicarPreset('90dias')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === '90dias' ? 'active' : '' ?>">Últimos 90d</button>
-                        <button type="button" onclick="aplicarPreset('anio')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'anio' ? 'active' : '' ?>">Este Año</button>
-                        <button type="button" onclick="aplicarPreset('todo')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'todo' ? 'active' : '' ?>">Todo</button>
+        <div class="col-6 col-lg-3">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Ingresos Totales</span>
+                    <div class="dash-metric-icon dash-icon-emerald">
+                        <i class="bi bi-wallet2"></i>
                     </div>
                 </div>
-            </div>
-
-            <!-- Fila Inferior: Rango de Fechas Específico, Categoría, Método de Pago y Estado -->
-            <div class="row g-2 align-items-end">
-                <div class="col-6 col-sm-4 col-md-2">
-                    <label class="form-label extra-small fw-bold text-muted mb-1">Desde:</label>
-                    <input type="date" name="desde" id="fechaDesde" value="<?= htmlspecialchars($filtros['desde']) ?>" class="form-control form-control-sm">
+                <div class="dash-metric-number text-dark">
+                    Bs <?= number_format($kpis['total_recaudado'], 2) ?>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <label class="form-label extra-small fw-bold text-muted mb-1">Hasta:</label>
-                    <input type="date" name="hasta" id="fechaHasta" value="<?= htmlspecialchars($filtros['hasta']) ?>" class="form-control form-control-sm">
-                </div>
-                <div class="col-6 col-sm-4 col-md-3">
-                    <label class="form-label extra-small fw-bold text-muted mb-1">Categoría:</label>
-                    <select name="id_categoria" class="form-select form-select-sm">
-                        <option value="0">Todas las categorías</option>
-                        <?php foreach ($categorias as $cat): ?>
-                            <option value="<?= (int)$cat['id_categoria'] ?>" <?= (int)$filtros['categoria'] === (int)$cat['id_categoria'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($cat['nombre']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <label class="form-label extra-small fw-bold text-muted mb-1">Método de Pago:</label>
-                    <select name="metodo" class="form-select form-select-sm">
-                        <option value="">Todos los métodos</option>
-                        <?php foreach ($metodosDisponibles as $m): ?>
-                            <option value="<?= htmlspecialchars($m) ?>" <?= $filtros['metodo'] === $m ? 'selected' : '' ?>><?= htmlspecialchars($m) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2">
-                    <label class="form-label extra-small fw-bold text-muted mb-1">Estado Vigencia:</label>
-                    <select name="estado_vigencia" class="form-select form-select-sm">
-                        <option value="">Todos los estados</option>
-                        <option value="VIGENTE" <?= $filtros['estado_vigencia'] === 'VIGENTE' ? 'selected' : '' ?>>Vigente / Activo</option>
-                        <option value="POR_VENCER" <?= $filtros['estado_vigencia'] === 'POR_VENCER' ? 'selected' : '' ?>>Por Vencer (≤7d)</option>
-                        <option value="VENCIDO" <?= $filtros['estado_vigencia'] === 'VENCIDO' ? 'selected' : '' ?>>Vencido / En Mora</option>
-                    </select>
-                </div>
-                <div class="col-6 col-sm-4 col-md-1 d-flex gap-1">
-                    <button type="submit" class="btn btn-success btn-sm w-100 fw-bold" title="Aplicar filtros">
-                        <i class="bi bi-filter"></i>
-                    </button>
-                    <?php if (!empty($filtros['desde']) || !empty($filtros['hasta']) || $filtros['categoria'] || !empty($filtros['buscar']) || !empty($filtros['metodo']) || !empty($filtros['estado_vigencia']) || !empty($filtros['preset'])): ?>
-                        <a href="<?= htmlspecialchars($baseUrl) ?>/admin/reportes" class="btn btn-light border btn-sm text-muted" title="Limpiar todos los filtros">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </a>
-                    <?php endif; ?>
+                <div class="dash-metric-sub">
+                    <span class="text-success fw-semibold"><i class="bi bi-shield-check"></i> Auditado</span>
+                    <span>Abonos confirmados</span>
                 </div>
             </div>
-            <input type="hidden" name="preset" id="inputPreset" value="<?= htmlspecialchars($filtros['preset']) ?>">
-        </form>
-
-        <?php if ($errorFiltros): ?>
-            <div class="alert alert-danger small mt-2 mb-0" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i> <?= htmlspecialchars($errorFiltros) ?>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Recaudación Mes Actual</span>
+                    <div class="dash-metric-icon dash-icon-blue">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark">
+                    Bs <?= number_format($kpis['total_mes'], 2) ?>
+                </div>
+                <div class="dash-metric-sub">
+                    <span class="text-primary fw-semibold"><i class="bi bi-graph-up-arrow"></i> Meta:</span>
+                    <span>Bs <?= number_format($kpis['proyeccion_mes'], 2) ?></span>
+                </div>
             </div>
-        <?php endif; ?>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dash-hero-metric">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Comercios al Día</span>
+                    <div class="dash-metric-icon dash-icon-purple">
+                        <i class="bi bi-shop-window"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark">
+                    <?= $kpis['comercios_activos'] ?>
+                </div>
+                <div class="dash-metric-sub">
+                    <span class="text-success fw-semibold"><i class="bi bi-check-circle-fill"></i> Al día</span>
+                    <span>Vigencia activa en catálogo</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dash-hero-metric <?= ($kpis['comercios_por_vencer'] > 0) ? 'border-warning shadow-xs' : '' ?>">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="dash-metric-title">Por Vencer (7 días)</span>
+                    <div class="dash-metric-icon dash-icon-amber">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+                <div class="dash-metric-number text-dark">
+                    <?= $kpis['comercios_por_vencer'] ?>
+                </div>
+                <div class="dash-metric-sub">
+                    <span class="text-warning-emphasis fw-semibold"><i class="bi bi-clock-history"></i> Renovar</span>
+                    <span>Seguimiento de cobro</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 3. Navegación por Pestañas (Tabs) -->
+    <!-- 2. Navegación por Pestañas (Tabs) -->
     <ul class="nav nav-pills nav-reportes gap-2 mb-4 p-2 bg-light rounded-4 border no-print" id="tabsReportes" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link <?= $tabActivo === 'finanzas' ? 'active' : '' ?>" id="tab-finanzas-btn" data-bs-toggle="pill" data-bs-target="#tab-finanzas" type="button" role="tab" onclick="cambiarPestana('finanzas')">
@@ -403,6 +395,77 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                 </div>
             </div>
 
+            <!-- Filtros de Reportes (Compactos y Pegados sobre la tabla) -->
+            <div class="admin-card p-3 mb-3 report-filters">
+                <form id="formFiltrosReportes" onsubmit="event.preventDefault(); filtrarReportePagosEnVivo();">
+                    <input type="hidden" name="tab" id="inputTabActivo" value="<?= htmlspecialchars($tabActivo) ?>">
+                    <input type="hidden" name="buscar" id="buscarServidor" value="<?= htmlspecialchars($filtros['buscar']) ?>">
+
+                    <!-- Fila Superior: Presets de Rango de Fecha -->
+                    <div class="row g-1 align-items-center mb-2">
+                        <div class="col-12">
+                            <div class="d-flex gap-1 flex-wrap align-items-center">
+                                <span class="extra-small text-muted fw-bold me-1">Rangos:</span>
+                                <button type="button" onclick="aplicarPreset('hoy')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'hoy' ? 'active' : '' ?>">Hoy</button>
+                                <button type="button" onclick="aplicarPreset('semana')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'semana' ? 'active' : '' ?>">Esta Semana</button>
+                                <button type="button" onclick="aplicarPreset('mes')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'mes' ? 'active' : '' ?>">Este Mes</button>
+                                <button type="button" onclick="aplicarPreset('mes_anterior')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'mes_anterior' ? 'active' : '' ?>">Mes Pasado</button>
+                                <button type="button" onclick="aplicarPreset('90dias')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === '90dias' ? 'active' : '' ?>">Últimos 90d</button>
+                                <button type="button" onclick="aplicarPreset('anio')" class="btn btn-outline-secondary btn-preset <?= $filtros['preset'] === 'anio' ? 'active' : '' ?>">Este Año</button>
+                                <button type="button" onclick="aplicarPreset('todo')" class="btn btn-outline-secondary btn-preset <?= (empty($filtros['preset']) || $filtros['preset'] === 'todo') ? 'active' : '' ?>">Todo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila Inferior: Rango de Fechas Específico, Categoría, Método de Pago y Estado -->
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6 col-md-2">
+                            <label class="form-label extra-small fw-bold text-muted mb-1">Desde:</label>
+                            <input type="date" name="desde" id="fechaDesde" value="<?= htmlspecialchars($filtros['desde']) ?>" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label extra-small fw-bold text-muted mb-1">Hasta:</label>
+                            <input type="date" name="hasta" id="fechaHasta" value="<?= htmlspecialchars($filtros['hasta']) ?>" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label extra-small fw-bold text-muted mb-1">Categoría:</label>
+                            <select name="id_categoria" id="filtroCategoria" class="form-select form-select-sm">
+                                <option value="0">Todas las categorías</option>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option value="<?= (int)$cat['id_categoria'] ?>" <?= (int)$filtros['categoria'] === (int)$cat['id_categoria'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($cat['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label extra-small fw-bold text-muted mb-1">Método de Pago:</label>
+                            <select name="metodo" id="filtroMetodo" class="form-select form-select-sm">
+                                <option value="">Todos los métodos</option>
+                                <?php foreach ($metodosDisponibles as $m): ?>
+                                    <option value="<?= htmlspecialchars($m) ?>" <?= $filtros['metodo'] === $m ? 'selected' : '' ?>><?= htmlspecialchars($m) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label extra-small fw-bold text-muted mb-1">Estado Vigencia:</label>
+                            <select name="estado_vigencia" id="filtroEstadoVigencia" class="form-select form-select-sm">
+                                <option value="">Todos los estados</option>
+                                <option value="VIGENTE" <?= $filtros['estado_vigencia'] === 'VIGENTE' ? 'selected' : '' ?>>Vigente / Activo</option>
+                                <option value="POR_VENCER" <?= $filtros['estado_vigencia'] === 'POR_VENCER' ? 'selected' : '' ?>>Por Vencer (≤7d)</option>
+                                <option value="VENCIDO" <?= $filtros['estado_vigencia'] === 'VENCIDO' ? 'selected' : '' ?>>Vencido / En Mora</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-1 d-flex gap-1">
+                            <button type="button" id="btnResetFiltrosReportes" class="btn btn-light border btn-sm text-muted w-100" title="Limpiar todos los filtros">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="preset" id="inputPreset" value="<?= htmlspecialchars($filtros['preset']) ?>">
+                </form>
+            </div>
+
             <!-- Tabla de Transacciones y Abonos Confirmados -->
             <div class="admin-card mb-4 overflow-hidden">
                 <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -430,10 +493,16 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                         <tbody>
                             <?php if (!empty($pagos)): ?>
                                 <?php foreach ($pagos as $p): ?>
-                                    <tr class="fila-buscable" data-texto="<?= strtolower(htmlspecialchars($p['establecimiento'] . ' ' . $p['categoria'] . ' ' . $p['numero_comprobante'] . ' ' . $p['metodo_pago'])) ?>">
+                                    <tr class="fila-buscable" 
+                                        data-texto="<?= strtolower(htmlspecialchars($p['establecimiento'] . ' ' . $p['categoria'] . ' ' . $p['numero_comprobante'] . ' ' . $p['metodo_pago'])) ?>"
+                                        data-categoria="<?= (int)($p['id_categoria'] ?? 0) ?>"
+                                        data-fecha="<?= date('Y-m-d', strtotime($p['fecha_reporte'])) ?>"
+                                        data-metodo="<?= htmlspecialchars($p['metodo_pago'] ?? '') ?>"
+                                        data-estado="<?= htmlspecialchars($p['estado_vigencia'] ?? '') ?>"
+                                        data-monto="<?= (float)$p['monto'] ?>">
                                         <td><code class="text-muted small">#<?= (int)$p['id_pago'] ?></code></td>
                                         <td>
-                                            <a href="javascript:void(0)" onclick="abrirInformeComercio(<?= (int)$p['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
+                                            <a href="#" onclick="event.preventDefault(); abrirInformeComercio(<?= (int)$p['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
                                                 <?= htmlspecialchars($p['establecimiento']) ?>
                                             </a>
                                         </td>
@@ -471,48 +540,96 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
         <!-- PESTAÑA 2: CONTROL DE VIGENCIAS Y COBRO    -->
         <!-- ========================================== -->
         <div class="tab-pane fade <?= $tabActivo === 'vigencias' ? 'show active' : '' ?>" id="tab-vigencias" role="tabpanel">
-            <!-- Proyección Escalonada de Flujo y Retención de Cartera -->
+            <!-- Proyección Escalonada de Flujo y Retención de Cartera (SaaS) -->
             <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Tasa de Retención Activa</span>
-                        <h3 class="fw-bold text-success mt-2 mb-1"><?= number_format($kpis['tasa_retencion'], 1) ?>%</h3>
-                        <small class="text-muted extra-small">Comercios al día frente a la cartera total</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Retención Activa</span>
+                            <div class="dash-metric-icon dash-icon-emerald">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($kpis['tasa_retencion'], 1) ?>%</div>
+                        <div class="dash-metric-sub">
+                            <span class="text-success fw-semibold"><i class="bi bi-check2"></i> Cartera</span>
+                            <span>Al día</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Llamadas y menú</span>
-                        <h3 class="fw-bold text-info mt-2 mb-1"><?= number_format($totalesTelemetria['total_telefono'] + $totalesTelemetria['total_menu']) ?></h3>
-                        <small class="text-muted extra-small"><?= number_format($totalesTelemetria['total_telefono']) ?> llamadas · <?= number_format($totalesTelemetria['total_menu']) ?> menús</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Llamadas y Menú</span>
+                            <div class="dash-metric-icon dash-icon-blue">
+                                <i class="bi bi-telephone-outbound"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($totalesTelemetria['total_telefono'] + $totalesTelemetria['total_menu']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-primary fw-semibold"><i class="bi bi-activity"></i> Contactos</span>
+                            <span>Directos</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-danger border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Interés en promociones</span>
-                        <h3 class="fw-bold text-danger mt-2 mb-1"><?= number_format($totalesTelemetria['total_promociones']) ?></h3>
-                        <small class="text-muted extra-small">Aperturas de promociones comerciales</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Promociones</span>
+                            <div class="dash-metric-icon dash-icon-rose">
+                                <i class="bi bi-tag-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($totalesTelemetria['total_promociones']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-danger fw-semibold"><i class="bi bi-eye"></i> Aperturas</span>
+                            <span>Ofertas</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Corto Plazo (0 - 30 días)</span>
-                        <h3 class="fw-bold text-primary mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_30d_monto'], 2) ?></h3>
-                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_30d_cant'] ?></strong> renovaciones estimadas</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">0 - 30 Días</span>
+                            <div class="dash-metric-icon dash-icon-cyan">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark">Bs <?= number_format($kpis['proyeccion_30d_monto'], 0) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-info fw-semibold"><?= $kpis['proyeccion_30d_cant'] ?> renov.</span>
+                            <span>Estimadas</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Mediano Plazo (31 - 60 días)</span>
-                        <h3 class="fw-bold text-info mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_60d_monto'], 2) ?></h3>
-                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_60d_cant'] ?></strong> renovaciones estimadas</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">31 - 60 Días</span>
+                            <div class="dash-metric-icon dash-icon-purple">
+                                <i class="bi bi-calendar2-range"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark">Bs <?= number_format($kpis['proyeccion_60d_monto'], 0) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-purple fw-semibold"><?= $kpis['proyeccion_60d_cant'] ?> renov.</span>
+                            <span>Mediano plazo</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Trimestral (61 - 90 días)</span>
-                        <h3 class="fw-bold text-warning mt-2 mb-1">Bs <?= number_format($kpis['proyeccion_90d_monto'], 2) ?></h3>
-                        <small class="text-muted extra-small"><strong><?= $kpis['proyeccion_90d_cant'] ?></strong> renovaciones estimadas</small>
+                <div class="col-6 col-lg-4 col-xl-2">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">61 - 90 Días</span>
+                            <div class="dash-metric-icon dash-icon-amber">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark">Bs <?= number_format($kpis['proyeccion_90d_monto'], 0) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-warning-emphasis fw-semibold"><?= $kpis['proyeccion_90d_cant'] ?> renov.</span>
+                            <span>Trimestral</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -550,7 +667,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                                     ?>
                                     <tr class="fila-buscable" data-texto="<?= strtolower(htmlspecialchars($v['establecimiento'] . ' ' . $v['categoria'] . ' ' . $v['estado_cobertura'])) ?>">
                                         <td>
-                                            <a href="javascript:void(0)" onclick="abrirInformeComercio(<?= (int)$v['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
+                                            <a href="#" onclick="event.preventDefault(); abrirInformeComercio(<?= (int)$v['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
                                                 <?= htmlspecialchars($v['establecimiento']) ?>
                                             </a>
                                             <small class="text-muted extra-small"><i class="bi bi-telephone me-1"></i><?= htmlspecialchars($v['telefono_contacto'] ?: 'S/N') ?></small>
@@ -701,7 +818,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" onclick="abrirInformeComercio(<?= (int)$c['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
+                                            <a href="#" onclick="event.preventDefault(); abrirInformeComercio(<?= (int)$c['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
                                                 <?= htmlspecialchars($c['establecimiento']) ?>
                                             </a>
                                             <small class="text-muted extra-small"><i class="bi bi-telephone me-1"></i><?= htmlspecialchars($c['telefono_contacto'] ?: ($c['whatsapp_contacto'] ?: 'S/N')) ?></small>
@@ -746,34 +863,66 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
         <!-- PESTAÑA 4: TRÁFICO TURÍSTICO Y VISITAS     -->
         <!-- ========================================== -->
         <div class="tab-pane fade <?= $tabActivo === 'visitas' ? 'show active' : '' ?>" id="tab-visitas" role="tabpanel">
-            <!-- 1. Cuadrícula de KPIs de Audiencia Turística -->
+            <!-- 1. Cuadrícula de KPIs de Audiencia Turística (Diseño Moderno SaaS) -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-lg-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Visitantes Hoy</span>
-                        <h3 class="fw-bold text-primary mt-2 mb-1"><?= number_format($analiticaVisitas['resumen']['hoy']) ?></h3>
-                        <small class="text-muted extra-small">Usuarios únicos del día</small>
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Visitantes Hoy</span>
+                            <div class="dash-metric-icon dash-icon-blue">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($analiticaVisitas['resumen']['hoy']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-primary fw-semibold"><i class="bi bi-broadcast"></i> En vivo</span>
+                            <span>Usuarios únicos del día</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Últimos 7 Días</span>
-                        <h3 class="fw-bold text-success mt-2 mb-1"><?= number_format($analiticaVisitas['resumen']['semana']) ?></h3>
-                        <small class="text-muted extra-small">Audiencia de la semana</small>
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Últimos 7 Días</span>
+                            <div class="dash-metric-icon dash-icon-emerald">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($analiticaVisitas['resumen']['semana']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-success fw-semibold"><i class="bi bi-graph-up-arrow"></i> Semanal</span>
+                            <span>Audiencia de la semana</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-info border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Este Mes</span>
-                        <h3 class="fw-bold text-dark mt-2 mb-1"><?= number_format($analiticaVisitas['resumen']['mes']) ?></h3>
-                        <small class="text-muted extra-small">Mes en curso (<?= date('m/Y') ?>)</small>
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Este Mes</span>
+                            <div class="dash-metric-icon dash-icon-purple">
+                                <i class="bi bi-calendar-month-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($analiticaVisitas['resumen']['mes']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-purple fw-semibold"><i class="bi bi-calendar-check"></i> Mes</span>
+                            <span>Acumulado <?= date('m/Y') ?></span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6 col-lg-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Total Histórico</span>
-                        <h3 class="fw-bold text-warning mt-2 mb-1"><?= number_format($analiticaVisitas['resumen']['total']) ?></h3>
-                        <small class="text-muted extra-small">Visitas únicas registradas</small>
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Total Histórico</span>
+                            <div class="dash-metric-icon dash-icon-amber">
+                                <i class="bi bi-bar-chart-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($analiticaVisitas['resumen']['total']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-warning-emphasis fw-semibold"><i class="bi bi-globe-americas"></i> Total</span>
+                            <span>Visitas registradas</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -886,34 +1035,66 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
         <!-- PESTAÑA 5: RENDIMIENTO TURÍSTICO Y CONVERSIONES COMERCIALES -->
         <!-- ======================================================== -->
         <div class="tab-pane fade <?= $tabActivo === 'rendimiento' ? 'show active' : '' ?>" id="tab-rendimiento" role="tabpanel">
-            <!-- 1. Cuadrícula de KPIs Globales de Conversión -->
+            <!-- 1. Cuadrícula de KPIs Globales de Conversión (Diseño Moderno SaaS) -->
             <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-primary border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Vistas de Fichas</span>
-                        <h3 class="fw-bold text-primary mt-2 mb-1"><?= number_format($totalesTelemetria['total_vistas']) ?></h3>
-                        <small class="text-muted extra-small">Interés generado en destinos del Beni</small>
+                <div class="col-6 col-lg-3">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Vistas de Fichas</span>
+                            <div class="dash-metric-icon dash-icon-blue">
+                                <i class="bi bi-eye-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($totalesTelemetria['total_vistas']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-primary fw-semibold"><i class="bi bi-compass"></i> Interés</span>
+                            <span>Destinos del Beni</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-success border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Contactos por WhatsApp</span>
-                        <h3 class="fw-bold text-success mt-2 mb-1"><?= number_format($totalesTelemetria['total_whatsapp']) ?></h3>
-                        <small class="text-muted extra-small">Consultas directas a comercios</small>
+                <div class="col-6 col-lg-3">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">WhatsApp</span>
+                            <div class="dash-metric-icon dash-icon-emerald">
+                                <i class="bi bi-whatsapp"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($totalesTelemetria['total_whatsapp']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-success fw-semibold"><i class="bi bi-chat-dots-fill"></i> Contactos</span>
+                            <span>Consultas directas</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-danger border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Rutas en Google Maps</span>
-                        <h3 class="fw-bold text-danger mt-2 mb-1"><?= number_format($totalesTelemetria['total_mapa']) ?></h3>
-                        <small class="text-muted extra-small">Turistas que trazaron ruta a locales</small>
+                <div class="col-6 col-lg-3">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Rutas Maps</span>
+                            <div class="dash-metric-icon dash-icon-rose">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= number_format($totalesTelemetria['total_mapa']) ?></div>
+                        <div class="dash-metric-sub">
+                            <span class="text-danger fw-semibold"><i class="bi bi-signpost-2-fill"></i> Cómo llegar</span>
+                            <span>Trazaron ruta</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="admin-card p-3 p-xl-4 h-100 border-start border-warning border-4">
-                        <span class="text-muted extra-small fw-bold text-uppercase">Tasa Global de Conversión</span>
-                        <h3 class="fw-bold text-warning mt-2 mb-1"><?= $totalesTelemetria['tasa_conversion_gral'] ?>%</h3>
-                        <small class="text-muted extra-small">Turistas que pasaron de mirar a contactar</small>
+                <div class="col-6 col-lg-3">
+                    <div class="dash-hero-metric">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="dash-metric-title">Conversión Global</span>
+                            <div class="dash-metric-icon dash-icon-amber">
+                                <i class="bi bi-pie-chart-fill"></i>
+                            </div>
+                        </div>
+                        <div class="dash-metric-number text-dark"><?= $totalesTelemetria['tasa_conversion_gral'] ?>%</div>
+                        <div class="dash-metric-sub">
+                            <span class="text-warning-emphasis fw-semibold"><i class="bi bi-funnel-fill"></i> Ratio</span>
+                            <span>De visita a contacto</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -925,7 +1106,12 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                         <h6 class="fw-bold text-dark mb-0"><i class="bi bi-bullseye text-danger me-2"></i>Ranking de Comercios con Mayor Conversión Turística</h6>
                         <small class="text-muted">Establecimientos que más consultas por WhatsApp y rutas en mapa generan en la plataforma</small>
                     </div>
-                    <span class="badge bg-light text-dark border px-3 py-2"><?= count($rankingRendimiento) ?> comercios analizados</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-none fw-semibold d-inline-flex align-items-center gap-1" onclick="abrirModalGraficosRendimiento()">
+                            <i class="bi bi-bar-chart-line-fill text-danger"></i> Ver Gráficos
+                        </button>
+                        <span class="badge bg-light text-dark border px-3 py-2"><?= count($rankingRendimiento) ?> comercios analizados</span>
+                    </div>
                 </div>
                 <div class="table-responsive" style="max-height: 520px;">
                     <table class="table admin-table table-hover table-sm align-middle mb-0">
@@ -958,7 +1144,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" onclick="abrirInformeComercio(<?= (int)$r['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
+                                            <a href="#" onclick="event.preventDefault(); abrirInformeComercio(<?= (int)$r['id_lugar'] ?>)" class="text-dark fw-bold text-decoration-none hover-primary small d-block">
                                                 <?= htmlspecialchars($r['establecimiento']) ?>
                                             </a>
                                         </td>
@@ -1098,6 +1284,168 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
     </div>
 </div>
 
+<!-- ======================================================== -->
+<!-- MODAL DE ANÁLISIS GRÁFICO DE CONVERSIONES Y POPULARIDAD  -->
+<!-- ======================================================== -->
+<div class="modal fade" id="modalGraficosRanking" tabindex="-1" aria-labelledby="modalGraficosRankingTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header Modal -->
+            <div class="modal-header py-3" style="background: linear-gradient(135deg, #881337, #e11d48); color: #ffffff;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-white text-danger d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 1.15rem;">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0 text-white" id="modalGraficosRankingTitulo">Gráficos de Conversión y Popularidad de Comercios</h5>
+                        <small class="text-white-50">Comparativa visual de interacciones turísticas generadas en Trinidad</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- Body Modal -->
+            <div class="modal-body p-4 bg-light">
+                <div class="row g-4">
+                    <!-- Gráfico 1: Top 10 Comercios por Conversiones Totales -->
+                    <div class="col-lg-7">
+                        <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-trophy-fill text-warning me-2"></i>Top 10 Comercios con Más Conversiones</h6>
+                                    <p class="extra-small text-muted mb-0">Suma total de WhatsApp + Rutas en Mapa</p>
+                                </div>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1">Líderes</span>
+                            </div>
+                            <div style="height: 320px; position: relative;">
+                                <canvas id="chartRankingConversiones"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico 2: Distribución por Canal de Interacción -->
+                    <div class="col-lg-5">
+                        <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Canales de Contacto</h6>
+                                    <p class="extra-small text-muted mb-0">Distribución de contactos WhatsApp vs. Rutas Maps</p>
+                                </div>
+                                <span class="badge bg-light text-dark border rounded-pill px-2 py-1">Canales</span>
+                            </div>
+                            <div style="height: 320px; position: relative;">
+                                <canvas id="chartCanalesDona"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico 3: Comparativa Multivariable (Vistas vs Conversiones vs Favoritos) -->
+                    <div class="col-12">
+                        <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-steps text-success me-2"></i>Embudo de Atracción: Vistas vs. Contactos Reales</h6>
+                                    <p class="extra-small text-muted mb-0">Compara la visibilidad que recibe la ficha vs cuántos turistas decidieron contactarse</p>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Interacción</span>
+                            </div>
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="chartEmbudoAtraccion"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="modal-footer bg-white py-2">
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL DE VISTA PREVIA Y REPORTE PARA IMPRESIÓN OFICIAL   -->
+<!-- ======================================================== -->
+<div class="modal fade" id="modalVistaPreviaImpresion" tabindex="-1" aria-labelledby="modalImprimirTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header Modal -->
+            <div class="modal-header py-3" style="background: linear-gradient(135deg, #0E4D5E, #2A9D8F); color: #ffffff;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                        <i class="bi bi-printer-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0 text-white" id="modalImprimirTitulo">Cargando reporte...</h5>
+                        <small class="text-white-50" id="modalImprimirSubtitulo">Vista previa del informe analítico oficial</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- Body Modal -->
+            <div class="modal-body p-4 bg-light" id="modalImprimirAreaDocumento">
+                <!-- Spinner de carga -->
+                <div id="modalImprimirSpinner" class="text-center py-5">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Generando informe...</span>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0">Recopilando datos para el informe oficial...</p>
+                </div>
+
+                <!-- Documento Formato Hoja Oficial -->
+                <div id="modalImprimirContenido" style="display: none;" class="bg-white p-4 p-md-5 rounded-4 border shadow-sm mx-auto" style="max-width: 950px;">
+                    <!-- Membrete Oficial -->
+                    <div class="text-center pb-3 mb-4 border-bottom">
+                        <h3 class="fw-bold mb-1 text-dark tracking-wide">BENITOURS TRINIDAD</h3>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase" id="docReporteTitulo">INFORME OFICIAL</p>
+                        <div class="d-flex justify-content-center gap-3 text-muted extra-small">
+                            <span><i class="bi bi-calendar3 me-1"></i>Fecha de Emisión: <strong id="docReporteFecha">--</strong></span>
+                            <span>&bull;</span>
+                            <span><i class="bi bi-shield-check me-1"></i>Sistema de Administración BeniTours</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Resultados -->
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm table-bordered align-middle mb-0" id="docReporteTabla">
+                            <thead class="table-light" id="docReporteThead">
+                                <!-- Cabeceras dinámicas -->
+                            </thead>
+                            <tbody id="docReporteTbody">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pie del Informe -->
+                    <div class="pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 text-muted extra-small">
+                        <span>Total de registros listados: <strong id="docReporteTotal" class="text-dark">0</strong></span>
+                        <span>Trinidad, Beni &mdash; Guía Oficial de Turismo y Comercio</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="modal-footer bg-white py-2 justify-content-between">
+                <span class="text-muted extra-small d-none d-sm-inline">
+                    <i class="bi bi-info-circle me-1"></i>Puedes revisar el informe antes de imprimirlo en papel o guardarlo en PDF.
+                </span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold shadow-xs" id="btnEjecutarImpresionDoc" onclick="ejecutarImpresionDoc()">
+                        <i class="bi bi-printer me-1"></i> Imprimir / Guardar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // El buscador debe funcionar aunque un gráfico no pueda cargarse.
@@ -1105,6 +1453,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const contenedorBuscador = document.getElementById('buscadorReportes');
     const botonLimpiar = document.getElementById('btnLimpiarBuscador');
     const buscarServidor = document.getElementById('buscarServidor');
+
+    // Los filtros se aplican sin recargar la página. Al abrir un CSV o la
+    // versión imprimible, generar la URL en ese instante evita exportar datos
+    // distintos a los que el administrador tiene seleccionados en pantalla.
+    const actualizarUrlReporte = (enlace) => {
+        const accion = enlace.dataset.reporteAccion;
+        const tipo = enlace.dataset.reporteTipo;
+        if (!accion || !tipo) return;
+
+        const params = new URLSearchParams({ tipo });
+        const valores = {
+            desde: document.getElementById('fechaDesde')?.value || '',
+            hasta: document.getElementById('fechaHasta')?.value || '',
+            id_categoria: document.getElementById('filtroCategoria')?.value || '0',
+            buscar: document.getElementById('buscadorVivo')?.value?.trim() || buscarServidor?.value?.trim() || '',
+            metodo: document.getElementById('filtroMetodo')?.value || '',
+            estado_vigencia: document.getElementById('filtroEstadoVigencia')?.value || ''
+        };
+
+        Object.entries(valores).forEach(([clave, valor]) => {
+            if (valor !== '' && valor !== '0') params.set(clave, valor);
+        });
+        enlace.href = `<?= htmlspecialchars($baseUrl) ?>/admin/reportes/${accion}?${params.toString()}`;
+    };
+
+    document.querySelectorAll('[data-reporte-enlace]').forEach((enlace) => {
+        enlace.addEventListener('click', () => actualizarUrlReporte(enlace));
+    });
 
     const ubicarBuscador = (tab) => {
         const destino = document.querySelector(`.reporte-search-slot[data-tab="${tab}"]`);
@@ -1137,6 +1513,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (botonLimpiar) botonLimpiar.addEventListener('click', limpiarBuscador);
 
+    // Eventos de cambios en tiempo real para filtros de pagos sin recargar la página
+    ['fechaDesde', 'fechaHasta', 'filtroCategoria', 'filtroMetodo', 'filtroEstadoVigencia'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => {
+                // Al modificar fechas manualmente, desmarcamos los presets rápidos
+                if (id === 'fechaDesde' || id === 'fechaHasta') {
+                    document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+                    const inputPreset = document.getElementById('inputPreset');
+                    if (inputPreset) inputPreset.value = '';
+                }
+                filtrarTablasEnVivo(buscador?.value || '');
+            });
+        }
+    });
+
+    const btnReset = document.getElementById('btnResetFiltrosReportes');
+    if (btnReset) {
+        btnReset.addEventListener('click', () => {
+            const fDesde = document.getElementById('fechaDesde');
+            const fHasta = document.getElementById('fechaHasta');
+            const fCat = document.getElementById('filtroCategoria');
+            const fMet = document.getElementById('filtroMetodo');
+            const fEst = document.getElementById('filtroEstadoVigencia');
+            const inPreset = document.getElementById('inputPreset');
+
+            if (fDesde) fDesde.value = '';
+            if (fHasta) fHasta.value = '';
+            if (fCat) fCat.value = '0';
+            if (fMet) fMet.value = '';
+            if (fEst) fEst.value = '';
+            if (inPreset) inPreset.value = 'todo';
+
+            document.querySelectorAll('.btn-preset').forEach(b => {
+                b.classList.remove('active');
+                if (b.textContent.trim().toLowerCase() === 'todo') b.classList.add('active');
+            });
+
+            filtrarTablasEnVivo(buscador?.value || '');
+        });
+    }
+
     try {
         iniciarGraficos();
     } catch (error) {
@@ -1145,34 +1563,89 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Filtra las filas de las tablas en vivo conforme el usuario escribe en el buscador
+ * Normaliza cadenas para comparaciones flexibles (minúsculas y sin acentos)
  */
-function filtrarTablasEnVivo(termino) {
-    const normalizar = (valor) => String(valor || '')
+function normalizarTexto(valor) {
+    return String(valor || '')
         .toLocaleLowerCase('es')
         .normalize('NFD')
         .replace(/\p{Diacritic}/gu, '');
-    const query = normalizar(termino.trim());
-    const filas = document.querySelectorAll('.fila-buscable');
-    let visiblesPagos = 0;
+}
+
+/**
+ * Filtra las filas de la tabla de pagos en vivo usando JS (sin recargar la página)
+ */
+function filtrarReportePagosEnVivo() {
+    const query = normalizarTexto(document.getElementById('buscadorVivo')?.value?.trim() || '');
+    const fechaDesde = document.getElementById('fechaDesde')?.value || '';
+    const fechaHasta = document.getElementById('fechaHasta')?.value || '';
+    const categoria = document.getElementById('filtroCategoria')?.value || '0';
+    const metodo = document.getElementById('filtroMetodo')?.value || '';
+    const estado = document.getElementById('filtroEstadoVigencia')?.value || '';
+
+    const filas = document.querySelectorAll('#tablaPagos tbody tr.fila-buscable');
+    let visibles = 0;
+
+    filas.forEach(fila => {
+        const textoFila = normalizarTexto(fila.getAttribute('data-texto'));
+        const fCat = fila.getAttribute('data-categoria') || '0';
+        const fFecha = fila.getAttribute('data-fecha') || '';
+        const fMet = fila.getAttribute('data-metodo') || '';
+        const fEst = fila.getAttribute('data-estado') || '';
+
+        // Coincidencia de texto (buscador)
+        const coincideTexto = query === '' || textoFila.includes(query);
+
+        // Coincidencia de categoría
+        const coincideCat = (categoria === '0' || fCat === categoria);
+
+        // Coincidencia de método de pago
+        const coincideMet = (metodo === '' || fMet.toUpperCase() === metodo.toUpperCase());
+
+        // Coincidencia de estado de vigencia
+        const coincideEst = (estado === '' || fEst.toUpperCase() === estado.toUpperCase());
+
+        // Coincidencia de rango de fechas (YYYY-MM-DD)
+        let coincideFecha = true;
+        if (fechaDesde && fFecha) {
+            if (fFecha < fechaDesde) coincideFecha = false;
+        }
+        if (fechaHasta && fFecha) {
+            if (fFecha > fechaHasta) coincideFecha = false;
+        }
+
+        const visible = coincideTexto && coincideCat && coincideMet && coincideEst && coincideFecha;
+        fila.style.display = visible ? '' : 'none';
+
+        if (visible) visibles++;
+    });
+
+    const badgePagos = document.getElementById('conteoPagos');
+    if (badgePagos) badgePagos.textContent = visibles;
+}
+
+/**
+ * Filtra las filas de todas las tablas en vivo conforme el usuario escribe en el buscador
+ */
+function filtrarTablasEnVivo(termino) {
+    // Primero actualiza la tabla de pagos combinando todos los filtros
+    filtrarReportePagosEnVivo();
+
+    // Luego filtra las demás tablas (Vigencias y Antigüedad)
+    const query = normalizarTexto(termino.trim());
     let visiblesVigencias = 0;
     let visiblesAntiguedad = 0;
 
-    filas.forEach(fila => {
-        const texto = normalizar(fila.getAttribute('data-texto'));
+    document.querySelectorAll('#tablaVigencias tbody tr.fila-buscable, #tablaAntiguedad tbody tr.fila-buscable').forEach(fila => {
+        const texto = normalizarTexto(fila.getAttribute('data-texto'));
         const coincide = query === '' || texto.includes(query);
         fila.style.display = coincide ? '' : 'none';
 
         if (coincide) {
-            if (fila.closest('#tablaPagos')) visiblesPagos++;
             if (fila.closest('#tablaVigencias')) visiblesVigencias++;
             if (fila.closest('#tablaAntiguedad')) visiblesAntiguedad++;
         }
     });
-
-    // Actualizar contadores visibles
-    const badgePagos = document.getElementById('conteoPagos');
-    if (badgePagos) badgePagos.textContent = visiblesPagos;
 
     const badgeVig = document.getElementById('conteoVigencias');
     if (badgeVig) badgeVig.textContent = visiblesVigencias;
@@ -1192,12 +1665,67 @@ function limpiarBuscador() {
 }
 
 /**
- * Aplicación de Presets rápidos de fechas
+ * Aplicación de Presets rápidos de fechas sin recargar la página
  */
 function aplicarPreset(preset) {
     const inputPreset = document.getElementById('inputPreset');
     if (inputPreset) inputPreset.value = preset;
-    document.getElementById('formFiltrosReportes').submit();
+
+    // Resaltar botón activo
+    document.querySelectorAll('.btn-preset').forEach(b => {
+        b.classList.remove('active');
+        const onclickAttr = b.getAttribute('onclick') || '';
+        if (onclickAttr.includes("'" + preset + "'")) {
+            b.classList.add('active');
+        }
+    });
+
+    const fDesde = document.getElementById('fechaDesde');
+    const fHasta = document.getElementById('fechaHasta');
+    if (!fDesde || !fHasta) return;
+
+    const hoy = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const formatYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    if (preset === 'hoy') {
+        const hoyStr = formatYMD(hoy);
+        fDesde.value = hoyStr;
+        fHasta.value = hoyStr;
+    } else if (preset === 'semana') {
+        // Lunes de la semana actual
+        const diaSemana = hoy.getDay(); // 0 Dom, 1 Lun, ...
+        const diffAlLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
+        const lunes = new Date(hoy);
+        lunes.setDate(hoy.getDate() + diffAlLunes);
+        fDesde.value = formatYMD(lunes);
+        fHasta.value = formatYMD(hoy);
+    } else if (preset === 'mes') {
+        // Primer día del mes actual hasta hoy
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        fDesde.value = formatYMD(inicioMes);
+        fHasta.value = formatYMD(hoy);
+    } else if (preset === 'mes_anterior') {
+        // Todo el mes calendario anterior
+        const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+        const finMesPasado = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+        fDesde.value = formatYMD(inicioMesPasado);
+        fHasta.value = formatYMD(finMesPasado);
+    } else if (preset === '90dias') {
+        const hace90 = new Date(hoy);
+        hace90.setDate(hoy.getDate() - 90);
+        fDesde.value = formatYMD(hace90);
+        fHasta.value = formatYMD(hoy);
+    } else if (preset === 'anio') {
+        const inicioAnio = new Date(hoy.getFullYear(), 0, 1);
+        fDesde.value = formatYMD(inicioAnio);
+        fHasta.value = formatYMD(hoy);
+    } else if (preset === 'todo') {
+        fDesde.value = '';
+        fHasta.value = '';
+    }
+
+    filtrarTablasEnVivo(document.getElementById('buscadorVivo')?.value || '');
 }
 
 /**
@@ -1342,8 +1870,8 @@ function iniciarGraficos() {
         const pagosPorMes = <?= json_encode($analiticaFinanciera['grafico']['pagos']) ?>;
 
         const gradiente = ctxIngresos.createLinearGradient(0, 0, 0, 270);
-        gradiente.addColorStop(0, 'rgba(25, 135, 84, 0.55)');
-        gradiente.addColorStop(1, 'rgba(25, 135, 84, 0.05)');
+        gradiente.addColorStop(0, 'rgba(42, 157, 143, 0.55)');
+        gradiente.addColorStop(1, 'rgba(42, 157, 143, 0.05)');
 
         chartIngresosInstance = new Chart(ctxIngresos, {
             type: 'bar',
@@ -1353,7 +1881,7 @@ function iniciarGraficos() {
                     label: 'Ingresos confirmados',
                     data: montos,
                     backgroundColor: gradiente,
-                    borderColor: '#198754',
+                    borderColor: '#2A9D8F',
                     borderWidth: 2,
                     borderRadius: 8,
                     maxBarThickness: 50
@@ -1365,7 +1893,7 @@ function iniciarGraficos() {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#092611',
+                        backgroundColor: '#0E4D5E',
                         padding: 11,
                         callbacks: {
                             label: (c) => ' Bs ' + Number(c.parsed.y).toLocaleString('es-BO', { minimumFractionDigits: 2 }),
@@ -1551,8 +2079,8 @@ function iniciarGraficosVisitas() {
         const valoresSemanas = <?= json_encode($analiticaVisitas['semanas']['valores']) ?>;
 
         const gradienteSemanas = ctxSemanas.createLinearGradient(0, 0, 0, 270);
-        gradienteSemanas.addColorStop(0, 'rgba(25, 135, 84, 0.75)');
-        gradienteSemanas.addColorStop(1, 'rgba(25, 135, 84, 0.15)');
+        gradienteSemanas.addColorStop(0, 'rgba(42, 157, 143, 0.75)');
+        gradienteSemanas.addColorStop(1, 'rgba(42, 157, 143, 0.15)');
 
         chartSemanasInstance = new Chart(ctxSemanas, {
             type: 'bar',
@@ -1562,7 +2090,7 @@ function iniciarGraficosVisitas() {
                     label: 'Visitantes por semana',
                     data: valoresSemanas,
                     backgroundColor: gradienteSemanas,
-                    borderColor: '#198754',
+                    borderColor: '#2A9D8F',
                     borderWidth: 2,
                     borderRadius: 8,
                     maxBarThickness: 45
@@ -1648,8 +2176,30 @@ function iniciarGraficosVisitas() {
     }
 }
 
-// Escuchar cambios de pestaña para redimensionar los gráficos correctamente cuando se hacen visibles
+// Variables globales para instancias de gráficos del Modal de Rendimiento
+let chartRankingConvInstance = null;
+let chartCanalesDonaInstance = null;
+let chartEmbudoInstance = null;
+
+/**
+ * Abre el modal con los gráficos visuales de la tabla de Rendimiento y Conversión
+ */
+function abrirModalGraficosRendimiento() {
+    const modalEl = document.getElementById('modalGraficosRanking');
+    if (!modalEl) return;
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+// Inicializar gráficos del Modal cuando este se muestre en pantalla
 document.addEventListener('DOMContentLoaded', () => {
+    const modalRankingEl = document.getElementById('modalGraficosRanking');
+    if (modalRankingEl) {
+        modalRankingEl.addEventListener('shown.bs.modal', () => {
+            renderizarGraficosModalRanking();
+        });
+    }
+
     const tabVisitasBtn = document.getElementById('tab-visitas-btn');
     if (tabVisitasBtn) {
         tabVisitasBtn.addEventListener('shown.bs.tab', () => {
@@ -1668,4 +2218,373 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Construye los gráficos interactivos dentro del Modal usando los datos del ranking
+ */
+function renderizarGraficosModalRanking() {
+    if (!window.Chart) return;
+
+    <?php
+    $datosRankingJson = [];
+    if (!empty($rankingRendimiento)) {
+        foreach ($rankingRendimiento as $rk) {
+            $datosRankingJson[] = [
+                'nombre' => $rk['establecimiento'],
+                'categoria' => $rk['categoria'],
+                'vistas' => (int)$rk['vistas'],
+                'whatsapp' => (int)$rk['contactos_whatsapp'],
+                'mapa' => (int)$rk['rutas_mapa'],
+                'favoritos' => (int)$rk['guardado_favoritos'],
+                'total_conv' => (int)$rk['total_conversiones']
+            ];
+        }
+    }
+    ?>
+    const datosRanking = <?= json_encode($datosRankingJson, JSON_UNESCAPED_UNICODE) ?>;
+    const totalesCanales = {
+        whatsapp: <?= (int)$totalesTelemetria['total_whatsapp'] ?>,
+        mapa: <?= (int)$totalesTelemetria['total_mapa'] ?>,
+        favoritos: <?= (int)$totalesTelemetria['total_favoritos'] ?>
+    };
+
+    // 1. Gráfico de Barras Horizontales: Top 10 Comercios por Conversiones
+    const ctxConv = document.getElementById('chartRankingConversiones')?.getContext('2d');
+    if (ctxConv) {
+        if (chartRankingConvInstance) chartRankingConvInstance.destroy();
+
+        // Tomar hasta los 10 primeros
+        const top10 = datosRanking.slice(0, 10);
+        const labelsTop = top10.map(d => d.nombre.length > 20 ? d.nombre.substring(0, 18) + '...' : d.nombre);
+        const dataWhatsapp = top10.map(d => d.whatsapp);
+        const dataMapa = top10.map(d => d.mapa);
+
+        chartRankingConvInstance = new Chart(ctxConv, {
+            type: 'bar',
+            data: {
+                labels: labelsTop,
+                datasets: [
+                    {
+                        label: 'WhatsApp',
+                        data: dataWhatsapp,
+                        backgroundColor: '#2A9D8F',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Rutas Maps',
+                        data: dataMapa,
+                        backgroundColor: '#e11d48',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } } },
+                    tooltip: {
+                        backgroundColor: '#0E4D5E',
+                        padding: 10,
+                        callbacks: {
+                            footer: (items) => {
+                                let total = 0;
+                                items.forEach(i => total += i.parsed.x);
+                                return 'Total: ' + total + ' conversiones';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: { precision: 0 },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    y: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Gráfico de Dona: Distribución por Canal de Interacción
+    const ctxCanales = document.getElementById('chartCanalesDona')?.getContext('2d');
+    if (ctxCanales) {
+        if (chartCanalesDonaInstance) chartCanalesDonaInstance.destroy();
+
+        const labelsCanales = ['WhatsApp Directo', 'Rutas en Google Maps', 'En Favoritos'];
+        const dataCanales = [totalesCanales.whatsapp, totalesCanales.mapa, totalesCanales.favoritos];
+
+        chartCanalesDonaInstance = new Chart(ctxCanales, {
+            type: 'doughnut',
+            data: {
+                labels: labelsCanales,
+                datasets: [{
+                    data: dataCanales,
+                    backgroundColor: ['#2A9D8F', '#e11d48', '#FF6F3C'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 11 } } },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        padding: 10,
+                        callbacks: {
+                            label: (c) => ' ' + c.label + ': ' + c.raw + ' interacciones'
+                        }
+                    }
+                },
+                cutout: '62%'
+            }
+        });
+    }
+
+    // 3. Gráfico de Barras Comparativo: Visibilidad vs Contactos (Top 8)
+    const ctxEmbudo = document.getElementById('chartEmbudoAtraccion')?.getContext('2d');
+    if (ctxEmbudo) {
+        if (chartEmbudoInstance) chartEmbudoInstance.destroy();
+
+        const top8 = datosRanking.slice(0, 8);
+        const labelsEmb = top8.map(d => d.nombre.length > 18 ? d.nombre.substring(0, 16) + '...' : d.nombre);
+        const dataVistas = top8.map(d => d.vistas);
+        const dataTotalConv = top8.map(d => d.total_conv);
+
+        chartEmbudoInstance = new Chart(ctxEmbudo, {
+            type: 'bar',
+            data: {
+                labels: labelsEmb,
+                datasets: [
+                    {
+                        label: 'Vistas de Ficha',
+                        data: dataVistas,
+                        backgroundColor: 'rgba(249, 115, 22, 0.82)',
+                        borderColor: '#ea580c',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Contactos Reales (Conv.)',
+                        data: dataTotalConv,
+                        backgroundColor: 'rgba(42, 157, 143, 0.88)',
+                        borderColor: '#0E4D5E',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        backgroundColor: '#0E4D5E',
+                        padding: 10,
+                        callbacks: {
+                            afterBody: (items) => {
+                                const idx = items[0].dataIndex;
+                                const v = dataVistas[idx] || 0;
+                                const c = dataTotalConv[idx] || 0;
+                                const tasa = v > 0 ? ((c / v) * 100).toFixed(1) : '0.0';
+                                return 'Tasa de conversión: ' + tasa + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10.5 } }
+                    }
+                }
+            }
+        });
+    }
+}
+
+/**
+ * Abre el informe oficial dentro de un Modal en la misma página (sin recargas ni cambiar de pantalla)
+ */
+function abrirModalImprimir(tipo) {
+    const modalEl = document.getElementById('modalVistaPreviaImpresion');
+    if (!modalEl) return;
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    const spinner = document.getElementById('modalImprimirSpinner');
+    const contenido = document.getElementById('modalImprimirContenido');
+    const tituloModal = document.getElementById('modalImprimirTitulo');
+
+    if (spinner) spinner.style.display = 'block';
+    if (contenido) contenido.style.display = 'none';
+    if (tituloModal) tituloModal.textContent = 'Generando informe...';
+
+    // Parámetros actuales de los filtros
+    const params = new URLSearchParams({
+        tipo: tipo,
+        format: 'json'
+    });
+
+    const valores = {
+        desde: document.getElementById('fechaDesde')?.value || '',
+        hasta: document.getElementById('fechaHasta')?.value || '',
+        id_categoria: document.getElementById('filtroCategoria')?.value || '0',
+        buscar: document.getElementById('buscadorVivo')?.value?.trim() || '',
+        metodo: document.getElementById('filtroMetodo')?.value || '',
+        estado_vigencia: document.getElementById('filtroEstadoVigencia')?.value || ''
+    };
+
+    Object.entries(valores).forEach(([clave, valor]) => {
+        if (valor !== '' && valor !== '0') params.set(clave, valor);
+    });
+
+    fetch(`<?= htmlspecialchars($baseUrl) ?>/admin/reportes/imprimir?${params.toString()}`, {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Error al cargar datos del reporte (' + res.status + ')');
+        return res.json();
+    })
+    .then(data => {
+        if (spinner) spinner.style.display = 'none';
+        if (contenido) contenido.style.display = 'block';
+
+        if (tituloModal) tituloModal.textContent = data.titulo || 'Informe Oficial';
+        const docTitulo = document.getElementById('docReporteTitulo');
+        if (docTitulo) docTitulo.textContent = data.titulo || 'INFORME OFICIAL';
+
+        const docFecha = document.getElementById('docReporteFecha');
+        if (docFecha) docFecha.textContent = data.fecha || '';
+
+        const docTotal = document.getElementById('docReporteTotal');
+        if (docTotal) docTotal.textContent = data.total || (data.filas ? data.filas.length : 0);
+
+        // Cabeceras de tabla
+        const thead = document.getElementById('docReporteThead');
+        if (thead) {
+            let thHtml = '<tr>';
+            (data.cabeceras || []).forEach(c => {
+                thHtml += `<th class="small py-2">${escapeHtml(c)}</th>`;
+            });
+            thHtml += '</tr>';
+            thead.innerHTML = thHtml;
+        }
+
+        // Filas de tabla
+        const tbody = document.getElementById('docReporteTbody');
+        if (tbody) {
+            let trHtml = '';
+            if (data.filas && data.filas.length > 0) {
+                data.filas.forEach(fila => {
+                    trHtml += '<tr>';
+                    fila.forEach((val, idx) => {
+                        const esPrimero = idx === 0;
+                        const esMonto = String(val).startsWith('Bs ') || /^[0-9]+(\.[0-9]{2})?$/.test(String(val).replace(/,/g, ''));
+                        const align = esMonto ? 'text-end' : (esPrimero ? 'text-center' : '');
+                        trHtml += `<td class="small py-1 ${align}">${escapeHtml(val)}</td>`;
+                    });
+                    trHtml += '</tr>';
+                });
+            } else {
+                const totalCols = data.cabeceras ? data.cabeceras.length : 1;
+                trHtml = `<tr><td colspan="${totalCols}" class="text-center py-4 text-muted small">No se encontraron registros para este informe.</td></tr>`;
+            }
+            tbody.innerHTML = trHtml;
+        }
+    })
+    .catch(err => {
+        if (spinner) spinner.style.display = 'none';
+        if (contenido) {
+            contenido.style.display = 'block';
+            contenido.innerHTML = `<div class="alert alert-danger py-3 small mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>${err.message || 'Error al obtener el reporte.'}</div>`;
+        }
+    });
+}
+
+/**
+ * Escapa cadenas HTML para prevenir inyecciones
+ */
+function escapeHtml(texto) {
+    if (texto === null || texto === undefined) return '';
+    return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+/**
+ * Ejecuta la impresión directamente desde la misma pantalla usando un iframe oculto
+ * sin abrir una segunda ventana ni dejar una página en blanco abierta.
+ */
+function ejecutarImpresionDoc() {
+    const docHtml = document.getElementById('modalImprimirContenido')?.innerHTML;
+    const titulo = document.getElementById('docReporteTitulo')?.textContent || 'Informe';
+    if (!docHtml) return;
+
+    // Buscar o crear iframe oculto para impresión silenciosa
+    let printIframe = document.getElementById('iframeImpresionOculto');
+    if (!printIframe) {
+        printIframe = document.createElement('iframe');
+        printIframe.id = 'iframeImpresionOculto';
+        printIframe.style.position = 'fixed';
+        printIframe.style.right = '0';
+        printIframe.style.bottom = '0';
+        printIframe.style.width = '0';
+        printIframe.style.height = '0';
+        printIframe.style.border = '0';
+        printIframe.style.visibility = 'hidden';
+        document.body.appendChild(printIframe);
+    }
+
+    const doc = printIframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>${escapeHtml(titulo)} - BeniTours</title>
+            <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css">
+            <style>
+                @page { size: auto; margin: 15mm 10mm; }
+                body { margin: 0; padding: 15px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #212529; background: #fff; }
+                .table-sm th, .table-sm td { font-size: 0.8rem; padding: 0.35rem 0.5rem; }
+                thead { display: table-header-group; }
+                tr { break-inside: avoid; }
+                .table-bordered { border-color: #dee2e6 !important; }
+            </style>
+        </head>
+        <body>
+            ${docHtml}
+        </body>
+        </html>
+    `);
+    doc.close();
+
+    // Esperar a que rendericen estilos e invocar impresión directa sin popups visibles
+    setTimeout(() => {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+    }, 250);
+}
 </script>

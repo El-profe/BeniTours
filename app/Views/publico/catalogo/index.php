@@ -9,13 +9,13 @@
         <div class="col-xl-9">
             
             <!-- Badge: Visión departamental con sede en la capital -->
-            <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill text-uppercase mb-3 shadow-sm">
+            <span class="badge hero-badge-teal fw-bold px-3 py-2 rounded-pill text-uppercase mb-3 shadow-sm">
                 <i class="bi bi-compass-fill me-1"></i> Portal Turístico del Beni · Trinidad
             </span>
 
             <!-- Título Principal: Escalable hacia todo el departamento -->
             <h1 class="display-4 fw-extrabold mb-3 text-white">
-                Descubre los mejores destinos del <span class="text-warning text-highlight">Beni</span>
+                Descubre los mejores destinos del <span class="text-teal-highlight">Beni</span>
             </h1>
 
             <!-- Descripción: Conecta la capital con el potencial de la región -->
@@ -130,7 +130,7 @@
     <!-- Barra de Herramientas: Contador y Selector de Modo de Vista -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 px-1">
         <div class="d-flex align-items-center gap-2">
-            <span id="contadorResultados" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold small">
+            <span id="contadorResultados" class="badge bg-teal-subtle text-teal border border-teal-subtle px-3 py-2 rounded-pill fw-semibold small">
                 <?= count($lugares) ?> lugares encontrados
             </span>
         </div>
@@ -151,7 +151,7 @@
             <!-- Barra de control del mapa -->
             <div class="card-header bg-white py-2 px-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-semibold small">
+                    <span class="badge badge-teal rounded-pill px-3 py-1 fw-semibold small">
                         <i class="bi bi-geo-alt-fill me-1"></i> Mapa General de Trinidad, Beni
                     </span>
                     <span id="mapaConteoLugares" class="badge bg-light text-secondary border rounded-pill px-2 py-1 extra-small"></span>
@@ -160,10 +160,10 @@
                     </span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" id="btnMapaCentrarTrinidad" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 shadow-none" title="Centrar en el centro de Trinidad">
+                    <button type="button" id="btnMapaCentrarTrinidad" class="btn btn-sm btn-outline-teal rounded-pill px-3 py-1 shadow-none" title="Centrar en el centro de Trinidad">
                         <i class="bi bi-crosshair me-1"></i> Centrar Trinidad
                     </button>
-                    <button type="button" id="btnMapaMiUbicacion" class="btn btn-sm btn-success rounded-pill px-3 py-1 shadow-none" title="Ver mi ubicación GPS y lugares en 1 km">
+                    <button type="button" id="btnMapaMiUbicacion" class="btn btn-sm btn-teal-action rounded-pill px-3 py-1 shadow-none" title="Ver mi ubicación GPS y lugares en 1 km">
                         <i class="bi bi-cursor-fill me-1"></i> Mi Ubicación (1 km)
                     </button>
                 </div>
@@ -288,7 +288,7 @@
                             <?php endif; ?>
                             <div class="d-flex gap-2">
                                 <a href="<?= htmlspecialchars($baseUrl) ?>/catalogo/detalle?slug=<?= urlencode($l['slug']) ?>"
-                                   class="btn btn-success rounded-pill w-100 fw-semibold btn-sm py-2">
+                                   class="btn btn-teal-action rounded-pill w-100 fw-semibold btn-sm py-2">
                                     Ver Ficha <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -306,7 +306,7 @@
 
     <!-- Botón Centrado de Ver Más / Ver Menos Lugares -->
     <div id="contenedorVerMasLugares" class="text-center mt-4 mb-3<?= count($lugares) <= 9 ? ' d-none' : '' ?>">
-        <button type="button" id="btnVerMasLugares" class="btn btn-outline-success btn-ver-mas-catalogo rounded-pill px-4 py-2 fw-semibold shadow-sm">
+        <button type="button" id="btnVerMasLugares" class="btn btn-outline-teal btn-ver-mas-catalogo rounded-pill px-4 py-2 fw-semibold shadow-sm">
             <i class="bi bi-chevron-down me-2" id="iconoVerMasLugares"></i>
             <span id="textoVerMasLugares">Ver más lugares (<?= max(0, count($lugares) - 9) ?> restantes)</span>
         </button>
@@ -315,60 +315,6 @@
     <script id="lugaresInicialesJson" type="application/json">
         <?= json_encode($lugares, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>
     </script>
-</section>
-
-
-<!-- Guía del Viajero -->
-<section class="bg-white py-5 border-top border-bottom" id="guia-trinidad">
-    <div class="container py-3">
-        <div class="text-center mb-5">
-            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2">
-                Consejos Útiles
-            </span>
-            <h2 class="fw-bold text-dark">¿Llegando por primera vez a Trinidad?</h2>
-            <p class="text-muted small mx-auto" style="max-width: 600px;">
-                Información práctica para moverte por la ciudad con total tranquilidad y disfrutar de la hospitalidad beniana.
-            </p>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-transport" id="transporte">
-                    <div class="icon-circle bg-warning-subtle text-warning mx-auto mb-3">
-                        <i class="bi bi-scooter fs-2"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark">Transporte en Mototaxi</h5>
-                    <p class="text-muted small mb-0">
-                        El medio más tradicional y rápido son los mototaxis y los "toritos". La tarifa estándar dentro del casco cívico oscila entre Bs 3 y Bs 5 por carrera.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-food">
-                    <div class="icon-circle bg-success-subtle text-success mx-auto mb-3">
-                        <i class="bi bi-cup-hot-fill fs-2"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark">Sabores Imperdibles</h5>
-                    <p class="text-muted small mb-0">
-                        No te vayas de Trinidad sin probar el pacú frito de río, el majadito de charque con plátano maduro, el keoperí al horno y los masacos de yuca o plátano.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-sunset">
-                    <div class="icon-circle bg-info-subtle text-info mx-auto mb-3">
-                        <i class="bi bi-water fs-2"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark">Atardeceres Benianos</h5>
-                    <p class="text-muted small mb-0">
-                        La Laguna Suárez (a 5 km del centro) y Puerto Ballivián sobre el río Ibare son los mejores puntos para contemplar la caída del sol con un refresco tradicional de somó.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
 </section>
 
 <!-- Sección Carrusel de Promociones y Ofertas Imperdibles -->
@@ -489,7 +435,7 @@
                                                     </div>
                                                 <?php endif; ?>
 
-                                                <h5 class="fw-bold text-success mb-2 text-truncate" title="<?= htmlspecialchars($pr['titulo']) ?>">
+                                                <h5 class="fw-bold text-teal mb-2 text-truncate" title="<?= htmlspecialchars($pr['titulo']) ?>">
                                                     <?= htmlspecialchars($pr['titulo']) ?>
                                                 </h5>
                                                 <p class="text-secondary small flex-grow-1 mb-3 line-clamp-3">
@@ -506,7 +452,7 @@
                                                 <!-- Acciones -->
                                                 <div class="d-flex gap-2 pt-2 border-top mt-auto">
                                                     <button type="button" 
-                                                            class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                                                            class="btn btn-outline-teal btn-sm rounded-pill px-3 fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-1"
                                                             data-promo-trigger="modal">
                                                         <i class="bi bi-eye"></i>
                                                         <span>Ver Ficha</span>
@@ -515,7 +461,7 @@
                                                         <a href="https://wa.me/<?= $waPromoRaw ?>?text=<?= $textoWaPromo ?>" 
                                                            target="_blank" rel="noopener noreferrer"
                                                            onclick="window.BeniTursItinerario?.registrarEvento(<?= (int)$pr['id_lugar'] ?>, 'WHATSAPP')"
-                                                           class="btn btn-success btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1 shadow-sm">
+                                                           class="btn btn-teal-action btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1 shadow-sm">
                                                             <i class="bi bi-whatsapp"></i>
                                                             <span>Aprovechar</span>
                                                         </a>
@@ -539,11 +485,64 @@
                 <i class="bi bi-tag-fill text-warning fs-1 mb-2 d-block"></i>
                 <h5 class="fw-bold text-dark">Próximamente más Promociones</h5>
                 <p class="text-muted small mb-3">Nuestros comercios aliados renuevan ofertas continuamente. Visita el catálogo para explorar todos los lugares disponibles.</p>
-                <a href="#explorar" class="btn btn-outline-success btn-sm rounded-pill px-4 fw-semibold">
+                <a href="#explorar" class="btn btn-outline-teal btn-sm rounded-pill px-4 fw-semibold">
                     <i class="bi bi-compass me-1"></i> Explorar Catálogo
                 </a>
             </div>
         <?php endif; ?>
+    </div>
+</section>
+
+<!-- Guía del Viajero -->
+<section class="bg-white py-5 border-top border-bottom" id="guia-trinidad">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <span class="badge hero-badge-teal px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2">
+                Consejos Útiles
+            </span>
+            <h2 class="fw-bold text-dark">¿Llegando por primera vez a Trinidad?</h2>
+            <p class="text-muted small mx-auto" style="max-width: 600px;">
+                Información práctica para moverte por la ciudad con total tranquilidad y disfrutar de la hospitalidad beniana.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-transport" id="transporte">
+                    <div class="icon-circle mx-auto mb-3" style="background-color: rgba(13, 148, 136, 0.15); color: #0d9488;">
+                        <i class="bi bi-scooter fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Transporte en Mototaxi</h5>
+                    <p class="text-muted small mb-0">
+                        El medio más tradicional y rápido son los mototaxis y los "toritos". La tarifa estándar dentro del casco cívico oscila entre Bs 3 y Bs 5 por carrera.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-food">
+                    <div class="icon-circle mx-auto mb-3" style="background-color: rgba(15, 59, 67, 0.12); color: #0f3b43;">
+                        <i class="bi bi-cup-hot-fill fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Sabores Imperdibles</h5>
+                    <p class="text-muted small mb-0">
+                        No te vayas de Trinidad sin probar el pacú frito de río, el majadito de charque con plátano maduro, el keoperí al horno y los masacos de yuca o plátano.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-sunset">
+                    <div class="icon-circle bg-info-subtle text-info mx-auto mb-3">
+                        <i class="bi bi-water fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Atardeceres Benianos</h5>
+                    <p class="text-muted small mb-0">
+                        La Laguna Suárez (a 5 km del centro) y Puerto Ballivián sobre el río Ibare son los mejores puntos para contemplar la caída del sol con un refresco tradicional de somó.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -553,7 +552,7 @@
         <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
             <div class="modal-header bg-light border-0 py-3 px-4 d-flex justify-content-between align-items-center">
                 <div class="promo-modal-header-badges">
-                    <span class="badge bg-success rounded-pill px-3 py-2 fw-semibold" id="modalPromoCategoria">
+                    <span class="badge badge-teal rounded-pill px-3 py-2 fw-semibold" id="modalPromoCategoria">
                         <i class="bi bi-tag-fill me-1" id="modalPromoCatIcono"></i>
                         <span id="modalPromoCatTexto">Promoción</span>
                     </span>
@@ -568,7 +567,7 @@
                     <!-- Columna Izquierda: Foto completa sin recortes -->
                     <div class="col-lg-6 d-flex flex-column">
                         <div class="promo-modal-image-box rounded-4 overflow-hidden position-relative shadow-sm flex-grow-1 d-flex align-items-center justify-content-center"
-                             style="min-height: 320px; max-height: 520px; background-color: #081c15;">
+                             style="min-height: 320px; max-height: 520px; background-color: #0f3b43;">
                             <!-- Fondo desenfocado -->
                             <div id="modalPromoImgBackdrop" class="position-absolute top-0 start-0 w-100 h-100"
                                  style="background-size: cover; background-position: center; filter: blur(16px) brightness(0.35); transform: scale(1.15);"></div>
@@ -579,7 +578,7 @@
                                  loading="lazy">
                             <!-- Placeholder si no hay imagen -->
                             <div id="modalPromoNoImg" class="text-white text-center p-4 position-relative d-none" style="z-index: 2;">
-                                <i class="bi bi-tags display-1 text-warning mb-3 d-block"></i>
+                                <i class="bi bi-tags display-1 text-teal mb-3 d-block"></i>
                                 <h4 class="fw-bold" id="modalPromoPlaceholderNombre"></h4>
                                 <p class="text-white-50 small mb-0">Oferta especial exclusiva en BeniTours</p>
                             </div>
@@ -595,7 +594,7 @@
                                     <i class="bi bi-geo-alt text-danger me-1"></i><span id="modalPromoLugarMunicipio">Trinidad</span>
                                 </span>
                             </div>
-                            <h3 class="fw-bold text-success mb-1" id="modalPromoTitulo"></h3>
+                            <h3 class="fw-bold text-teal mb-1" id="modalPromoTitulo"></h3>
                             <h5 class="fw-semibold text-dark mb-2" id="modalPromoLugarNombre"></h5>
                             
                             <!-- Vigencia -->
@@ -607,7 +606,7 @@
                             <!-- Descripción completa -->
                             <div class="p-3 bg-light rounded-3 mb-3 border">
                                 <h6 class="fw-bold text-dark mb-1 small text-uppercase tracking-wider">
-                                    <i class="bi bi-info-circle text-success me-1"></i> Descripción de la oferta:
+                                    <i class="bi bi-info-circle text-teal me-1"></i> Descripción de la oferta:
                                 </h6>
                                 <p class="text-secondary small mb-0 lh-base" id="modalPromoDescripcion" style="white-space: pre-line;"></p>
                             </div>
@@ -617,7 +616,7 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="fw-bold text-dark small text-uppercase">
-                                    <i class="bi bi-map-fill text-success me-1"></i> Ubicación del Comercio
+                                    <i class="bi bi-map-fill text-teal me-1"></i> Ubicación del Comercio
                                 </span>
                                 <small class="text-muted extra-small text-truncate" id="modalPromoLugarDireccion" style="max-width: 250px;"></small>
                             </div>
@@ -632,14 +631,14 @@
                         <div class="mt-auto pt-3 border-top d-flex flex-wrap gap-2">
                             <!-- WhatsApp -->
                             <a id="modalPromoBtnWa" href="#" target="_blank" rel="noopener noreferrer"
-                               class="btn btn-success fw-bold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                               class="btn btn-teal-action fw-bold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-2 shadow-sm">
                                 <i class="bi bi-whatsapp fs-5"></i>
                                 <span>Aprovechar en WhatsApp</span>
                             </a>
 
                             <!-- Ver Ficha Completa -->
                             <a id="modalPromoBtnFicha" href="#"
-                               class="btn btn-outline-success fw-semibold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-1">
+                               class="btn btn-outline-teal fw-semibold rounded-pill px-3 py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-1">
                                 <span>Ver Ficha Completa</span>
                                 <i class="bi bi-arrow-right"></i>
                             </a>
@@ -675,7 +674,7 @@
                 </p>
             </div>
             <div class="col-lg-4 text-center text-lg-end">
-                <a href="<?= htmlspecialchars($baseUrl) ?>/solicitar-incorporacion" class="btn btn-warning btn-lg rounded-pill fw-bold px-4 py-3 shadow-sm text-dark">
+                <a href="<?= htmlspecialchars($baseUrl) ?>/solicitar-incorporacion" class="btn btn-warning btn-cta-negocio btn-lg rounded-pill fw-bold px-4 py-3 shadow-sm">
                     <i class="bi bi-send-check-fill me-1"></i> Solicitar Publicación
                 </a>
             </div>

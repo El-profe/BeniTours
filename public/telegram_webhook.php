@@ -1,4 +1,5 @@
 <?php
+require dirname(__DIR__) . '/app/bootstrap_env.php';
 require dirname(__DIR__) . '/app/Core/Autoloader.php';
 App\Core\Autoloader::register();
 date_default_timezone_set('America/La_Paz');

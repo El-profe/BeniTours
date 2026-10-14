@@ -78,9 +78,14 @@ class Pago {
     }
 
     public function buscarPorId(int $id): ?array {
-        $sql = "SELECT p.*, l.nombre AS nombre_establecimiento 
+        $sql = "SELECT p.*, l.nombre AS nombre_establecimiento, l.slug AS slug_lugar,
+                       l.direccion, l.telefono_contacto, l.whatsapp_contacto, l.email_contacto,
+                       v.fecha_inicio, v.fecha_vencimiento, v.tipo_periodo,
+                       a.nombre AS nombre_admin
                 FROM pagos p 
                 INNER JOIN lugares l ON p.id_lugar = l.id_lugar 
+                LEFT JOIN vigencias v ON v.id_pago = p.id_pago
+                LEFT JOIN administradores a ON p.id_administrador_confirmacion = a.id_administrador
                 WHERE p.id_pago = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);

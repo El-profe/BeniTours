@@ -3,7 +3,13 @@ $esAdmin = $tipoAcceso === 'admin';
 $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8');
 ?>
 <link rel="stylesheet" href="<?= $escape($baseUrl) ?>/assets/css/login.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/login.css') ?>">
-<section class="container py-5" aria-labelledby="tituloAcceso">
+<section class="login-video-wrapper" aria-labelledby="tituloAcceso">
+    <!-- Video de Fondo Inmersivo -->
+    <video class="login-bg-video" autoplay muted loop playsinline preload="metadata" poster="<?= $escape($baseUrl) ?>/assets/img/hero-poster.webp" aria-hidden="true">
+        <source src="<?= $escape($baseUrl) ?>/assets/video/video.mp4" type="video/mp4">
+    </video>
+    <div class="login-video-overlay"></div>
+
     <div class="login-shell mx-auto">
         <aside class="login-brand p-4 p-lg-5">
             <div class="login-logo-wrap mb-4">
@@ -13,7 +19,7 @@ $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF
                          class="login-logo img-fluid">
                 </a>
             </div>
-            <span class="badge rounded-pill bg-warning text-dark mb-4 align-self-start">
+            <span class="badge rounded-pill hero-badge-teal mb-4 align-self-start">
                 <i class="bi <?= $esAdmin ? 'bi-shield-lock-fill' : 'bi-shop' ?> me-1" aria-hidden="true"></i>
                 <?= $esAdmin ? 'Panel Administrativo' : 'Portal de Comercios' ?> · Trinidad
             </span>
@@ -25,7 +31,7 @@ $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF
                 <a href="<?= $escape($baseUrl) ?>/negocio/login" <?= !$esAdmin ? 'aria-current="page"' : '' ?>>Mi negocio</a>
                 <a href="<?= $escape($baseUrl) ?>/admin/login" <?= $esAdmin ? 'aria-current="page"' : '' ?>>Administración</a>
             </nav>
-            <h1 class="h3 fw-bold mb-2" id="tituloAcceso"><?= $esAdmin ? 'Acceso administrativo' : 'Bienvenido a tu negocio' ?></h1>
+            <h1 class="h3 fw-bold mb-2 text-dark" id="tituloAcceso"><?= $esAdmin ? 'Acceso administrativo' : 'Bienvenido a tu negocio' ?></h1>
             <p class="text-secondary small mb-4"><?= $esAdmin ? 'Ingresa con tu cuenta de administrador.' : 'Usa el usuario y la contraseña que recibiste al aprobarse tu solicitud.' ?></p>
             <?php if (!empty($error)): ?>
                 <div class="alert alert-danger small" role="alert"><i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i><?= $escape($error) ?></div>
@@ -44,12 +50,12 @@ $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF
                     </div>
                     <small id="avisoMayusculas" class="text-warning-emphasis d-block mt-2" aria-live="polite"></small>
                 </div>
-                <button type="submit" class="btn btn-success btn-lg w-100 fw-semibold">Entrar <?= $esAdmin ? 'al panel' : 'a mi negocio' ?> <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
+                <button type="submit" class="btn btn-teal-action btn-lg w-100 fw-semibold">Entrar <?= $esAdmin ? 'al panel' : 'a mi negocio' ?> <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></button>
             </form>
             <?php if (!$esAdmin): ?>
-                <p class="small text-center mt-4 mb-0">¿Todavía no tienes cuenta? <a class="text-success fw-semibold" href="<?= $escape($baseUrl) ?>/solicitar-incorporacion">Publica tu negocio</a></p>
+                <p class="small text-center mt-4 mb-0">¿Todavía no tienes cuenta? <a class="text-teal fw-semibold text-decoration-none" href="<?= $escape($baseUrl) ?>/solicitar-incorporacion">Publica tu negocio</a></p>
             <?php endif; ?>
-            <a class="d-block text-center text-secondary small mt-4" href="<?= $escape($baseUrl) ?>/"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver al catálogo</a>
+            <a class="d-block text-center text-secondary small mt-4 text-decoration-none" href="<?= $escape($baseUrl) ?>/"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver al catálogo</a>
         </div>
     </div>
 </section>

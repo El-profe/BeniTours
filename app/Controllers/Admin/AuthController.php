@@ -37,6 +37,7 @@ class AuthController extends Controller {
 
         $this->render('auth/login', [
             'titulo'    => 'Acceso Administrativo',
+            'bodyClass' => 'page-login',
             'error'     => $error,
             'usuarioAnterior' => $usuarioAnterior,
             'csrfToken' => $csrfToken

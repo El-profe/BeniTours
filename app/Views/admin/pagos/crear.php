@@ -28,7 +28,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/pagos/guardar" method="POST" id="formPagoComercial">
+                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/pagos/guardar" method="POST" enctype="multipart/form-data" id="formPagoComercial">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                     <input type="hidden" name="id_tarifa" id="id_tarifa" value="<?= (int)($tarifa['id_tarifa'] ?? 1) ?>">
                     <input type="hidden" name="meses_duracion" id="meses_duracion" value="1">
@@ -49,6 +49,10 @@
                                         $vencimientoRaw = $c['ultimo_vencimiento'] ?? '';
                                     ?>
                                     <option value="<?= $c['id_lugar'] ?>" 
+                                            data-nombre="<?= htmlspecialchars($c['nombre'] ?? '') ?>"
+                                            data-whatsapp="<?= htmlspecialchars($c['whatsapp_contacto'] ?? '') ?>"
+                                            data-telefono="<?= htmlspecialchars($c['telefono_contacto'] ?? '') ?>"
+                                            data-direccion="<?= htmlspecialchars($c['direccion'] ?? '') ?>"
                                             data-plan="<?= htmlspecialchars($c['plan_solicitado'] ?? '') ?>"
                                             data-vencimiento="<?= htmlspecialchars($vencimientoRaw) ?>"
                                             data-vencimiento-fmt="<?= htmlspecialchars($vencimiento) ?>"
@@ -233,7 +237,7 @@
                             </div>
                         </div>
 
-                        <!-- 4. Fecha Declarada y Método de Pago -->
+                        <!-- 4. Fecha Declarada y Selector de Método de Pago -->
                         <div class="col-md-6 mt-3">
                             <label class="form-label fw-semibold small text-dark">
                                 <i class="bi bi-calendar-event me-1 text-muted"></i>Fecha Declarada del Abono *
@@ -243,39 +247,141 @@
 
                         <div class="col-md-6 mt-3">
                             <label class="form-label fw-semibold small text-dark">
-                                <i class="bi bi-credit-card-2-front me-1 text-muted"></i>Método de Pago
+                                <i class="bi bi-credit-card-2-front me-1 text-muted"></i>Canal de Cobro Seleccionado *
                             </label>
-                            <select name="metodo_pago" class="form-select">
-                                <option value="Transferencia bancaria / QR">Transferencia bancaria / QR</option>
-                                <option value="Depósito en ventanilla">Depósito en ventanilla</option>
-                                <option value="Efectivo en oficina">Efectivo en oficina</option>
-                            </select>
+                            <input type="hidden" name="metodo_pago" id="inputMetodoPago" value="Efectivo en oficina">
+                            <div class="btn-group w-100 p-1 bg-light rounded-4 border" role="group">
+                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-canal-pago active" id="btnCanalEfectivo" onclick="seleccionarCanalPago('EFECTIVO')">
+                                    <i class="bi bi-cash-stack text-success me-1"></i> Cobro en Efectivo
+                                </button>
+                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-canal-pago" id="btnCanalQR" onclick="seleccionarCanalPago('QR')">
+                                    <i class="bi bi-qr-code-scan text-primary me-1"></i> Pago por QR / Banco
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- 5. Comprobante y Notas -->
+                        <!-- Panel A: Flujo Cobro en Efectivo (Recibo Inmediato, WhatsApp e Impresión) -->
+                        <div class="col-12" id="panelFlujoEfectivo">
+                            <div class="p-3 rounded-4 border border-success-subtle bg-success-subtle bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success text-white px-2 py-1 rounded-pill fw-bold">
+                                            <i class="bi bi-receipt me-1"></i> Recibo de Caja BeniTours
+                                        </span>
+                                        <span class="small fw-semibold text-dark">Emisión y comprobante para el cliente</span>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" role="switch" name="confirmar_inmediato" id="checkConfirmarInmediato" value="1" checked>
+                                        <label class="form-check-label small fw-bold text-success" for="checkConfirmarInmediato">
+                                            Confirmar y activar vigencia de inmediato
+                                        </label>
+                                    </div>
+                                </div>
+                                <p class="small text-muted mb-3">
+                                    El recibo se autocompletará con los datos del comercio seleccionado. Podrás imprimirlo o enviárselo directamente a su WhatsApp en 1 clic.
+                                </p>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill fw-semibold" onclick="abrirModalPrevisualizarRecibo()">
+                                        <i class="bi bi-eye me-1"></i> Vista previa del recibo
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold" onclick="enviarWhatsAppBorrador()">
+                                        <i class="bi bi-whatsapp me-1"></i> Probar envío a WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel B: Flujo Pago por QR / Transferencia (QR en pantalla + Cámara de Comprobante) -->
+                        <div class="col-12" id="panelFlujoQR" style="display: none;">
+                            <div class="p-3 p-md-4 rounded-4 border border-primary-subtle bg-primary-subtle bg-opacity-10">
+                                <div class="row g-3 align-items-center">
+                                    <!-- Visualización del QR para que el cliente lo escanee -->
+                                    <div class="col-md-5 text-center border-end-md">
+                                        <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-bold mb-2">
+                                            <i class="bi bi-qr-code-scan me-1"></i> Escanear para Pagar
+                                        </span>
+                                        <?php 
+                                            $qrPath = $cobro['qr_url'] ?? '/assets/img/QR-Prueba.jpeg';
+                                            $qrFullPath = $baseUrl . $qrPath;
+                                        ?>
+                                        <div class="bg-white p-2 d-inline-block rounded-4 shadow-sm border my-2">
+                                            <img src="<?= htmlspecialchars($qrFullPath) ?>" id="imgQrCobro" alt="QR de Recaudación" class="img-fluid rounded-3" style="max-height: 190px; object-fit: contain;">
+                                        </div>
+                                        <div class="extra-small text-muted">
+                                            <strong class="text-dark d-block"><?= htmlspecialchars($cobro['banco'] ?? 'Banco Unión / Ganadero') ?></strong>
+                                            Titular: <?= htmlspecialchars($cobro['titular'] ?? 'Directorio BeniTurs') ?><br>
+                                            Cta: <span class="font-monospace fw-bold text-dark"><?= htmlspecialchars($cobro['cuenta'] ?? '1234567890') ?></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Captura directa de foto con cámara o carga de archivo -->
+                                    <div class="col-md-7">
+                                        <label class="form-label fw-bold small text-dark mb-1">
+                                            <i class="bi bi-camera-fill text-primary me-1"></i>Capturar / Subir Foto del Comprobante
+                                        </label>
+                                        <p class="extra-small text-muted mb-2">
+                                            Toma una foto al comprobante del cliente o selecciona la captura de pantalla:
+                                        </p>
+
+                                        <!-- Botonera de Cámara / Archivo -->
+                                        <div class="d-flex gap-2 flex-wrap mb-3">
+                                            <label class="btn btn-outline-primary rounded-pill px-3 py-2 btn-sm fw-bold cursor-pointer">
+                                                <i class="bi bi-camera me-1"></i> Sacar foto con Cámara
+                                                <input type="file" id="inputCamaraComprobante" name="comprobante_archivo" accept="image/*" capture="environment" class="d-none" onchange="procesarFotoComprobante(this)">
+                                            </label>
+                                            <label class="btn btn-light border rounded-pill px-3 py-2 btn-sm fw-semibold cursor-pointer">
+                                                <i class="bi bi-folder2-open me-1"></i> Elegir de Galería / PC
+                                                <input type="file" id="inputArchivoComprobante" accept="image/jpeg,image/png,image/webp" class="d-none" onchange="procesarFotoComprobante(this)">
+                                            </label>
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2" id="btnQuitarFoto" onclick="quitarFotoComprobante()" style="display: none;" title="Quitar comprobante">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Previsualización de la foto capturada -->
+                                        <div id="contenedorPreviewFoto" class="p-2 border rounded-3 bg-white text-center" style="display: none;">
+                                            <img id="previewFotoImg" src="" alt="Comprobante capturado" class="img-fluid rounded-2 shadow-xs" style="max-height: 180px;">
+                                            <div class="extra-small text-success fw-bold mt-1">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Foto del comprobante cargada correctamente
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Comprobante Secuencial y Notas -->
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small text-dark">
-                                <i class="bi bi-receipt me-1 text-muted"></i>N° de Comprobante o Transacción
+                                <i class="bi bi-receipt me-1 text-muted"></i>N° de Recibo o Comprobante
                             </label>
-                            <input type="text" name="numero_comprobante" class="form-control" placeholder="Ej. TRF-9823412 o Recibo #042">
+                            <input type="text" name="numero_comprobante" id="inputNumeroComprobante" class="form-control" placeholder="Automático (Ej. REC-<?= date('Y') ?>-XXXX)">
+                            <small class="text-muted extra-small">Si lo dejas en blanco, el sistema generará uno automáticamente.</small>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small text-dark">
                                 <i class="bi bi-chat-left-text me-1 text-muted"></i>Observaciones o Notas Internas
                             </label>
-                            <input type="text" name="observaciones" id="inputObservaciones" class="form-control" placeholder="Banco emisor, acuerdo comercial o notas...">
+                            <input type="text" name="observaciones" id="inputObservaciones" class="form-control" placeholder="Detalle comercial, cajero o notas adicionales...">
                         </div>
                     </div>
 
                     <!-- Botón de Envío -->
                     <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <span class="text-muted small">
-                            <i class="bi bi-info-circle me-1"></i>Al guardar, el pago quedará <strong>PENDIENTE</strong> para revisión y posterior confirmación.
-                        </span>
-                        <button <?= !$tarifa ? 'disabled' : '' ?> type="submit" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm">
-                            <i class="bi bi-check-circle me-2"></i>Guardar Pago Pendiente
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small" id="txtNotaGuardado">
+                                <i class="bi bi-info-circle me-1"></i>Cobro en efectivo: Se registrará y se emitirá el recibo listo para imprimir o enviar.
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button <?= !$tarifa ? 'disabled' : '' ?> type="submit" name="emitir_recibo" value="1" class="btn btn-outline-success btn-lg rounded-pill px-4 fw-bold shadow-sm" id="btnGuardarEImprimir">
+                                <i class="bi bi-printer me-2"></i>Guardar e Imprimir Recibo
+                            </button>
+                            <button <?= !$tarifa ? 'disabled' : '' ?> type="submit" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm" id="btnGuardarPrincipal">
+                                <i class="bi bi-check-circle me-2"></i>Guardar Pago
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -291,17 +397,17 @@
     border-color: #dee2e6;
 }
 .card-plan:hover {
-    border-color: #198754;
+    border-color: #2A9D8F;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 .card-plan.active {
-    border-color: #198754 !important;
-    background-color: rgba(25, 135, 84, 0.04);
+    border-color: #2A9D8F !important;
+    background-color: rgba(42, 157, 143, 0.04);
 }
 .btn-modo-plan.active {
     background-color: #ffffff !important;
-    color: #198754 !important;
+    color: #217E73 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 </style>
@@ -605,4 +711,222 @@ function actualizarProyeccionVigencia() {
         txtProyeccion.innerHTML = `Vigencia proyectada: <strong>${fmtInicio}</strong> &rarr; <strong>${fmtFin}</strong> (${mesesSeleccionados} mes(es) de cobertura)`;
     }
 }
+
+/**
+ * Selección interactiva de Canal de Cobro: Efectivo vs QR / Transferencia
+ */
+let canalCobroActual = 'EFECTIVO';
+
+function seleccionarCanalPago(canal) {
+    canalCobroActual = canal;
+    const btnEf = document.getElementById('btnCanalEfectivo');
+    const btnQr = document.getElementById('btnCanalQR');
+    const panelEf = document.getElementById('panelFlujoEfectivo');
+    const panelQr = document.getElementById('panelFlujoQR');
+    const inputMetodo = document.getElementById('inputMetodoPago');
+    const txtNota = document.getElementById('txtNotaGuardado');
+    const btnImprimir = document.getElementById('btnGuardarEImprimir');
+
+    if (canal === 'EFECTIVO') {
+        btnEf.classList.add('active', 'btn-success', 'text-white');
+        btnEf.classList.remove('btn-light', 'text-dark');
+        btnQr.classList.remove('active', 'btn-primary', 'text-white');
+        btnQr.classList.add('btn-light', 'text-dark');
+
+        panelEf.style.display = 'block';
+        panelQr.style.display = 'none';
+        inputMetodo.value = 'Efectivo en oficina';
+        txtNota.innerHTML = '<i class="bi bi-info-circle me-1"></i>Cobro en efectivo: Se registrará y se emitirá el recibo listo para imprimir o enviar.';
+        btnImprimir.style.display = 'inline-block';
+    } else {
+        btnQr.classList.add('active', 'btn-primary', 'text-white');
+        btnQr.classList.remove('btn-light', 'text-dark');
+        btnEf.classList.remove('active', 'btn-success', 'text-white');
+        btnEf.classList.add('btn-light', 'text-dark');
+
+        panelEf.style.display = 'none';
+        panelQr.style.display = 'block';
+        inputMetodo.value = 'Transferencia bancaria / QR';
+        txtNota.innerHTML = '<i class="bi bi-info-circle me-1"></i>Pago por QR: Asegúrese de capturar o adjuntar el comprobante emitido por el cliente.';
+        btnImprimir.style.display = 'none';
+    }
+}
+
+/**
+ * Manejo de Captura de Foto del Comprobante
+ */
+function procesarFotoComprobante(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    
+    // Si viene del input de galería, asignarlo también al input que viajará en el form si es necesario
+    if (input.id === 'inputArchivoComprobante') {
+        const camaraInput = document.getElementById('inputCamaraComprobante');
+        // Usar DataTransfer para transferir el archivo si el navegador lo soporta
+        if (window.DataTransfer) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            camaraInput.files = dt.files;
+        }
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewFotoImg').src = e.target.result;
+        document.getElementById('contenedorPreviewFoto').style.display = 'block';
+        document.getElementById('btnQuitarFoto').style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function quitarFotoComprobante() {
+    document.getElementById('inputCamaraComprobante').value = '';
+    document.getElementById('inputArchivoComprobante').value = '';
+    document.getElementById('previewFotoImg').src = '';
+    document.getElementById('contenedorPreviewFoto').style.display = 'none';
+    document.getElementById('btnQuitarFoto').style.display = 'none';
+}
+
+/**
+ * Generación de datos autocompletados del Recibo
+ */
+function obtenerDatosReciboActual() {
+    const select = document.getElementById('pago-lugar');
+    const opt = select?.selectedOptions[0];
+    const nombreComercio = opt ? (opt.dataset.nombre || opt.textContent.split('(')[0].trim()) : 'Comercio no seleccionado';
+    const whatsapp = opt?.dataset.whatsapp || '';
+    const telefono = opt?.dataset.telefono || '';
+    const direccion = opt?.dataset.direccion || 'Trinidad, Beni';
+    const monto = parseFloat(document.getElementById('inputMontoFinal')?.value || 0).toFixed(2);
+    const meses = mesesSeleccionados;
+    const fecha = document.getElementById('inputFechaDeclarada')?.value || new Date().toISOString().slice(0, 10);
+    const numComp = document.getElementById('inputNumeroComprobante')?.value.trim() || ('REC-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000));
+    const canal = canalCobroActual;
+
+    return {
+        nombreComercio,
+        whatsapp,
+        telefono,
+        direccion,
+        monto,
+        meses,
+        fecha,
+        numComp,
+        canal
+    };
+}
+
+/**
+ * Abrir Modal de Previsualización de Recibo
+ */
+function abrirModalPrevisualizarRecibo() {
+    const d = obtenerDatosReciboActual();
+    if (!document.getElementById('pago-lugar').value) {
+        alert('Por favor selecciona primero un establecimiento comercial.');
+        return;
+    }
+
+    document.getElementById('reciboModalComercio').textContent = d.nombreComercio;
+    document.getElementById('reciboModalNumero').textContent = d.numComp;
+    document.getElementById('reciboModalFecha').textContent = d.fecha;
+    document.getElementById('reciboModalMonto').textContent = 'Bs ' + Number(d.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 });
+    document.getElementById('reciboModalMeses').textContent = d.meses + ' mes(es) de suscripción comercial';
+    document.getElementById('reciboModalCanal').textContent = d.canal;
+    document.getElementById('reciboModalContacto').textContent = d.whatsapp || d.telefono || 'Sin teléfono registrado';
+
+    const modal = new bootstrap.Modal(document.getElementById('modalPreviewRecibo'));
+    modal.show();
+}
+
+/**
+ * Enviar Borrador de Recibo por WhatsApp
+ */
+function enviarWhatsAppBorrador() {
+    const d = obtenerDatosReciboActual();
+    if (!document.getElementById('pago-lugar').value) {
+        alert('Por favor selecciona primero un establecimiento comercial.');
+        return;
+    }
+
+    let numero = d.whatsapp || d.telefono;
+    if (!numero) {
+        numero = prompt('El comercio no tiene teléfono registrado. Ingrese el número de WhatsApp con código de país (ej. 59178901234):');
+    }
+    if (!numero) return;
+
+    numero = numero.replace(/\D/g, '');
+    if (!numero.startsWith('591') && numero.length === 8) {
+        numero = '591' + numero;
+    }
+
+    const mensaje = `🧾 *COMPROBANTE DE PAGO - BENITOURS*\n\n` +
+        `Estimado(a) *${d.nombreComercio}*,\n` +
+        `Confirmamos la recepción de tu pago por concepto de suscripción comercial en el directorio turístico *BeniTours*:\n\n` +
+        `🔹 *Recibo N°:* ${d.numComp}\n` +
+        `🔹 *Monto:* Bs ${d.monto}\n` +
+        `🔹 *Cobertura:* ${d.meses} mes(es)\n` +
+        `🔹 *Método:* ${d.canal}\n` +
+        `🔹 *Fecha:* ${d.fecha}\n\n` +
+        `¡Gracias por impulsar el turismo y comercio en Trinidad! 🌴🇧🇴\n` +
+        `Equipo BeniTours`;
+
+    const url = `https://api.whatsapp.com/send?phone=${encodeURIComponent(numero)}&text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+}
 </script>
+
+<!-- Modal de Vista Previa de Recibo -->
+<div class="modal fade" id="modalPreviewRecibo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="bi bi-receipt-cutoff text-success me-2"></i>Vista Previa de Recibo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="p-3 border rounded-3 bg-light">
+                    <div class="text-center mb-3">
+                        <h6 class="fw-bold text-success mb-0">DIRECTORIO BENITOURS</h6>
+                        <small class="text-muted extra-small">Trinidad - Beni, Bolivia</small>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">N° Recibo:</span>
+                        <strong class="font-monospace text-dark" id="reciboModalNumero">REC-001</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">Establecimiento:</span>
+                        <strong class="text-dark" id="reciboModalComercio">—</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">Fecha:</span>
+                        <span class="text-dark" id="reciboModalFecha">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">Concepto:</span>
+                        <span class="text-dark" id="reciboModalMeses">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">Método:</span>
+                        <span class="text-dark" id="reciboModalCanal">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between small border-bottom pb-2 mb-2">
+                        <span class="text-muted">Contacto:</span>
+                        <span class="text-dark" id="reciboModalContacto">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between fs-5 fw-bold text-success pt-2">
+                        <span>Total Pagado:</span>
+                        <span id="reciboModalMonto">Bs 0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" onclick="enviarWhatsAppBorrador()">
+                    <i class="bi bi-whatsapp me-1"></i> Enviar por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

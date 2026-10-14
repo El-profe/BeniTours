@@ -1,21 +1,49 @@
 :root {
-    --business-green: #14633e;
-    --business-ink: #20392e;
-    --business-muted: #65766d;
+    --business-green: #0E4D5E;
+    --business-green-light: #2A9D8F;
+    --business-gold: #FF6F3C;
+    --business-ink: #0F172A;
+    --business-muted: #64748b;
 }
 
 body.business-portal {
     margin: 0;
-    background: #f3f6f3;
+    background: #f7faf9;
     color: var(--business-ink);
     font-family: system-ui, sans-serif;
+}
+
+/* Dropdowns del Portal de Negocios */
+.dropdown-menu {
+    border: 1px solid rgba(15, 59, 67, 0.12) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 30px rgba(9, 37, 42, 0.12) !important;
+}
+
+.dropdown-item {
+    transition: background-color 0.18s ease, color 0.18s ease;
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    color: var(--business-ink);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #e6fffa !important;
+    color: #0f3b43 !important;
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
 }
 
 .business-header {
     background: #fff;
     border-top: 4px solid var(--business-green);
     border-bottom: 1px solid #dae5dd;
-    box-shadow: 0 4px 20px #163d2406;
+    box-shadow: 0 4px 20px rgba(15, 59, 67, 0.05);
 }
 
 .business-header-inner,
@@ -44,20 +72,20 @@ body.business-portal {
 }
 
 .business-brand-logo-badge {
-    background: linear-gradient(145deg, #0b2f15 0%, #155d31 100%);
+    background: linear-gradient(145deg, #0A3D4A 0%, #0E4D5E 100%);
     padding: 6px 12px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(11, 47, 21, 0.16);
+    box-shadow: 0 2px 8px rgba(15, 59, 67, 0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.2);
 }
 
 .business-brand:hover .business-brand-logo-badge {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(11, 47, 21, 0.24);
+    box-shadow: 0 4px 12px rgba(15, 59, 67, 0.3);
 }
 
 .business-brand-logo {
@@ -148,18 +176,18 @@ body.business-portal {
 }
 
 .business-nav-link:hover {
-    background: #f0f6f1;
-    color: var(--business-green);
+    background: #e6fffa;
+    color: var(--business-green-light);
 }
 
 .business-nav-link.active {
     background: var(--business-green);
     color: #fff;
-    box-shadow: 0 4px 10px #14633e26;
+    box-shadow: 0 4px 10px rgba(15, 59, 67, 0.25);
 }
 
 .business-portal a:focus-visible {
-    outline: 3px solid #c18a12;
+    outline: 3px solid #2A9D8F;
     outline-offset: 4px;
 }
 
@@ -197,12 +225,12 @@ body.business-portal {
     gap: 32px;
     min-height: 210px;
     padding: 32px 36px;
-    border: 1px solid #23734f;
+    border: 1px solid rgba(45, 212, 191, 0.3);
     border-radius: 22px;
-    background: #14633e;
-    background-image: linear-gradient(115deg, #104832 0%, #14633e 55%, #278657 100%);
+    background: #0E4D5E;
+    background-image: linear-gradient(115deg, #0A3D4A 0%, #0E4D5E 55%, #2A9D8F 100%);
     color: #fff;
-    box-shadow: 0 10px 28px #14633e20;
+    box-shadow: 0 10px 28px rgba(15, 59, 67, 0.22);
 }
 
 .business-welcome::after {
@@ -231,7 +259,7 @@ body.business-portal {
     margin-bottom: 14px;
     border-radius: 30px;
     background: #f9d778;
-    color: #384220;
+    color: #0F172A;
     font-size: 11px;
     font-weight: 750;
     letter-spacing: .04em;
@@ -323,8 +351,8 @@ body.business-portal {
 }
 
 .business-content .form-control:focus {
-    border-color: #42865b;
-    box-shadow: 0 0 0 3px #19875420;
+    border-color: #2A9D8F;
+    box-shadow: 0 0 0 3px rgba(42, 157, 143, .16);
 }
 
 .business-content .form-label {
@@ -566,6 +594,10 @@ body.business-portal {
     transition: transform 0.3s ease;
 }
 
+.preview-image-fallback {
+    display: flex;
+}
+
 .preview-business-card:hover .preview-img-container img {
     transform: scale(1.03);
 }
@@ -599,7 +631,7 @@ body.business-portal {
 
 .promo-create-header {
     color: #fff;
-    background: linear-gradient(120deg, #0d512f, #198754 68%, #48a76c);
+    background: linear-gradient(120deg, #0E4D5E, #2A9D8F 68%, #46B7AA);
 }
 
 .promo-create-header .btn-close {
@@ -635,8 +667,8 @@ body.business-portal {
     place-items: center;
     overflow: hidden;
     border-radius: .85rem;
-    color: #1b7a42;
-    background: #dcefe2;
+    color: #217E73;
+    background: #E2F2F0;
     font-size: 1.6rem;
 }
 
@@ -681,7 +713,7 @@ body.business-portal {
     white-space: nowrap;
 }
 
-.promo-form-preview-content strong { color: #20392e; }
+.promo-form-preview-content strong { color: #0F172A; }
 .promo-form-preview-content small { color: #65766d; font-size: .78rem; }
 
 .promo-form-section-title {
@@ -704,7 +736,7 @@ body.business-portal {
 }
 
 .promo-form-section-title div { display: grid; line-height: 1.15; }
-.promo-form-section-title strong { color: #20392e; font-size: .92rem; }
+.promo-form-section-title strong { color: #0F172A; font-size: .92rem; }
 .promo-form-section-title small { color: #65766d; font-size: .76rem; }
 
 .promo-form-control {
@@ -714,8 +746,8 @@ body.business-portal {
 }
 
 .promo-form-control:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .13);
+    border-color: #2A9D8F;
+    box-shadow: 0 0 0 .2rem rgba(42, 157, 143, .16);
 }
 
 .promo-upload-zone {
@@ -726,7 +758,7 @@ body.business-portal {
     padding: 1rem;
     border: 2px dashed #bad7c4;
     border-radius: 1rem;
-    color: #39724e;
+    color: #217E73;
     background: #fafdfb;
     cursor: pointer;
     text-align: center;
@@ -735,15 +767,53 @@ body.business-portal {
 
 .promo-upload-zone:hover,
 .promo-upload-zone.is-selected {
-    border-color: #198754;
-    background: #eef9f1;
+    border-color: #2A9D8F;
+    background: #F0FAF8;
     transform: translateY(-1px);
 }
 
-.promo-upload-zone > i { color: #198754; font-size: 1.7rem; }
+.promo-upload-zone > i { color: #217E73; font-size: 1.7rem; }
 .promo-upload-zone small { color: #65766d; font-size: .76rem; }
 
 @media (max-width: 575.98px) {
+    /* El tablero conserva jerarquía y espacios cómodos en pantallas angostas. */
+    .business-content .card.rounded-4.p-4 {
+        padding: 1rem !important;
+    }
+
+    .business-content .alert.p-4 {
+        padding: 1rem !important;
+    }
+
+    .business-content .input-group {
+        flex-wrap: wrap;
+    }
+
+    .business-content .input-group > .form-control {
+        width: 100%;
+        flex: 1 0 100%;
+        border-right: 1px solid #cbd8ce !important;
+        border-radius: 10px !important;
+    }
+
+    .business-content .input-group > .btn {
+        width: 100%;
+        margin-top: .5rem;
+        border-radius: 10px !important;
+    }
+
+    .membership-banner-card .badge {
+        text-align: center;
+    }
+
+    .preview-img-container {
+        height: 165px !important;
+    }
+
+    .preview-business-card .card-body {
+        padding: 1rem !important;
+    }
+
     .promo-create-modal { border-radius: 1rem; }
     .promo-form-preview { align-items: flex-start; }
     .promo-form-preview-content { width: calc(100% - 5.5rem); }
@@ -793,3 +863,43 @@ body.business-portal {
 .sidebar-nav-item.active i {
     color: #ffffff !important;
 }
+
+/* Paleta Río Mamoré: elimina los verdes heredados también en hover y estados. */
+body.business-portal {
+    --bs-success: #2A9D8F;
+    --bs-success-rgb: 42, 157, 143;
+    --bs-success-text-emphasis: #0A3D4A;
+    --bs-success-bg-subtle: #DDF4F1;
+    --bs-success-border-subtle: #9BD9D0;
+    --bs-link-color: #0E4D5E;
+    --bs-link-hover-color: #0A3D4A;
+}
+
+body.business-portal .btn-success,
+body.business-portal .business-content .btn-success {
+    --bs-btn-bg: #2A9D8F;
+    --bs-btn-border-color: #2A9D8F;
+    --bs-btn-hover-bg: #217E73;
+    --bs-btn-hover-border-color: #217E73;
+    --bs-btn-active-bg: #1B685F;
+    --bs-btn-active-border-color: #1B685F;
+}
+body.business-portal .btn-outline-success {
+    --bs-btn-color: #217E73;
+    --bs-btn-border-color: #2A9D8F;
+    --bs-btn-hover-bg: #2A9D8F;
+    --bs-btn-hover-border-color: #2A9D8F;
+}
+body.business-portal .text-success,
+body.business-portal .text-success-emphasis { color: #217E73 !important; }
+body.business-portal .bg-success { background-color: #2A9D8F !important; }
+body.business-portal .border-success { border-color: #2A9D8F !important; }
+body.business-portal .bg-success-subtle { background-color: #DDF4F1 !important; }
+body.business-portal .border-success-subtle { border-color: #9BD9D0 !important; }
+body.business-portal .alert-success { --bs-alert-color: #0A3D4A; --bs-alert-bg: #DDF4F1; --bs-alert-border-color: #9BD9D0; }
+body.business-portal .form-control:focus,
+body.business-portal .form-select:focus { border-color: #2A9D8F; box-shadow: 0 0 0 .2rem rgba(42, 157, 143, .16); }
+body.business-portal .business-content .btn-success:hover,
+body.business-portal .business-content .btn-success:focus { background-color: #217E73; border-color: #217E73; }
+body.business-portal .promo-upload-zone:hover,
+body.business-portal .promo-upload-zone.is-selected { border-color: #2A9D8F; background: #F0FAF8; }

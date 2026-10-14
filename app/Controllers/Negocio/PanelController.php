@@ -597,4 +597,245 @@ class PanelController extends Controller {
             exit();
         }
     }
+
+    /* =========================================================================
+     * GESTIÓN DE TRANSPORTE Y RADIOMÓVILES (Autogestión por el Sindicato / Central)
+     * ========================================================================= */
+
+    public function transporte(): void {
+        $this->asegurarOperadorTransporte();
+        $lugar = $this->lugarModel->buscarPorId($this->idLugar);
+        $paradas = $this->transporteModel->listarParadasPorLugar($this->idLugar, false);
+        $tarifas = $this->transporteModel->listarTarifasPorLugar($this->idLugar, false);
+        $moviles = $this->transporteModel->listarMovilesPorLugar($this->idLugar, false);
+
+        $mensaje = $_SESSION['negocio_flash'] ?? null;
+        $error   = $_SESSION['negocio_error'] ?? null;
+        unset($_SESSION['negocio_flash'], $_SESSION['negocio_error']);
+
+        $this->render('negocio/transporte', [
+            'titulo'   => 'Gestión de Radiomóvil & Despacho - ' . $lugar['nombre'],
+            'lugar'    => $lugar,
+            'paradas'  => $paradas,
+            'tarifas'  => $tarifas,
+            'moviles'  => $moviles,
+            'mensaje'  => $mensaje,
+            'error'    => $error
+        ], 'negocio');
+    }
+
+    public function guardarParada(): void {
+        $this->verificarCsrfTransporte('paradas');
+        $nombre    = $this->textoPost('nombre');
+        $tipo      = $this->textoPost('tipo') ?: 'CENTRAL';
+        $direccion = $this->textoPost('direccion');
+        $telefono  = $this->textoPost('telefono_contacto');
+        $latitudRaw = $this->textoPost('latitud');
+        $longitudRaw = $this->textoPost('longitud');
+        $latitud   = $latitudRaw !== '' ? (float)$latitudRaw : null;
+        $longitud  = $longitudRaw !== '' ? (float)$longitudRaw : null;
+        $idParada  = !empty($_POST['id_parada']) ? (int)$_POST['id_parada'] : null;
+
+        if (!in_array($tipo, ['TERMINAL', 'AEROPUERTO', 'CENTRAL', 'PARADA_URBANA'], true)) {
+            $this->errorTransporte('El tipo de parada no es valido.', 'paradas');
+        }
+        if (mb_strlen($nombre) > 150 || mb_strlen($direccion) > 255 || mb_strlen($telefono) > 50) {
+            $this->errorTransporte('Uno de los datos excede la longitud permitida.', 'paradas');
+        }
+        if (($latitudRaw !== '' && (!is_numeric($latitudRaw) || $latitud < -90 || $latitud > 90)) || ($longitudRaw !== '' && (!is_numeric($longitudRaw) || $longitud < -180 || $longitud > 180))) {
+            $this->errorTransporte('Ingresa coordenadas GPS validas.', 'paradas');
+        }
+
+        if (empty($nombre)) {
+            $_SESSION['negocio_error'] = 'El nombre de la parada es obligatorio.';
+            header("Location: {$this->config['base_url']}/negocio/transporte?tab=paradas");
+            exit();
+        }
+
+        try {
+            $this->transporteModel->guardarParada([
+                'id_parada'         => $idParada,
+                'id_lugar'          => $this->idLugar,
+                'nombre'            => $nombre,
+                'tipo'              => $tipo,
+                'direccion'         => $direccion,
+                'latitud'           => $latitud,
+                'longitud'          => $longitud,
+                'telefono_contacto' => $telefono,
+                'activo'            => 1
+            ]);
+            $_SESSION['negocio_flash'] = 'Parada guardada correctamente.';
+        } catch (\Throwable $e) {
+            error_log('Error al guardar parada de transporte: ' . $e->getMessage());
+            $_SESSION['negocio_error'] = 'No se pudo guardar la parada. Inténtalo nuevamente.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=paradas");
+        exit();
+    }
+
+    public function eliminarParada(): void {
+        $this->verificarCsrfTransporte('paradas');
+        $idParada = (int)($_POST['id_parada'] ?? 0);
+        if ($idParada > 0) {
+            $this->transporteModel->eliminarParada($idParada, $this->idLugar);
+            $_SESSION['negocio_flash'] = 'Parada eliminada correctamente.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=paradas");
+        exit();
+    }
+
+    public function guardarTarifa(): void {
+        $this->verificarCsrfTransporte('tarifas');
+        $origen        = $this->textoPost('origen');
+        $destino       = $this->textoPost('destino');
+        $tipoServicio  = $this->textoPost('tipo_servicio') ?: 'URBANO_FIJO';
+        $precioBaseRaw = $this->textoPost('precio_base');
+        $precioNocturnoRaw = $this->textoPost('precio_nocturno');
+        $precioBase    = (float)$precioBaseRaw;
+        $precioNocturno= $precioNocturnoRaw !== '' ? (float)$precioNocturnoRaw : null;
+        $descripcion   = $this->textoPost('descripcion');
+        $idTarifa      = !empty($_POST['id_tarifa']) ? (int)$_POST['id_tarifa'] : null;
+
+        if (!in_array($tipoServicio, ['URBANO_FIJO', 'AEROPUERTO_TERMINAL', 'EXPRESO_PROVINCIAL'], true)) {
+            $this->errorTransporte('El tipo de servicio no es valido.', 'tarifas');
+        }
+        if (!is_numeric($precioBaseRaw) || ($precioNocturno !== null && (!is_numeric($precioNocturnoRaw) || $precioNocturno < 0)) || mb_strlen($origen) > 120 || mb_strlen($destino) > 120 || mb_strlen($descripcion) > 255) {
+            $this->errorTransporte('Revisa los montos y la longitud de los datos ingresados.', 'tarifas');
+        }
+
+        if (empty($origen) || empty($destino) || $precioBase <= 0) {
+            $_SESSION['negocio_error'] = 'Origen, destino y precio base son obligatorios.';
+            header("Location: {$this->config['base_url']}/negocio/transporte?tab=tarifas");
+            exit();
+        }
+
+        try {
+            $this->transporteModel->guardarTarifa([
+                'id_tarifa'       => $idTarifa,
+                'id_lugar'        => $this->idLugar,
+                'tipo_servicio'   => $tipoServicio,
+                'origen'          => $origen,
+                'destino'         => $destino,
+                'precio_base'     => $precioBase,
+                'precio_nocturno' => $precioNocturno,
+                'descripcion'     => $descripcion,
+                'activo'          => 1
+            ]);
+            $_SESSION['negocio_flash'] = 'Tarifa guardada correctamente.';
+        } catch (\Throwable $e) {
+            error_log('Error al guardar tarifa de transporte: ' . $e->getMessage());
+            $_SESSION['negocio_error'] = 'No se pudo guardar la tarifa. Inténtalo nuevamente.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=tarifas");
+        exit();
+    }
+
+    public function eliminarTarifa(): void {
+        $this->verificarCsrfTransporte('tarifas');
+        $idTarifa = (int)($_POST['id_tarifa'] ?? 0);
+        if ($idTarifa > 0) {
+            $this->transporteModel->eliminarTarifa($idTarifa, $this->idLugar);
+            $_SESSION['negocio_flash'] = 'Tarifa eliminada con éxito.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=tarifas");
+        exit();
+    }
+
+    public function guardarMovil(): void {
+        $this->verificarCsrfTransporte('moviles');
+        $numeroMovil    = $this->textoPost('numero_movil');
+        $nombreChofer   = $this->textoPost('nombre_chofer');
+        $telefonoChofer = $this->textoPost('telefono_chofer');
+        $placa          = $this->textoPost('placa');
+        $modeloVehiculo = $this->textoPost('modelo_vehiculo');
+        $estado         = $this->textoPost('estado') ?: 'DISPONIBLE';
+        $idMovil        = !empty($_POST['id_movil']) ? (int)$_POST['id_movil'] : null;
+
+        if (!in_array($estado, ['DISPONIBLE', 'EN_CARRERA', 'FUERA_SERVICIO'], true)) {
+            $this->errorTransporte('El estado del movil no es valido.', 'moviles');
+        }
+        if (mb_strlen($numeroMovil) > 20 || mb_strlen($nombreChofer) > 120 || mb_strlen($telefonoChofer) > 30 || mb_strlen($placa) > 20 || mb_strlen($modeloVehiculo) > 100) {
+            $this->errorTransporte('Uno de los datos excede la longitud permitida.', 'moviles');
+        }
+
+        if (empty($numeroMovil) || empty($nombreChofer)) {
+            $_SESSION['negocio_error'] = 'El número de móvil y el nombre del chofer son obligatorios.';
+            header("Location: {$this->config['base_url']}/negocio/transporte?tab=moviles");
+            exit();
+        }
+
+        try {
+            $this->transporteModel->guardarMovil([
+                'id_movil'        => $idMovil,
+                'id_lugar'        => $this->idLugar,
+                'numero_movil'    => $numeroMovil,
+                'nombre_chofer'   => $nombreChofer,
+                'telefono_chofer' => $telefonoChofer,
+                'placa'           => $placa,
+                'modelo_vehiculo' => $modeloVehiculo,
+                'estado'          => $estado,
+                'activo'          => 1
+            ]);
+            $_SESSION['negocio_flash'] = 'Móvil registrado correctamente.';
+        } catch (\Throwable $e) {
+            error_log('Error al guardar móvil de transporte: ' . $e->getMessage());
+            $_SESSION['negocio_error'] = 'No se pudo guardar el móvil. Inténtalo nuevamente.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=moviles");
+        exit();
+    }
+
+    public function cambiarEstadoMovil(): void {
+        $this->verificarCsrfTransporte('moviles');
+        $idMovil = (int)($_POST['id_movil'] ?? 0);
+        $estado  = $this->textoPost('estado') ?: 'DISPONIBLE';
+        if (!in_array($estado, ['DISPONIBLE', 'EN_CARRERA', 'FUERA_SERVICIO'], true)) {
+            $this->errorTransporte('El estado del móvil no es válido.', 'moviles');
+        }
+        if ($idMovil > 0 && $this->transporteModel->cambiarEstadoMovil($idMovil, $estado, $this->idLugar)) {
+            $_SESSION['negocio_flash'] = 'Estado del móvil actualizado.';
+        } else {
+            $_SESSION['negocio_error'] = 'No se encontró el móvil solicitado.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=moviles");
+        exit();
+    }
+
+    public function eliminarMovil(): void {
+        $this->verificarCsrfTransporte('moviles');
+        $idMovil = (int)($_POST['id_movil'] ?? 0);
+        if ($idMovil > 0) {
+            $this->transporteModel->eliminarMovil($idMovil, $this->idLugar);
+            $_SESSION['negocio_flash'] = 'Móvil eliminado de la flota.';
+        }
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab=moviles");
+        exit();
+    }
+
+    private function verificarCsrfTransporte(string $tab): void {
+        $this->asegurarOperadorTransporte();
+        $token = $_POST['csrf_token'] ?? null;
+        if (!is_string($token) || !CsrfMiddleware::validarToken($token)) {
+            $this->errorTransporte('La sesion del formulario expiro. Recarga la pagina e intentalo nuevamente.', $tab);
+        }
+    }
+
+    private function errorTransporte(string $mensaje, string $tab): void {
+        $_SESSION['negocio_error'] = $mensaje;
+        header("Location: {$this->config['base_url']}/negocio/transporte?tab={$tab}");
+        exit();
+    }
+
+    private function textoPost(string $campo): string {
+        $valor = $_POST[$campo] ?? '';
+        return is_string($valor) ? trim($valor) : '';
+    }
+
+    private function asegurarOperadorTransporte(): void {
+        $lugar = $this->lugarModel->buscarPorId($this->idLugar);
+        if (empty($lugar['es_operador_transporte']) || ($lugar['estado_verificacion_transporte'] ?? '') !== 'APROBADO') {
+            http_response_code(403);
+            exit('El panel de transporte solo esta disponible para sindicatos y centrales aprobadas.');
+        }
+    }
 }

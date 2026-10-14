@@ -1,15 +1,16 @@
 /* ==========================================================================
-   PANEL ADMINISTRATIVO - TRINIDAD TURISMO
+   PANEL ADMINISTRATIVO - TRINIDAD TURISMO (RÍO MAMORÉ & TEAL AMAZÓNICO)
    ========================================================================== */
 :root {
-    --admin-sidebar-bg: #092611;
-    --admin-sidebar-hover: #123d1e;
-    --admin-sidebar-active: #198754;
-    --admin-gold: #ffc107;
-    --admin-body-bg: #f4f7f6;
-    --admin-card-border: #e8ece9;
-    --admin-text-main: #1f2d24;
-    --admin-text-muted: #65756a;
+    --admin-sidebar-bg: #0E4D5E;
+    --admin-sidebar-hover: #0A3D4A;
+    --admin-sidebar-active: #2A9D8F;
+    --admin-gold: #FF6F3C;
+    --admin-gold-hover: #E85D2E;
+    --admin-body-bg: #EEF5F7;
+    --admin-card-border: #D7E5E9;
+    --admin-text-main: #0F172A;
+    --admin-text-muted: #64748b;
     
     --sidebar-width: 260px;
     --topbar-height: 64px;
@@ -53,8 +54,8 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background-color: rgba(255, 193, 7, 0.18);
-    color: var(--admin-gold);
+    background-color: rgba(13, 148, 136, 0.22);
+    color: #2dd4bf;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -104,7 +105,7 @@ body {
     background-color: var(--admin-sidebar-active);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.35);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
 }
 
 .sidebar-footer {
@@ -117,20 +118,115 @@ body {
    BARRA SUPERIOR (TOPBAR)
    -------------------------------------------------------------------------- */
 #adminTopbar {
-    height: var(--topbar-height);
+    height: 70px;
     position: fixed;
     top: 0;
     right: 0;
     left: 0;
-    background: #ffffff;
+    background: rgba(14, 77, 94, 0.96);
+    backdrop-filter: blur(10px);
     z-index: 1040;
-    border-bottom: 1px solid var(--admin-card-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 20px rgba(9, 37, 42, 0.3);
     padding: 0 1.5rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     transition: var(--transition);
 }
+
+.topbar-inner-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.admin-topbar-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.admin-topbar-logo:hover {
+    transform: scale(1.03);
+}
+
+.topbar-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0d9488;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.4);
+}
+
+.btn-topbar-catalog {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.btn-topbar-catalog:hover {
+    background: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+}
+
+.btn-topbar-user {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    transition: all 0.2s ease;
+}
+
+.btn-topbar-user:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Dropdowns del Panel Administrativo (Hover & Active Teal) */
+.dropdown-menu {
+    border: 1px solid rgba(15, 59, 67, 0.12) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 30px rgba(9, 37, 42, 0.15) !important;
+}
+
+.dropdown-item {
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    color: var(--admin-text-main);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #e6fffa !important;
+    color: #0f3b43 !important;
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item.text-danger:hover,
+.dropdown-item.text-danger:focus {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+}
+
+
 
 #adminContent {
     margin-left: 0;
@@ -398,45 +494,69 @@ body {
 }
 
 .admin-desktop-nav {
-    width: 100%;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    border-top: 1px solid var(--admin-card-border);
-    padding-block: 0.5rem;
+    gap: 0.35rem;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 0.3rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .admin-top-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 10px;
-    color: var(--admin-text-main);
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.82);
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     font-weight: 600;
     white-space: nowrap;
+    transition: all 0.2s ease;
 }
+
+.admin-top-link i {
+    font-size: 0.95rem;
+    transition: transform 0.2s ease;
+    color: rgba(255, 255, 255, 0.75);
+}
+
 .admin-top-link:hover {
-    background: #e8f3ed;
-    color: #14633d;
-}
-.admin-top-link.active {
-    background: var(--admin-sidebar-active);
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
 }
+
+.admin-top-link:hover i {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.admin-top-link.active {
+    background: #0d9488;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 3px 12px rgba(13, 148, 136, 0.4);
+}
+
+.admin-top-link.active i {
+    color: #ffffff;
+}
+
 .admin-top-link.disabled {
-    color: var(--admin-text-muted);
+    color: rgba(255, 255, 255, 0.4);
     background: transparent;
     opacity: 0.65;
 }
+
+
 @media (min-width: 992px) {
     :root {
-        --topbar-height: 120px;
-    }
-    #adminTopbar {
-        flex-wrap: wrap;
+        --topbar-height: 70px;
     }
 }
+
 
 .admin-table {
     min-width: 520px; /* Evita que las columnas se aplasten en pantallas pequeñas */
@@ -507,15 +627,15 @@ body {
 @keyframes badgePulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7);
     }
     70% {
         transform: scale(1.03);
-        box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
     }
     100% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
     }
 }
 
@@ -1118,6 +1238,105 @@ body {
     top: calc(var(--topbar-height) + 1rem);
 }
 
+@media (max-width: 575.98px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    #adminContent .row {
+        --bs-gutter-x: 1rem;
+    }
+
+    #adminContent .row > * {
+        min-width: 0;
+    }
+
+    .form-section-card {
+        min-width: 0;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+    }
+
+    .form-section-header {
+        align-items: flex-start;
+        gap: .65rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-section-title {
+        font-size: .95rem;
+    }
+
+    .form-section-desc {
+        font-size: .75rem;
+        overflow-wrap: anywhere;
+    }
+
+    .type-choice-container {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .type-choice-card {
+        min-width: 0;
+        padding: .85rem;
+    }
+
+    .type-choice-card > div:last-child {
+        min-width: 0;
+    }
+
+    .type-choice-card small {
+        overflow-wrap: anywhere;
+    }
+
+    .category-pill-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dropzone-modern {
+        padding: 1.5rem .85rem;
+    }
+
+    .dropzone-modern strong,
+    .dropzone-modern small {
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+
+    .image-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sticky-sidebar-box {
+        position: static;
+    }
+
+    .live-preview-img-box {
+        height: 165px;
+    }
+
+    .live-preview-body {
+        padding: 1rem;
+    }
+
+    .live-preview-meta {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .location-mode-tabs {
+        width: 100%;
+    }
+
+    .location-mode-tabs button {
+        flex: 1 1 0;
+        padding: .45rem .3rem;
+        font-size: .7rem;
+    }
+}
+
 /* --------------------------------------------------------------------------
    INTERFAZ BANDEJA DE SOLICITUDES (/admin/solicitudes)
    -------------------------------------------------------------------------- */
@@ -1187,6 +1406,186 @@ body {
 .solicitudes-table-modern tbody tr:hover td {
     background-color: #f9fcf9;
 }
+
+/* Botón de Acción Recibo */
+.btn-recibo-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #15803d;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(22, 101, 52, 0.08);
+}
+
+.btn-recibo-action i {
+    font-size: 0.95rem;
+    color: #16a34a;
+}
+
+.btn-recibo-action:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+}
+
+.btn-recibo-action:hover i {
+    color: #ffffff;
+}
+
+/* Tema Río Mamoré & Teal Amazónico: exclusivo del panel administrativo. */
+body.admin-theme {
+    --admin-rio-mamore: #0E4D5E;
+    --admin-teal-amazonico: #2A9D8F;
+    --admin-papaya: #FF6F3C;
+    --admin-bruma: #EEF5F7;
+    --admin-noche: #0F172A;
+    --bs-primary: #0E4D5E;
+    --bs-primary-rgb: 14, 77, 94;
+    --bs-success: #2A9D8F;
+    --bs-success-rgb: 42, 157, 143;
+    --bs-success-text-emphasis: #0A3D4A;
+    --bs-success-bg-subtle: #DDF4F1;
+    --bs-success-border-subtle: #9BD9D0;
+    --bs-info: #2A9D8F;
+    --bs-info-rgb: 42, 157, 143;
+    --bs-warning: #FF6F3C;
+    --bs-warning-rgb: 255, 111, 60;
+    --bs-body-bg: #EEF5F7;
+    --bs-body-color: #0F172A;
+    --bs-link-color: #0E4D5E;
+    --bs-link-hover-color: #0A3D4A;
+}
+
+body.admin-theme .btn-primary { --bs-btn-bg: #0E4D5E; --bs-btn-border-color: #0E4D5E; --bs-btn-hover-bg: #0A3D4A; --bs-btn-hover-border-color: #0A3D4A; --bs-btn-active-bg: #08323D; --bs-btn-active-border-color: #08323D; }
+body.admin-theme .btn-success, body.admin-theme .btn-info { --bs-btn-bg: #2A9D8F; --bs-btn-border-color: #2A9D8F; --bs-btn-hover-bg: #217E73; --bs-btn-hover-border-color: #217E73; --bs-btn-active-bg: #1B685F; --bs-btn-active-border-color: #1B685F; }
+body.admin-theme .btn-warning { --bs-btn-bg: #FF6F3C; --bs-btn-border-color: #FF6F3C; --bs-btn-hover-bg: #E85D2E; --bs-btn-hover-border-color: #E85D2E; --bs-btn-active-bg: #CC4F26; --bs-btn-active-border-color: #CC4F26; --bs-btn-color: #ffffff; --bs-btn-hover-color: #ffffff; }
+body.admin-theme .btn-outline-primary { --bs-btn-color: #0E4D5E; --bs-btn-border-color: #0E4D5E; --bs-btn-hover-bg: #0E4D5E; --bs-btn-hover-border-color: #0E4D5E; }
+body.admin-theme .btn-outline-success, body.admin-theme .btn-outline-info { --bs-btn-color: #217E73; --bs-btn-border-color: #2A9D8F; --bs-btn-hover-bg: #2A9D8F; --bs-btn-hover-border-color: #2A9D8F; }
+body.admin-theme .btn-outline-warning { --bs-btn-color: #C94B23; --bs-btn-border-color: #FF6F3C; --bs-btn-hover-bg: #FF6F3C; --bs-btn-hover-border-color: #FF6F3C; --bs-btn-hover-color: #ffffff; }
+body.admin-theme #adminTopbar { background: rgba(14, 77, 94, .96); box-shadow: 0 4px 20px rgba(14, 77, 94, .28); }
+body.admin-theme .topbar-avatar, body.admin-theme .admin-top-link.active, body.admin-theme .nav-admin-link.active { background-color: #2A9D8F; box-shadow: 0 4px 12px rgba(42, 157, 143, .35); }
+body.admin-theme .btn-topbar-catalog:hover { background-color: #2A9D8F; border-color: #2A9D8F; box-shadow: 0 4px 12px rgba(42, 157, 143, .35); }
+body.admin-theme .admin-page-hero { background: linear-gradient(135deg, #0E4D5E, #2A9D8F); box-shadow: 0 12px 28px rgba(14, 77, 94, .2); }
+body.admin-theme .admin-card, body.admin-theme .admin-metric-card, body.admin-theme .dash-hero-metric { border-color: #D7E5E9; }
+body.admin-theme .admin-metric-card:hover, body.admin-theme .dash-hero-metric:hover { border-color: #8BCBC2 !important; box-shadow: 0 10px 24px rgba(14, 77, 94, .1); }
+body.admin-theme .dash-icon-emerald { background: rgba(42, 157, 143, .14); color: #217E73; }
+body.admin-theme .payment-kpi-total { background: linear-gradient(135deg, #0E4D5E, #2A9D8F); }
+body.admin-theme .payment-kpi-month { background: linear-gradient(135deg, #123B6D, #2A9D8F); }
+body.admin-theme .payment-kpi-pending { background: linear-gradient(135deg, #C94B23, #FF8A5C); }
+body.admin-theme .payment-kpi-active { background: linear-gradient(135deg, #1E6F78, #2A9D8F); }
+body.admin-theme .admin-table th, body.admin-theme .solicitudes-admin-table thead th, body.admin-theme .solicitudes-table-modern thead th { background-color: #E7F1F4 !important; color: #38515B; }
+body.admin-theme .filter-pill-btn.active, body.admin-theme .report-bar span { background-color: #2A9D8F !important; border-color: #2A9D8F !important; }
+body.admin-theme .report-summary, body.admin-theme .modal-header-comercio { background: linear-gradient(135deg, #0E4D5E, #2A9D8F) !important; }
+body.admin-theme .report-summary small { color: #DDF4F1 !important; }
+body.admin-theme .report-kpi-current { background: linear-gradient(135deg, #0E4D5E, #2A9D8F) !important; }
+body.admin-theme .report-kpi-compare, body.admin-theme .report-kpi-rate { background: linear-gradient(135deg, #1A6072, #46B7AA) !important; }
+body.admin-theme .report-kpi-pending { background: linear-gradient(135deg, #C94B23, #FF8A5C) !important; }
+body.admin-theme .dash-icon-teal { background: rgba(42, 157, 143, .14) !important; color: #217E73 !important; }
+body.admin-theme .nav-reportes .nav-link.active, body.admin-theme .btn-preset.active { background-color: #2A9D8F !important; border-color: #2A9D8F !important; box-shadow: 0 4px 12px rgba(42, 157, 143, .25) !important; }
+body.admin-theme .nav-reportes .nav-link:hover:not(.active) { background-color: #E2F2F0 !important; color: #217E73 !important; }
+body.admin-theme #modalInformeComercio .modal-header { background: linear-gradient(135deg, #0E4D5E, #2A9D8F) !important; }
+
+/* ==========================================================================
+   OPTIMIZACIONES MÓVILES PARA PAGOS Y FINANZAS
+   ========================================================================== */
+@media (max-width: 767.98px) {
+    .dash-hero-metric {
+        padding: 0.85rem 1rem;
+    }
+
+    .dash-hero-metric .dash-metric-number {
+        font-size: 1.25rem !important;
+    }
+
+    .dash-hero-metric .dash-metric-title {
+        font-size: 0.72rem;
+    }
+
+    .dash-hero-metric .dash-metric-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .dash-metric-sub {
+        font-size: 0.7rem;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.1rem;
+    }
+
+    #formBuscarPagos {
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .filter-pill-btn {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 0.4rem 0.65rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Sustituci\u00f3n integral de los verdes heredados de Bootstrap y m\u00f3dulos administrativos. */
+body.admin-theme .text-success,
+body.admin-theme .text-success-emphasis { color: #217E73 !important; }
+body.admin-theme .bg-success { background-color: #2A9D8F !important; }
+body.admin-theme .border-success { border-color: #2A9D8F !important; }
+body.admin-theme .alert-success { --bs-alert-color: #0A3D4A; --bs-alert-bg: #DDF4F1; --bs-alert-border-color: #9BD9D0; }
+body.admin-theme .badge.bg-success-subtle,
+body.admin-theme .alert-success-subtle { background-color: #DDF4F1 !important; color: #0A3D4A !important; border-color: #9BD9D0 !important; }
+body.admin-theme .form-control:focus,
+body.admin-theme .form-select:focus { border-color: #2A9D8F; box-shadow: 0 0 0 .2rem rgba(42, 157, 143, .16); }
+
+body.admin-theme .dash-cat-card:hover,
+body.admin-theme .plan-pricing-card:hover,
+body.admin-theme .place-search-input:focus,
+body.admin-theme .place-filter-select:focus,
+body.admin-theme .type-choice-card.active,
+body.admin-theme .type-choice-card:has(input[type="radio"]:checked),
+body.admin-theme .category-pill-card:has(input[type="radio"]:checked),
+body.admin-theme .choice-card:has(input:checked),
+body.admin-theme .image-preview-card.is-cover,
+body.admin-theme .dropzone-modern:hover,
+body.admin-theme .image-upload-zone:hover,
+body.admin-theme .comprobante-preview-btn:hover { border-color: #2A9D8F !important; }
+
+body.admin-theme .dash-cat-card:hover .dash-cat-arrow,
+body.admin-theme .place-table-icon,
+body.admin-theme .type-choice-icon,
+body.admin-theme .category-pill-icon,
+body.admin-theme .dropzone-modern-icon,
+body.admin-theme .solicitud-avatar,
+body.admin-theme .admin-empty-state > i,
+body.admin-theme .image-upload-zone { color: #217E73 !important; }
+body.admin-theme .place-table-icon,
+body.admin-theme .type-choice-icon,
+body.admin-theme .dropzone-modern-icon,
+body.admin-theme .solicitud-avatar { background-color: #E2F2F0 !important; border-color: #B8E1DA !important; }
+body.admin-theme .choice-card:has(input:checked),
+body.admin-theme .category-pill-card:has(input[type="radio"]:checked),
+body.admin-theme .dropzone-modern:hover,
+body.admin-theme .image-upload-zone:hover { background-color: #F0FAF8 !important; box-shadow: 0 0 0 2px rgba(42, 157, 143, .16); }
+body.admin-theme .payment-insight-number,
+body.admin-theme .image-preview-card span,
+body.admin-theme .operation-item::before,
+body.admin-theme .nav-catalogos-container .nav-link.active { background-color: #2A9D8F !important; }
+body.admin-theme .btn-recibo-action { background: #E2F2F0; border-color: #9BD9D0; color: #217E73; box-shadow: 0 1px 3px rgba(14, 77, 94, .1); }
+body.admin-theme .btn-recibo-action i { color: #2A9D8F; }
+body.admin-theme .btn-recibo-action:hover { background: #2A9D8F; border-color: #2A9D8F; box-shadow: 0 4px 10px rgba(42, 157, 143, .25); }
+body.admin-theme .admin-global-search:focus-within { border-color: #2A9D8F; box-shadow: 0 0 0 .22rem rgba(42, 157, 143, .16); }
+body.admin-theme .admin-search-summary { background: linear-gradient(90deg, #F0FAF8, #ffffff); }
+body.admin-theme .admin-search-chip { background: #E2F2F0; color: #217E73; }
 
 
 

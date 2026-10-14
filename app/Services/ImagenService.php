@@ -30,9 +30,20 @@ class ImagenService {
         if (!preg_match('/\A(lugar|promo)_[a-f0-9]{16}_[0-9]+\.(jpg|png|webp)\z/D', $nombre)) {
             return null;
         }
-        return str_starts_with($nombre, 'promo_')
-            ? self::getDirectorioPromociones() . $nombre
-            : self::getDirectorioStorage() . $nombre;
+        if (str_starts_with($nombre, 'promo_')) {
+            return self::getDirectorioPromociones() . $nombre;
+        }
+
+        $rutaActual = self::getDirectorioStorage() . $nombre;
+        if (is_file($rutaActual)) {
+            return $rutaActual;
+        }
+
+        // Compatibilidad con las fotografias existentes antes de reorganizar el almacenamiento.
+        $rutaRespaldo = dirname(rtrim(self::getDirectorioStorage(), DIRECTORY_SEPARATOR))
+            . DIRECTORY_SEPARATOR . 'lugares_backup_raw' . DIRECTORY_SEPARATOR . $nombre;
+
+        return is_file($rutaRespaldo) ? $rutaRespaldo : $rutaActual;
     }
 
     public static function eliminarArchivo(string $nombre): bool {

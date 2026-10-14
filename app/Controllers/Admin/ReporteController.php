@@ -24,14 +24,8 @@ class ReporteController extends Controller {
         $kpis = $this->obtenerKPIs();
         $analiticaFinanciera = $this->obtenerAnaliticaFinanciera();
 
-        // 2. Reporte de Transacciones Financieras con búsqueda y método
-        $pagos = $filtros['error'] ? [] : $this->obtenerReporteFinanciero(
-            $filtros['desde'],
-            $filtros['hasta'],
-            $filtros['categoria'],
-            $filtros['buscar'],
-            $filtros['metodo']
-        );
+        // 2. Reporte de Transacciones Financieras (se cargan todos para filtrado instantáneo con JS sin recarga)
+        $pagos = $filtros['error'] ? [] : $this->obtenerReporteFinanciero('', '', 0, '', '');
 
         // 3. Reporte de Cobertura de Vigencias con búsqueda y estado
         $vigencias = $this->obtenerReporteVigencias(
@@ -445,10 +439,18 @@ class ReporteController extends Controller {
         $sql = "SELECT p.id_pago, p.monto, p.fecha_pago_declarada, p.numero_comprobante,
                        COALESCE(p.fecha_confirmacion, p.fecha_pago_declarada, p.created_at) AS fecha_reporte,
                        p.metodo_pago, p.fecha_confirmacion, p.comprobante_archivo,
-                       l.id_lugar, l.nombre AS establecimiento, c.nombre AS categoria
+                       l.id_lugar, l.nombre AS establecimiento, c.nombre AS categoria, l.id_categoria,
+                       v.fecha_vencimiento,
+                       CASE 
+                           WHEN v.fecha_vencimiento IS NULL THEN 'SIN_VIGENCIA'
+                           WHEN v.fecha_vencimiento < CURDATE() THEN 'VENCIDO'
+                           WHEN v.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 'POR_VENCER'
+                           ELSE 'VIGENTE'
+                       END AS estado_vigencia
                 FROM pagos p
                 INNER JOIN lugares l ON p.id_lugar = l.id_lugar
                 INNER JOIN categorias c ON l.id_categoria = c.id_categoria
+                LEFT JOIN vigencias v ON v.id_pago = p.id_pago
                 WHERE " . implode(' AND ', $where) . "
                 ORDER BY p.id_pago DESC";
 
@@ -588,8 +590,8 @@ class ReporteController extends Controller {
         $filas = $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
         $paleta = [
-            '#198754', '#0d6efd', '#ffc107', '#0dcaf0', 
-            '#6f42c1', '#d63384', '#fd7e14', '#20c997'
+            '#2A9D8F', '#0E4D5E', '#FF6F3C', '#46B7AA', 
+            '#6f42c1', '#d63384', '#FF8A5C', '#1E6F78'
         ];
 
         $labels = [];
@@ -667,6 +669,54 @@ class ReporteController extends Controller {
             'solicitudes' => $this->exportarSolicitudes(),
             default       => die('Tipo de reporte no válido.')
         };
+    }
+
+    /** Genera una versión HTML limpia de cada informe para impresión. */
+    public function imprimir(): void {
+        $tipo = is_string($_GET['tipo'] ?? null) ? $_GET['tipo'] : 'financiero';
+        $filtros = $this->leerFiltros();
+        if ($filtros['error']) { http_response_code(422); exit($filtros['error']); }
+        $rankingRendimiento = \App\Services\TelemetriaService::obtenerRankingComercial($filtros['desde'], $filtros['hasta'], 100);
+
+        $reportes = [
+            'financiero' => ['Balance de Ingresos Filtrado', ['ID Pago', 'Establecimiento', 'Categoría', 'Importe (Bs)', 'Fecha de pago', 'Comprobante', 'Método'], array_map(fn($d) => ['#' . $d['id_pago'], $d['establecimiento'], $d['categoria'], number_format((float)$d['monto'], 2), date('d/m/Y', strtotime($d['fecha_pago_declarada'])), $d['numero_comprobante'] ?: 'S/N', $d['metodo_pago']], $this->obtenerReporteFinanciero($filtros['desde'], $filtros['hasta'], $filtros['categoria'], $filtros['buscar'], $filtros['metodo']))],
+            'vigencias' => ['Control de Vigencias', ['Establecimiento', 'Categoría', 'Teléfono', 'Inicio', 'Vencimiento', 'Días restantes', 'Estado'], array_map(fn($d) => [$d['establecimiento'], $d['categoria'], $d['telefono_contacto'] ?: ($d['whatsapp_contacto'] ?: 'S/N'), date('d/m/Y', strtotime($d['fecha_inicio'])), date('d/m/Y', strtotime($d['fecha_vencimiento'])), $d['dias_restantes'], $d['estado_cobertura']], $this->obtenerReporteVigencias($filtros['categoria'], $filtros['buscar'], $filtros['estado_vigencia']))],
+            'rendimiento' => ['Ranking de Rendimiento y Conversión', ['Puesto', 'Establecimiento', 'Categoría', 'Vistas', 'WhatsApp', 'Mapas', 'Favoritos', 'Conversiones'], array_map(fn($d, $i) => ['#' . ($i + 1), $d['establecimiento'], $d['categoria'], $d['vistas'], $d['contactos_whatsapp'], $d['rutas_mapa'], $d['guardado_favoritos'], $d['total_conversiones']], $rankingRendimiento, array_keys($rankingRendimiento))],
+            'antiguedad' => ['Ranking de Comercios por Antigüedad', ['Puesto', 'Establecimiento', 'Categoría', 'Registro', 'Antigüedad', 'Días activo', 'Estado'], array_map(fn($d) => ['#' . $d['ranking'], $d['establecimiento'], $d['categoria'], date('d/m/Y', strtotime($d['fecha_registro'])), $d['antiguedad_texto'], $d['antiguedad_dias'], $d['estado_suscripcion']], $this->obtenerReporteComerciosAntiguedad($filtros['buscar'], $filtros['categoria']))],
+            'lugares' => ['Padrón Completo de Lugares', ['ID', 'Nombre', 'Tipo', 'Categoría', 'Teléfono', 'Dirección'], $this->db->query("SELECT l.id_lugar, l.nombre, l.tipo_lugar, c.nombre AS categoria, l.telefono_contacto, l.direccion FROM lugares l INNER JOIN categorias c ON c.id_categoria = l.id_categoria ORDER BY l.id_lugar ASC")->fetchAll(PDO::FETCH_NUM)],
+            'solicitudes' => ['Histórico de Solicitudes', ['Solicitud', 'Negocio', 'Categoría', 'Plan', 'Solicitante', 'Teléfono', 'Estado', 'Fecha'], $this->db->query("SELECT s.id_solicitud, s.nombre_establecimiento, c.nombre, s.plan_solicitado, s.nombre_solicitante, s.telefono_contacto, s.estado, DATE_FORMAT(s.created_at, '%d/%m/%Y %H:%i') FROM solicitudes s INNER JOIN categorias c ON c.id_categoria = s.id_categoria ORDER BY s.id_solicitud DESC")->fetchAll(PDO::FETCH_NUM)],
+        ];
+
+        if ($tipo === 'proyeccion') {
+            $tarifa = (float)$this->db->query("SELECT monto FROM tarifas WHERE activo = 1 ORDER BY vigente_desde DESC LIMIT 1")->fetchColumn() ?: 250.0;
+            $reportes['proyeccion'] = ['Proyección de Cobranzas (30-90 días)', ['Establecimiento', 'Categoría', 'Vencimiento', 'Días restantes', 'Horizonte', 'Tarifa estimada (Bs)', 'Estado'], array_map(function ($d) use ($tarifa) {
+                $dias = (int)$d['dias_restantes'];
+                $horizonte = $dias < 0 ? 'Mora expirada' : ($dias <= 30 ? 'Corto plazo (0-30 días)' : ($dias <= 60 ? 'Mediano plazo (31-60 días)' : ($dias <= 90 ? 'Trimestral (61-90 días)' : 'Largo plazo (+90 días)')));
+                return [$d['establecimiento'], $d['categoria'], date('d/m/Y', strtotime($d['fecha_vencimiento'])), $dias, $horizonte, number_format($tarifa, 2), $d['estado_cobertura']];
+            }, $this->obtenerReporteVigencias($filtros['categoria'], $filtros['buscar']))];
+        }
+
+        if (!isset($reportes[$tipo])) { http_response_code(404); exit('Tipo de reporte no válido.'); }
+        [$titulo, $cabeceras, $filas] = $reportes[$tipo];
+
+        // Si se solicita en formato JSON (para mostrar en el Modal interactivo sin salir de la página)
+        $esJson = (isset($_GET['format']) && $_GET['format'] === 'json') || 
+                  (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) ||
+                  (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+
+        if ($esJson) {
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode([
+                'titulo'    => $titulo,
+                'cabeceras' => $cabeceras,
+                'filas'     => $filas,
+                'fecha'     => date('d/m/Y H:i'),
+                'total'     => count($filas)
+            ], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        $this->render('admin/reportes/imprimir', compact('titulo', 'cabeceras', 'filas'), 'admin');
     }
 
     private function exportarRendimiento(string $desde = '', string $hasta = ''): void {

@@ -1,4 +1,5 @@
 *.mp4
+*.zip
 public/assets/video/
 config/comercial.local.php
 .env

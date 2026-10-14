@@ -21,7 +21,7 @@
 
     <!-- Mensajes Flash -->
     <?php if (!empty($mensaje)): ?>
-        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4 border-0" role="alert" style="background-color: #d1e7dd; color: #0f5132;">
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4 border-0" role="alert" style="background-color: #DDF4F1; color: #0A3D4A;">
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-check-circle-fill fs-5"></i>
                 <span class="fw-semibold"><?= htmlspecialchars($mensaje) ?></span>

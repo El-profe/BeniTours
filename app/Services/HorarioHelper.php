@@ -63,7 +63,7 @@ class HorarioHelper {
                 return [
                     'abierto' => true,
                     'texto'   => 'Abierto ahora',
-                    'badge'   => 'bg-success-subtle text-success border border-success-subtle'
+                    'badge'   => 'bg-teal-subtle text-teal border border-teal-subtle'
                 ];
             } else {
                 return [
