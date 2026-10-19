@@ -39,6 +39,16 @@ class CatalogoController extends Controller {
         $idMunicipio = !empty($_GET['municipio']) ? (int)$_GET['municipio'] : null;
         $lugares = $this->lugarModel->listarPublicos($categoriaSeleccionada, null, $idMunicipio);
         $promocionesVigentes = (new Promocion())->listarTodasVigentesPublicas();
+        $eventosDestacados = (new \App\Models\Evento())->listarVigentesPublicos();
+
+        $ogMeta = [
+            'title'       => 'BeniTours - Directorio Turístico y Comercial del Beni',
+            'description' => 'Descubre los mejores destinos, atractivos naturales, gastronomía amazónica, hospedaje y comercios locales en Trinidad y las principales rutas del Beni.',
+            'image'       => "{$this->config['base_url']}/assets/img/hero-poster.webp",
+            'url'         => "{$this->config['base_url']}/",
+            'type'        => 'website',
+            'image_type'  => 'image/webp'
+        ];
 
         $this->render('publico/catalogo/index', [
             'titulo'                => 'BeniTours - Directorio Turístico y Comercial del Beni',
@@ -48,7 +58,9 @@ class CatalogoController extends Controller {
             'categoriaSeleccionada' => $categoriaSeleccionada,
             'municipioSeleccionado' => $idMunicipio,
             'lugares'               => $lugares,
-            'promocionesVigentes'   => $promocionesVigentes
+            'promocionesVigentes'   => $promocionesVigentes,
+            'eventosDestacados'     => $eventosDestacados,
+            'ogMeta'                => $ogMeta
         ], 'publico');
     }
 
@@ -76,15 +88,30 @@ class CatalogoController extends Controller {
         $promociones = $promocionModel->listarVigentesPublicas((int)$lugar['id_lugar']);
         $fotografias = (new Fotografia())->listarPorLugar((int)$lugar['id_lugar']);
 
-
         $imgUrl = !empty($lugar['imagen'])
             ? "{$this->config['base_url']}/imagen?f=" . urlencode($lugar['imagen'])
-            : "{$this->config['base_url']}/assets/img/logo2.png";
+            : "{$this->config['base_url']}/assets/img/hero-poster.webp";
+
+        $descRaw = trim(strip_tags($lugar['descripcion'] ?? ''));
+        if (!empty($descRaw)) {
+            $descOg = mb_substr($descRaw, 0, 160, 'UTF-8');
+            if (mb_strlen($descRaw, 'UTF-8') > 160) {
+                $descOg .= '...';
+            }
+        } else {
+            $descOg = "Conoce {$lugar['nombre']} ({$lugar['categoria']}) en {$lugar['municipio']}, Beni. Encuentra ubicación, fotos, contacto directo y promociones en BeniTours.";
+        }
+
+        $tituloOg = !empty($lugar['municipio'])
+            ? "{$lugar['nombre']} ({$lugar['municipio']}) | BeniTours"
+            : "{$lugar['nombre']} | BeniTours";
+
         $ogMeta = [
-            'title' => "{$lugar['nombre']} | BeniTours",
-            'description' => mb_substr(strip_tags($lugar['descripcion'] ?? ''), 0, 160, 'UTF-8'),
-            'image' => $imgUrl,
-            'url' => "{$this->config['base_url']}/catalogo/detalle?slug=" . urlencode($lugar['slug'])
+            'title'       => $tituloOg,
+            'description' => $descOg,
+            'image'       => $imgUrl,
+            'url'         => "{$this->config['base_url']}/catalogo/detalle?slug=" . urlencode($lugar['slug']),
+            'type'        => 'place'
         ];
 
         $this->render('publico/catalogo/detalle', [
@@ -107,7 +134,12 @@ class CatalogoController extends Controller {
 
         $resultados = $this->lugarModel->listarPublicos($idCategoria, $termino, $idMunicipio);
         foreach ($resultados as &$resultado) {
-            $resultado['estado_horario'] = \App\Services\HorarioHelper::evaluarEstado($resultado['horario_atencion'] ?? null);
+            $resultado['estado_horario'] = \App\Services\HorarioHelper::evaluarEstado(
+                $resultado['horario_atencion'] ?? null,
+                $resultado['estado_operativo'] ?? null,
+                $resultado['aviso_temporal_motivo'] ?? null,
+                $resultado['aviso_temporal_reapertura'] ?? null
+            );
         }
         unset($resultado);
 

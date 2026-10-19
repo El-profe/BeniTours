@@ -1482,3 +1482,86 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
         transform: translateY(0);
     }
 }
+
+/* Publicidad de eventos en la portada */
+.modal-eventos-beni {
+    border-radius: 1.35rem;
+    box-shadow: 0 1.25rem 3rem rgba(8, 61, 74, .28);
+}
+
+.modal-eventos-beni .modal-header {
+    background: linear-gradient(120deg, #0E4D5E, #2A9D8F);
+}
+
+.modal-eventos-eyebrow {
+    display: block;
+    margin-bottom: .15rem;
+    color: #DDF4F1;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+}
+
+.evento-publicidad-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: min(68vh, 610px);
+    padding: 1rem;
+    background: radial-gradient(circle at top, #E2F2F0, #EEF5F7 65%);
+}
+
+.evento-publicidad-imagen {
+    display: block;
+    max-width: 100%;
+    max-height: min(58vh, 525px);
+    border-radius: .95rem;
+    box-shadow: 0 .75rem 1.75rem rgba(15, 23, 42, .2);
+    object-fit: contain;
+}
+
+.evento-publicidad-info {
+    width: min(100%, 525px);
+    margin-top: 1rem;
+    padding: .8rem 1rem;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: .9rem;
+    background: rgba(255, 255, 255, .93);
+    box-shadow: 0 .25rem .85rem rgba(15, 23, 42, .12);
+}
+
+#carruselEventosBeni .carousel-control-prev,
+#carruselEventosBeni .carousel-control-next {
+    width: 12%;
+}
+
+#carruselEventosBeni .carousel-control-prev-icon,
+#carruselEventosBeni .carousel-control-next-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: .5rem;
+    border-radius: 50%;
+    background-color: rgba(14, 77, 94, .82);
+    background-size: 55%;
+}
+
+#carruselEventosBeni .carousel-indicators [data-bs-target] {
+    width: .55rem;
+    height: .55rem;
+    margin: 0 .32rem;
+    border: 0;
+    border-radius: 50%;
+    background-color: #2A9D8F;
+}
+
+@media (max-width: 575.98px) {
+    .modal-eventos-beni { border-radius: 1rem; }
+    .evento-publicidad-card { min-height: auto; padding: .75rem; }
+    .evento-publicidad-imagen { max-height: 62vh; }
+    .evento-publicidad-info { width: 100%; margin-top: .75rem; padding: .65rem .8rem; }
+    .evento-publicidad-info h3 { font-size: .85rem; }
+    .evento-publicidad-info p { font-size: .72rem; }
+}

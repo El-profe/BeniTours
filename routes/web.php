@@ -83,6 +83,12 @@ $router->post('/admin/catalogos/municipios/estado', [\App\Controllers\Admin\Cata
 $router->post('/admin/catalogos/planes/guardar', [\App\Controllers\Admin\CatalogoController::class, 'guardarPlan']);
 $router->post('/admin/catalogos/planes/estado', [\App\Controllers\Admin\CatalogoController::class, 'cambiarEstadoPlan']);
 
+// Agenda de Eventos y Festividades
+$router->get('/admin/eventos', [\App\Controllers\Admin\EventoController::class, 'index']);
+$router->post('/admin/eventos/guardar', [\App\Controllers\Admin\EventoController::class, 'guardar']);
+$router->post('/admin/eventos/estado', [\App\Controllers\Admin\EventoController::class, 'cambiarEstado']);
+$router->post('/admin/eventos/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminar']);
+
 
 // Portal de las cuentas aprovisionadas.
 $router->get('/negocio/login', [\App\Controllers\Negocio\AuthController::class, 'login']);
@@ -102,5 +108,6 @@ $router->get('/negocio/perfil', [\App\Controllers\Negocio\PanelController::class
 $router->post('/negocio/perfil/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarPerfil']);
 $router->get('/negocio/renovar', [\App\Controllers\Negocio\PanelController::class, 'renovar']);
 $router->post('/negocio/renovar/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarRenovacion']);
+$router->post('/negocio/estado-operativo', [\App\Controllers\Negocio\PanelController::class, 'cambiarEstadoOperativo']);
 
 

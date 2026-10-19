@@ -198,7 +198,12 @@
                     if (mb_strlen($descripcion, 'UTF-8') > 140) {
                         $descripcion = mb_substr($descripcion, 0, 140, 'UTF-8') . '...';
                     }
-                    $estadoHorario = \App\Services\HorarioHelper::evaluarEstado($l['horario_atencion'] ?? null);
+                    $estadoHorario = \App\Services\HorarioHelper::evaluarEstado(
+                        $l['horario_atencion'] ?? null,
+                        $l['estado_operativo'] ?? null,
+                        $l['aviso_temporal_motivo'] ?? null,
+                        $l['aviso_temporal_reapertura'] ?? null
+                    );
                     $urlFicha = $baseUrl . '/catalogo/detalle?slug=' . urlencode($l['slug']);
                 ?>
                 <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col<?= ($indiceLugar >= 9) ? ' d-none tarjeta-oculta-fila' : '' ?>"

@@ -98,7 +98,122 @@
             </div>
         </div>
     </div>
-    <!-- MÓDULO DE IMPACTO COMERCIAL Y CLIENTES GENERADOS (TELEMETRÍA EN VIVO) -->
+
+    <!-- MÓDULO: Control de Estado Operativo en Tiempo Real (Abierto vs Cierre Temporal) -->
+    <?php
+        $estaCerradoTemporal = ($lugar['estado_operativo'] ?? 'ABIERTO_HABITUAL') === 'CERRADO_TEMPORAL';
+        $motivoActual = $lugar['aviso_temporal_motivo'] ?? '';
+        $reaperturaActual = $lugar['aviso_temporal_reapertura'] ?? '';
+    ?>
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 <?= $estaCerradoTemporal ? 'bg-danger-subtle border border-danger-subtle' : 'bg-white' ?>">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3 fs-3 flex-shrink-0 <?= $estaCerradoTemporal ? 'bg-danger text-white' : 'bg-teal-subtle text-teal' ?>">
+                    <i class="bi <?= $estaCerradoTemporal ? 'bi-door-closed-fill' : 'bi-door-open-fill' ?>"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge <?= $estaCerradoTemporal ? 'bg-danger text-white' : 'bg-success text-white' ?> rounded-pill px-3 py-1 small fw-bold">
+                            <?= $estaCerradoTemporal ? 'Cerrado Temporalmente' : 'Horario Habitual Activo' ?>
+                        </span>
+                        <span class="text-muted extra-small">
+                            <i class="bi bi-clock me-1"></i><?= htmlspecialchars($lugar['horario_atencion'] ?: 'Sin horario') ?>
+                        </span>
+                    </div>
+                    <?php if ($estaCerradoTemporal): ?>
+                        <h5 class="fw-bold text-danger mb-1">Tu local está anunciado como cerrado</h5>
+                        <p class="text-secondary small mb-0">
+                            <strong>Motivo mostrado:</strong> "<?= htmlspecialchars($motivoActual ?: 'Cerrado temporalmente') ?>"
+                            <?php if (!empty($reaperturaActual)): ?>
+                                &bull; <strong>Reapertura estimada:</strong> <?= date('d/m/Y', strtotime($reaperturaActual)) ?>
+                            <?php endif; ?>
+                        </p>
+                    <?php else: ?>
+                        <h5 class="fw-bold text-dark mb-1">Atención al cliente en horario regular</h5>
+                        <p class="text-muted small mb-0">¿No abrirás hoy por mantenimiento, evento privado o descanso? Puedes poner en pausa tu local por hoy con un aviso.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="flex-shrink-0">
+                <?php if ($estaCerradoTemporal): ?>
+                    <form action="<?= htmlspecialchars($baseUrl) ?>/negocio/estado-operativo" method="POST" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                        <input type="hidden" name="accion" value="ABRIR">
+                        <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="bi bi-check-circle-fill me-1"></i> Reanudar Atención Habitual
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCierreTemporal">
+                        <i class="bi bi-pause-circle-fill me-1"></i> Pausar por Hoy / Cierre Temporal
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para configurar Cierre Temporal -->
+    <div class="modal fade" id="modalCierreTemporal" tabindex="-1" aria-labelledby="tituloModalCierre" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <form action="<?= htmlspecialchars($baseUrl) ?>/negocio/estado-operativo" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                    <input type="hidden" name="accion" value="CERRAR">
+
+                    <div class="modal-header bg-danger text-white border-0 py-3 px-4">
+                        <h5 class="modal-title fw-bold" id="tituloModalCierre">
+                            <i class="bi bi-door-closed me-2"></i>Aviso de Cierre Temporal
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <p class="text-secondary small mb-3">
+                            Este aviso se mostrará a los turistas en tu ficha del catálogo público para que sepan por qué no atiendes hoy y cuándo reabres, evitando confusiones o que se desplacen en vano.
+                        </p>
+
+                        <!-- Botones de motivos rápidos -->
+                        <label class="form-label fw-bold text-dark small mb-2">Selecciona un motivo común o escribe el tuyo:</label>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button type="button" class="btn btn-light btn-sm rounded-pill border btn-motivo-rapido" data-motivo="Hoy cerrado por evento privado / reserva exclusiva.">
+                                🎉 Evento Privado
+                            </button>
+                            <button type="button" class="btn btn-light btn-sm rounded-pill border btn-motivo-rapido" data-motivo="Cerrado hoy por mantenimiento del local. ¡Reabrimos mañana!">
+                                🛠️ Mantenimiento
+                            </button>
+                            <button type="button" class="btn btn-light btn-sm rounded-pill border btn-motivo-rapido" data-motivo="Cerrado por feriado / descanso del personal.">
+                                🌴 Feriado / Descanso
+                            </button>
+                            <button type="button" class="btn btn-light btn-sm rounded-pill border btn-motivo-rapido" data-motivo="Cerrado hoy por corte de servicios / fuerza mayor.">
+                                ⚠️ Fuerza Mayor
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="inputMotivoCierre" class="form-label fw-bold text-dark small">Mensaje que verán los clientes:</label>
+                            <textarea name="motivo" id="inputMotivoCierre" class="form-control rounded-3" rows="3" 
+                                      placeholder="Ej. Hoy cerrado por evento privado. ¡Los esperamos mañana con normalidad a las 18:00!" required></textarea>
+                            <div class="form-text extra-small text-muted">Máximo 255 caracteres. Se muestra destacado en tu ficha.</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="inputFechaReapertura" class="form-label fw-bold text-dark small">Fecha estimada de reapertura (opcional):</label>
+                            <input type="date" name="reapertura" id="inputFechaReapertura" class="form-control rounded-pill" min="<?= date('Y-m-d') ?>">
+                            <div class="form-text extra-small text-muted">Si la conoces, servirá para orientar mejor a los visitantes.</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 bg-light p-3">
+                        <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">
+                            <i class="bi bi-bell-fill me-1"></i> Publicar Aviso de Cierre
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white border-start border-4 border-success">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <div>
@@ -716,4 +831,19 @@ function imprimirQrCartel() {
     `);
     ventanaImpresion.document.close();
 }
+
+// Rellenar motivo rápido en el modal de cierre temporal
+document.addEventListener('DOMContentLoaded', () => {
+    const inputMotivo = document.getElementById('inputMotivoCierre');
+    const botonesRapidos = document.querySelectorAll('.btn-motivo-rapido');
+    botonesRapidos.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const motivo = btn.getAttribute('data-motivo');
+            if (inputMotivo && motivo) {
+                inputMotivo.value = motivo;
+                inputMotivo.focus();
+            }
+        });
+    });
+});
 </script>

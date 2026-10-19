@@ -167,7 +167,8 @@ class PanelController extends Controller {
             'estadoVigencia'     => $estadoVigencia,
             'urlFichaPublica'    => $urlFichaPublica,
             'mensaje'            => $mensaje,
-            'error'              => $error
+            'error'              => $error,
+            'csrfToken'          => CsrfMiddleware::obtenerToken()
         ], 'negocio');
     }
 
@@ -838,4 +839,31 @@ class PanelController extends Controller {
             exit('El panel de transporte solo esta disponible para sindicatos y centrales aprobadas.');
         }
     }
+
+    public function cambiarEstadoOperativo(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['negocio_error'] = 'Sesión expirada o token inválido.';
+            header("Location: {$this->config['base_url']}/negocio/dashboard");
+            exit();
+        }
+
+        $accion = trim($_POST['accion'] ?? '');
+        if ($accion === 'ABRIR') {
+            $this->lugarModel->actualizarEstadoOperativo($this->idLugar, 'ABIERTO_HABITUAL', null, null);
+            $_SESSION['negocio_flash'] = '¡Tu negocio ha reanudado su horario de atención habitual!';
+        } elseif ($accion === 'CERRAR') {
+            $motivo = trim($_POST['motivo'] ?? '');
+            $reapertura = !empty($_POST['reapertura']) ? trim($_POST['reapertura']) : null;
+            if (empty($motivo)) {
+                $motivo = 'Cerrado temporalmente por mantenimiento o evento.';
+            }
+
+            $this->lugarModel->actualizarEstadoOperativo($this->idLugar, 'CERRADO_TEMPORAL', $motivo, $reapertura);
+            $_SESSION['negocio_flash'] = 'Estado actualizado: Tu negocio se muestra como "Cerrado temporalmente" con tu aviso.';
+        }
+
+        header("Location: {$this->config['base_url']}/negocio/dashboard");
+        exit();
+    }
 }
+

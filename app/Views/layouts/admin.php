@@ -88,6 +88,12 @@
                         <span>Parámetros & Planes</span>
                     </a>
                 </li>
+                <li>
+                    <a href="<?= htmlspecialchars($baseUrl) ?>/admin/eventos" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'eventos')) ? 'active' : '' ?>">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Agenda & Eventos</span>
+                    </a>
+                </li>
             </ul>
 
         </div>
@@ -158,6 +164,10 @@
                 <a href="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos" class="admin-top-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'catalogos')) ? 'active' : '' ?>">
                     <i class="bi bi-sliders2"></i>
                     <span>Parámetros</span>
+                </a>
+                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/eventos" class="admin-top-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'eventos')) ? 'active' : '' ?>">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Eventos</span>
                 </a>
             </nav>
 

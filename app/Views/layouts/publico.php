@@ -5,14 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($titulo ?? 'Inicio') ?> | <?= htmlspecialchars($appName ?? 'Trinidad Turismo') ?></title>
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo2.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo2.png') ?>">
-    <?php if (!empty($ogMeta)): ?>
-        <meta property="og:title" content="<?= htmlspecialchars($ogMeta['title'] ?? '') ?>">
-        <meta property="og:description" content="<?= htmlspecialchars($ogMeta['description'] ?? '') ?>">
-        <meta property="og:type" content="website">
-        <?php if (!empty($ogMeta['image'])): ?>
-            <meta property="og:image" content="<?= htmlspecialchars($ogMeta['image']) ?>">
+    <!-- SEO y Redes Sociales (Open Graph & Twitter Cards) -->
+    <meta name="description" content="<?= htmlspecialchars($ogMeta['description'] ?? 'Directorio turístico y comercial del Beni: descubre atractivos naturales, gastronomía, hoteles y rutas en Trinidad.') ?>">
+    <link rel="canonical" href="<?= htmlspecialchars($ogMeta['url'] ?? $baseUrl . '/') ?>">
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn, Telegram) -->
+    <meta property="og:site_name" content="BeniTours">
+    <meta property="og:locale" content="es_BO">
+    <meta property="og:type" content="<?= htmlspecialchars($ogMeta['type'] ?? 'website') ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($ogMeta['title'] ?? ($titulo . ' | ' . ($appName ?? 'BeniTours'))) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($ogMeta['description'] ?? 'Directorio turístico y comercial del Beni: descubre atractivos naturales, gastronomía, hoteles y rutas en Trinidad.') ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($ogMeta['url'] ?? $baseUrl . '/') ?>">
+    <?php if (!empty($ogMeta['image'])): ?>
+        <meta property="og:image" content="<?= htmlspecialchars($ogMeta['image']) ?>">
+        <meta property="og:image:secure_url" content="<?= htmlspecialchars($ogMeta['image']) ?>">
+        <meta property="og:image:alt" content="<?= htmlspecialchars($ogMeta['title'] ?? 'BeniTours') ?>">
+        <?php if (!empty($ogMeta['image_type'])): ?>
+            <meta property="og:image:type" content="<?= htmlspecialchars($ogMeta['image_type']) ?>">
         <?php endif; ?>
-        <meta property="og:url" content="<?= htmlspecialchars($ogMeta['url'] ?? '') ?>">
+    <?php endif; ?>
+
+    <!-- Twitter Cards (X) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($ogMeta['title'] ?? ($titulo . ' | ' . ($appName ?? 'BeniTours'))) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($ogMeta['description'] ?? '') ?>">
+    <?php if (!empty($ogMeta['image'])): ?>
+        <meta name="twitter:image" content="<?= htmlspecialchars($ogMeta['image']) ?>">
     <?php endif; ?>
 
     <!-- Bootstrap 5.3.3 CSS (Local) -->
@@ -139,6 +157,82 @@
         </div>
     </footer>
 
+    <?php if (!empty($heroPantallaCompleta) && !empty($eventosDestacados)): ?>
+        <!-- Eventos de la agenda del Beni: se muestra al ingresar o recargar la portada si hay eventos vigentes. -->
+        <div class="modal fade" id="modalEventosBeni" tabindex="-1" aria-labelledby="modalEventosBeniTitulo" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <div class="modal-content modal-eventos-beni border-0 overflow-hidden">
+                    <div class="modal-header border-0 px-4 py-3">
+                        <div>
+                            <span class="modal-eventos-eyebrow"><i class="bi bi-stars me-1"></i> Agenda del Beni</span>
+                            <h2 class="modal-title h5 fw-bold mb-0 text-white" id="modalEventosBeniTitulo">Eventos destacados <?= date('Y') ?></h2>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar publicidad de eventos"></button>
+                    </div>
+                    <div class="modal-body p-0 bg-light">
+                        <div id="carruselEventosBeni" class="carousel slide" data-bs-interval="false">
+                            <div class="carousel-inner">
+                                <?php foreach ($eventosDestacados as $indice => $evento): ?>
+                                    <?php
+                                        $archivo = $evento['imagen_archivo'];
+                                        $esSubida = is_file(dirname(__DIR__, 3) . '/public/assets/img/eventos/' . $archivo);
+                                        $rutaUrl = $esSubida 
+                                            ? "{$baseUrl}/assets/img/eventos/" . rawurlencode($archivo) 
+                                            : "{$baseUrl}/assets/img/" . rawurlencode($archivo);
+                                        $rutaFisica = $esSubida
+                                            ? dirname(__DIR__, 3) . '/public/assets/img/eventos/' . $archivo
+                                            : dirname(__DIR__, 3) . '/public/assets/img/' . $archivo;
+                                        $versionEvento = is_file($rutaFisica) ? filemtime($rutaFisica) : time();
+                                    ?>
+                                    <div class="carousel-item <?= $indice === 0 ? 'active' : '' ?>">
+                                        <article class="evento-publicidad-card">
+                                            <img src="<?= htmlspecialchars($rutaUrl) ?>?v=<?= $versionEvento ?>"
+                                                class="evento-publicidad-imagen"
+                                                alt="<?= htmlspecialchars($evento['titulo']) ?>">
+                                            <div class="evento-publicidad-info">
+                                                <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                                                    <div>
+                                                        <h3 class="h6 fw-bold text-dark mb-1"><?= htmlspecialchars($evento['titulo']) ?></h3>
+                                                        <p class="small text-muted mb-0">
+                                                            <i class="bi bi-geo-alt-fill me-1 text-danger"></i><?= htmlspecialchars($evento['subtitulo_lugar'] ?? 'Trinidad · Beni') ?> &bull; 
+                                                            <i class="bi bi-calendar-event me-1 text-teal"></i><?= htmlspecialchars($evento['detalle_fechas']) ?>
+                                                        </p>
+                                                    </div>
+                                                    <?php if (!empty($evento['enlace_externo'])): ?>
+                                                        <a href="<?= htmlspecialchars($evento['enlace_externo']) ?>" target="_blank" rel="noopener noreferrer" 
+                                                           class="btn btn-sm btn-teal-action rounded-pill px-3 py-1 fw-bold mt-1">
+                                                            <i class="bi bi-box-arrow-up-right me-1"></i> Más info
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php if (count($eventosDestacados) > 1): ?>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carruselEventosBeni" data-bs-slide="prev" aria-label="Evento anterior">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carruselEventosBeni" data-bs-slide="next" aria-label="Siguiente evento">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                </button>
+                                <div class="carousel-indicators position-relative mx-0 mb-0 pt-2 pb-3">
+                                    <?php foreach ($eventosDestacados as $indice => $evento): ?>
+                                        <button type="button" data-bs-target="#carruselEventosBeni" data-bs-slide-to="<?= $indice ?>" class="<?= $indice === 0 ? 'active' : '' ?>" <?= $indice === 0 ? 'aria-current="true"' : '' ?> aria-label="Ver <?= htmlspecialchars($evento['titulo']) ?>"></button>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-white justify-content-center py-3">
+                        <button type="button" class="btn btn-outline-teal rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Explorar Beni</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Bootstrap Bundle JS (Local) -->
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 
@@ -239,6 +333,13 @@
                 }, 250);
             }, 10000);
 
+        });
+
+        // La publicidad de eventos se presenta cada vez que se abre o recarga la portada.
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEventos = document.getElementById('modalEventosBeni');
+            if (!modalEventos || !window.bootstrap?.Modal) return;
+            window.setTimeout(() => bootstrap.Modal.getOrCreateInstance(modalEventos).show(), 450);
         });
     </script>
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/shared/http.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/shared/http.js') ?>"></script>

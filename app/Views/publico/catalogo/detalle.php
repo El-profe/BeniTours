@@ -177,15 +177,57 @@
                 <h2 class="h5 fw-bold text-dark mb-3">Descripción</h2>
                 <p class="text-secondary mb-4" style="white-space: pre-line;"><?= htmlspecialchars($lugar['descripcion'] ?? '') ?></p>
                 <div class="border-top pt-4 mb-4">
-                    <h2 class="h5 fw-bold text-dark mb-2"><i class="bi bi-clock me-2 text-warning" aria-hidden="true"></i>Horarios de atención</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 fw-bold text-dark mb-0"><i class="bi bi-clock me-2 text-warning" aria-hidden="true"></i>Horarios de atención</h2>
+                        <?php
+                            $evaluacionHorario = \App\Services\HorarioHelper::evaluarEstado(
+                                $lugar['horario_atencion'] ?? null,
+                                $lugar['estado_operativo'] ?? null,
+                                $lugar['aviso_temporal_motivo'] ?? null,
+                                $lugar['aviso_temporal_reapertura'] ?? null
+                            );
+                        ?>
+                        <?php if ($evaluacionHorario): ?>
+                            <span class="badge <?= $evaluacionHorario['badge'] ?> rounded-pill px-3 py-1 extra-small fw-bold">
+                                <?= htmlspecialchars($evaluacionHorario['texto']) ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                     <p class="text-secondary mb-0" style="white-space: pre-line;"><?= htmlspecialchars(($lugar['horario_atencion'] ?? '') ?: 'Sin horario específico / Abierto al público') ?></p>
                 </div>
+
+                <?php if (($lugar['estado_operativo'] ?? '') === 'CERRADO_TEMPORAL'): ?>
+                    <!-- Alerta Destacada: Aviso Especial de Cierre Temporal del Negocio -->
+                    <div class="alert alert-danger rounded-4 p-3 mb-4 shadow-sm border-0 border-start border-danger border-4" role="alert">
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="rounded-circle bg-danger text-white p-2 fs-5 flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                <i class="bi bi-door-closed-fill"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold text-danger mb-1">Aviso importante del establecimiento:</h6>
+                                <p class="mb-1 small text-dark fw-semibold">
+                                    "<?= htmlspecialchars($lugar['aviso_temporal_motivo'] ?: 'Este local se encuentra temporalmente cerrado por mantenimiento o evento.') ?>"
+                                </p>
+                                <?php if (!empty($lugar['aviso_temporal_reapertura'])): ?>
+                                    <div class="extra-small text-danger fw-bold mt-1">
+                                        <i class="bi bi-calendar-event me-1"></i> Reapertura estimada: <?= date('d/m/Y', strtotime($lugar['aviso_temporal_reapertura'])) ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <?php
                     $whatsappRaw = preg_replace('/\D/', '', $lugar['whatsapp_contacto'] ?? '');
                     if (strlen($whatsappRaw) === 8) {
                         $whatsappRaw = '591' . $whatsappRaw;
                     }
-                    $mensajeWa = rawurlencode("Hola, vi la información de " . $lugar['nombre'] . " en BeniTours y quisiera hacer una consulta.");
+                    $esCerradoTemporal = ($lugar['estado_operativo'] ?? '') === 'CERRADO_TEMPORAL';
+                    $textoWaConsulta = $esCerradoTemporal
+                        ? ("Hola, vi en BeniTours que " . $lugar['nombre'] . " tiene un aviso de cierre temporal. Quisiera consultarles sobre su reapertura o reservas.")
+                        : ("Hola, vi la información de " . $lugar['nombre'] . " en BeniTours y quisiera hacer una consulta.");
+                    $mensajeWa = rawurlencode($textoWaConsulta);
                     $telefonoRaw = preg_replace('/[^\d+]/', '', $lugar['telefono_contacto'] ?? '');
                 ?>
                 <div class="border-top pt-4 mb-4">
@@ -211,6 +253,36 @@
                         <button type="button" class="btn btn-light rounded-pill py-2 text-secondary fw-semibold border d-flex align-items-center justify-content-center gap-2 mt-1" id="btnCompartirLugar">
                             <i class="bi bi-share-fill text-primary"></i> Compartir este lugar
                         </button>
+                    </div>
+                </div>
+
+                <!-- Modal para compartir en Redes Sociales (Escritorio / Fallback) -->
+                <div class="modal fade" id="modalCompartirLugar" tabindex="-1" aria-labelledby="tituloModalCompartir" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                            <div class="modal-header border-0 pb-0 pt-3 px-3">
+                                <h5 class="modal-title fs-6 fw-bold text-dark" id="tituloModalCompartir">
+                                    <i class="bi bi-share-fill text-primary me-2"></i>Compartir ficha
+                                </h5>
+                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body p-3">
+                                <p class="extra-small text-muted mb-3">Comparte este destino o comercio con tus contactos en redes:</p>
+                                <div class="d-grid gap-2">
+                                    <a id="btnShareWhatsApp" href="#" target="_blank" rel="noopener noreferrer" 
+                                       class="btn btn-success text-white rounded-pill fw-semibold py-2 d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-whatsapp fs-5"></i> Enviar por WhatsApp
+                                    </a>
+                                    <a id="btnShareFacebook" href="#" target="_blank" rel="noopener noreferrer" 
+                                       class="btn btn-primary rounded-pill fw-semibold py-2 d-flex align-items-center justify-content-center gap-2" style="background-color: #1877f2; border-color: #1877f2;">
+                                        <i class="bi bi-facebook fs-5"></i> Publicar en Facebook
+                                    </a>
+                                    <button type="button" id="btnShareCopiar" class="btn btn-light border rounded-pill fw-semibold py-2 text-dark d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-link-45deg fs-5"></i> <span id="txtBtnCopiar">Copiar enlace</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -546,20 +618,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const btnCompartir = document.getElementById('btnCompartirLugar');
+    const modalCompartirEl = document.getElementById('modalCompartirLugar');
+    const btnShareWhatsApp = document.getElementById('btnShareWhatsApp');
+    const btnShareFacebook = document.getElementById('btnShareFacebook');
+    const btnShareCopiar = document.getElementById('btnShareCopiar');
+    const txtBtnCopiar = document.getElementById('txtBtnCopiar');
+
     if (btnCompartir) {
+        const titulo = <?= json_encode($lugar['nombre'], JSON_UNESCAPED_UNICODE) ?>;
+        const textoDesc = <?= json_encode(!empty($lugar['municipio']) ? "Conoce {$lugar['nombre']} en {$lugar['municipio']}, Beni a través de BeniTours:" : "Conoce {$lugar['nombre']} en BeniTours:", JSON_UNESCAPED_UNICODE) ?>;
+        const urlActual = window.location.href;
+
+        // Configurar enlaces directos del modal
+        if (btnShareWhatsApp) {
+            btnShareWhatsApp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoDesc + ' ' + urlActual)}`;
+        }
+        if (btnShareFacebook) {
+            btnShareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
+        }
+
         btnCompartir.addEventListener('click', async () => {
-            const titulo = <?= json_encode($lugar['nombre'], JSON_UNESCAPED_UNICODE) ?>;
-            const url = window.location.href;
+            // Si el navegador soporta Web Share API (móviles y navegadores modernos)
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: titulo + ' | BeniTours',
-                        text: '¡Conoce ' + titulo + ' en Trinidad, Beni a través de BeniTours!',
-                        url: url
+                        text: textoDesc,
+                        url: urlActual
                     });
-                } catch (e) { /* Cancelado por el usuario */ }
+                    return;
+                } catch (e) {
+                    // Si el usuario canceló o falló, no hacemos nada o abrimos modal si no fue AbortError
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            // Fallback: abrir modal de compartir en escritorio
+            if (modalCompartirEl && window.bootstrap?.Modal) {
+                const modal = window.bootstrap.Modal.getOrCreateInstance(modalCompartirEl);
+                modal.show();
             } else {
-                navigator.clipboard.writeText(url).then(() => {
+                // Fallback directo a copiar
+                navigator.clipboard.writeText(urlActual).then(() => {
                     const original = btnCompartir.innerHTML;
                     btnCompartir.innerHTML = '<i class="bi bi-check-lg text-success"></i> ¡Enlace copiado!';
                     setTimeout(() => {
@@ -567,6 +667,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 2500);
                 });
             }
+        });
+
+        btnShareCopiar?.addEventListener('click', () => {
+            navigator.clipboard.writeText(urlActual).then(() => {
+                if (txtBtnCopiar) {
+                    txtBtnCopiar.textContent = '¡Copiado al portapapeles!';
+                    setTimeout(() => {
+                        txtBtnCopiar.textContent = 'Copiar enlace';
+                    }, 2500);
+                }
+            });
         });
     }
 });

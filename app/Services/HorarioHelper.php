@@ -9,7 +9,27 @@ use DateTimeZone;
  * si un establecimiento se encuentra actualmente abierto o cerrado.
  */
 class HorarioHelper {
-    public static function evaluarEstado(?string $horario): ?array {
+    public static function evaluarEstado(?string $horario, ?string $estadoOperativo = null, ?string $motivo = null, ?string $reapertura = null): ?array {
+        // 0. Comprobación prioritaria de Cierre Temporal / Pausa Operativa
+        if ($estadoOperativo === 'CERRADO_TEMPORAL') {
+            $textoMotivo = !empty($motivo) ? trim($motivo) : 'Cerrado temporalmente';
+            if (!empty($reapertura)) {
+                $fechaFmt = date('d/m/Y', strtotime($reapertura));
+                $textoBadge = "Cerrado hasta {$fechaFmt}";
+            } else {
+                $textoBadge = 'Cerrado temporalmente';
+            }
+
+            return [
+                'abierto'          => false,
+                'cerrado_temporal' => true,
+                'texto'            => $textoBadge,
+                'motivo'           => $textoMotivo,
+                'reapertura'       => $reapertura,
+                'badge'            => 'bg-danger-subtle text-danger border border-danger-subtle'
+            ];
+        }
+
         if (empty($horario)) {
             return null;
         }

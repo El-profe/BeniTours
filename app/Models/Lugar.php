@@ -20,6 +20,7 @@ class Lugar {
         
         $sql = "SELECT l.id_lugar, l.id_municipio, l.nombre, l.slug, l.descripcion, l.direccion, 
                        l.referencia_ubicacion, l.horario_atencion, l.tipo_lugar,
+                       l.estado_operativo, l.aviso_temporal_motivo, l.aviso_temporal_reapertura,
                        l.whatsapp_contacto, l.telefono_contacto, l.id_categoria,
                        l.latitud, l.longitud,
                        CONCAT(COALESCE(l.latitud, ''), ',', COALESCE(l.longitud, '')) AS coordenadas_gps,
@@ -401,4 +402,26 @@ class Lugar {
         }
         return $slugFinal;
     }
+
+    /**
+     * Actualiza el estado operativo temporal de un lugar/comercio.
+     */
+    public function actualizarEstadoOperativo(int $idLugar, string $estado, ?string $motivo = null, ?string $reapertura = null): bool {
+        $estadoValido = in_array($estado, ['ABIERTO_HABITUAL', 'CERRADO_TEMPORAL'], true) ? $estado : 'ABIERTO_HABITUAL';
+        $motivoValido = ($estadoValido === 'CERRADO_TEMPORAL') ? (!empty($motivo) ? mb_substr(trim($motivo), 0, 255, 'UTF-8') : null) : null;
+        $reaperturaValida = ($estadoValido === 'CERRADO_TEMPORAL' && !empty($reapertura)) ? $reapertura : null;
+
+        $stmt = $this->db->prepare("UPDATE lugares 
+                                    SET estado_operativo = :estado, 
+                                        aviso_temporal_motivo = :motivo, 
+                                        aviso_temporal_reapertura = :reapertura 
+                                    WHERE id_lugar = :id");
+        return $stmt->execute([
+            ':estado'     => $estadoValido,
+            ':motivo'     => $motivoValido,
+            ':reapertura' => $reaperturaValida,
+            ':id'         => $idLugar
+        ]);
+    }
 }
+
