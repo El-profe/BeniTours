@@ -6,6 +6,9 @@ use App\Core\Database;
 use App\Models\Lugar;
 use App\Models\Fotografia;
 use App\Models\Promocion;
+use App\Models\CuentaNegocio;
+use App\Models\Publicacion;
+use App\Models\OperacionAdmin;
 use App\Services\ImagenService;
 use App\Middleware\NegocioAuthMiddleware;
 use App\Middleware\CsrfMiddleware;
@@ -515,6 +518,7 @@ class PanelController extends Controller {
             'lugar'            => $lugar,
             'pagoPendiente'    => (bool)$pendiente->fetchColumn(),
             'planes'          => (new \App\Models\Tarifa())->listarPlanesActivos(),
+            'pagos'           => (new \App\Models\Pago())->listarPorLugar($this->idLugar),
             'esVisible'        => $esVisible,
             'fechaVencimiento' => $vencimiento,
             'cobro'            => $cobro,
@@ -532,7 +536,8 @@ class PanelController extends Controller {
         }
 
         $plan = trim($_POST['plan'] ?? 'MENSUAL');
-        if (!in_array($plan, ['MENSUAL', 'ANUAL'], true)) {
+        $planesValidos = ['MENSUAL', 'TRIMESTRAL', 'SEMESTRAL', 'ANUAL'];
+        if (!in_array($plan, $planesValidos, true)) {
             $_SESSION['negocio_error'] = 'Plan seleccionado inválido.';
             header("Location: {$this->config['base_url']}/negocio/renovar");
             exit();
@@ -865,5 +870,116 @@ class PanelController extends Controller {
         header("Location: {$this->config['base_url']}/negocio/dashboard");
         exit();
     }
-}
 
+    /**
+     * Procesa la solicitud voluntaria del comerciante para dar de baja su negocio.
+     */
+    public function procesarBajaVoluntaria(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['negocio_error'] = 'Sesión expirada o token CSRF inválido. Inténtalo nuevamente.';
+            header("Location: {$this->config['base_url']}/negocio/perfil");
+            exit();
+        }
+
+        $password = (string)($_POST['password_confirm'] ?? '');
+        $motivo = trim((string)($_POST['motivo_baja'] ?? ''));
+        $comentario = trim((string)($_POST['comentario_baja'] ?? ''));
+
+        if (empty($password)) {
+            $_SESSION['negocio_error'] = 'Debes ingresar tu contraseña actual para confirmar la baja.';
+            header("Location: {$this->config['base_url']}/negocio/perfil");
+            exit();
+        }
+
+        if (empty($motivo)) {
+            $motivo = 'Decisión voluntaria del titular';
+        }
+
+        // Obtener cuenta de negocio actual para verificar contraseña
+        $cuentaModel = new CuentaNegocio();
+        $cuenta = $cuentaModel->buscarPorLugar($this->idLugar);
+
+        if (!$cuenta || !password_verify($password, $cuenta['password_hash'])) {
+            $_SESSION['negocio_error'] = 'La contraseña ingresada no es correcta. No se procedió con la baja.';
+            header("Location: {$this->config['base_url']}/negocio/perfil");
+            exit();
+        }
+
+        // 1. Despublicar y registrar baja en publicaciones
+        $publicacionModel = new Publicacion();
+        $publicacionModel->registrarBajaVoluntaria($this->idLugar, $motivo, $comentario);
+
+        // 2. Desactivar la cuenta de acceso
+        $cuentaModel->cambiarEstadoActivo($this->idLugar, 0);
+
+        // 3. Registrar en bitácora administrativa para trazabilidad y auditoría
+        try {
+            $lugarInfo = $this->lugarModel->buscarPorId($this->idLugar);
+            $nombreLugar = $lugarInfo['nombre'] ?? 'Comercio';
+            (new OperacionAdmin())->registrar(
+                $this->idLugar,
+                0, // 0 = evento iniciado por el propio titular
+                'BAJA_VOLUNTARIA_COMERCIO',
+                "El comerciante dio de baja el local '{$nombreLugar}'. Motivo: {$motivo}. " . ($comentario ? "Detalle: {$comentario}" : "")
+            );
+        } catch (\Throwable $ignored) {}
+
+        // 4. Destruir sesión y limpiar cookies
+        unset(
+            $_SESSION['negocio_id'],
+            $_SESSION['negocio_lugar_id'],
+            $_SESSION['negocio_nombre'],
+            $_SESSION['negocio_user']
+        );
+        $_SESSION = [];
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+        session_destroy();
+
+        // Iniciar sesión limpia para mensaje de confirmación de baja
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['negocio_auth_flash'] = 'Tu negocio ha sido dado de baja exitosamente del catálogo de BeniTours. Si en el futuro deseas reabrirlo o reactivar tu cuenta, contáctanos.';
+
+        header("Location: {$this->config['base_url']}/negocio/login");
+        exit();
+    }
+
+
+    /**
+     * Muestra el recibo oficial de un pago realizado por este negocio.
+     */
+    public function recibo(): void {
+        $idPago = (int)($_GET['id'] ?? 0);
+        if ($idPago <= 0) {
+            $_SESSION['negocio_error'] = 'Recibo no encontrado o inválido.';
+            header("Location: {$this->config['base_url']}/negocio/renovar");
+            exit();
+        }
+
+        $pagoModel = new \App\Models\Pago();
+        $pago = $pagoModel->buscarPorId($idPago);
+
+        if (!$pago || (int)$pago['id_lugar'] !== (int)$this->idLugar) {
+            $_SESSION['negocio_error'] = 'No tienes permiso para ver este recibo o no existe.';
+            header("Location: {$this->config['base_url']}/negocio/renovar");
+            exit();
+        }
+
+        $this->render('negocio/recibo', [
+            'titulo' => 'Recibo Oficial de Pago #' . $pago['id_pago'],
+            'pago'   => $pago
+        ], 'negocio');
+    }
+}

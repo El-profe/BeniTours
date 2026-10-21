@@ -317,6 +317,11 @@ $hayFiltros = !empty($buscar) || !empty($tipoActual) || !empty($categoriaActual)
                                         <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1 fw-semibold">
                                             <i class="bi bi-check-circle-fill me-1"></i> Habilitado
                                         </span>
+                                    <?php elseif (!empty($l['baja_voluntaria'])): ?>
+                                        <span class="badge bg-dark-subtle text-dark border border-secondary-subtle rounded-pill px-3 py-1 fw-semibold" 
+                                              title="Baja voluntaria: <?= $escape($l['baja_motivo'] ?? 'Solicitado por el comerciante') ?><?= !empty($l['baja_fecha']) ? ' (' . date('d/m/Y', strtotime($l['baja_fecha'])) . ')' : '' ?>">
+                                            <i class="bi bi-person-x-fill me-1 text-danger"></i> Baja Voluntaria
+                                        </span>
                                     <?php else: ?>
                                         <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 fw-semibold" title="<?= $escape($l['motivo_suspension'] ?? 'Deshabilitado') ?>">
                                             <i class="bi bi-slash-circle-fill me-1"></i> Suspendido

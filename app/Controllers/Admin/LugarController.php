@@ -12,6 +12,7 @@ use App\Models\Vigencia;
 use App\Models\Tarifa;
 use App\Services\ImagenService;
 use App\Services\SolicitudService;
+use App\Services\ComprobanteService;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CsrfMiddleware;
 
@@ -189,12 +190,23 @@ class LugarController extends Controller {
                     }
                 }
 
+                // Subida de comprobante bancario/QR si fue adjuntado
+                $comprobanteArchivo = null;
+                if (!empty($_FILES['comprobante_pago']['tmp_name'])) {
+                    try {
+                        $comprobanteArchivo = ComprobanteService::subir($_FILES['comprobante_pago']);
+                    } catch (\Throwable $errComp) {
+                        error_log('Error al subir comprobante en alta de lugar: ' . $errComp->getMessage());
+                    }
+                }
+
                 $resultado = SolicitudService::crearCuentaComercialDirecta(
                     $idLugar,
                     [
                         'codigo_plan'        => $codigoPlan,
                         'metodo_pago'        => $metodoPago,
                         'numero_comprobante' => $numRecibo,
+                        'comprobante_archivo'=> $comprobanteArchivo,
                         'meses_duracion'     => ($meses && $meses > 0) ? $meses : null,
                         'monto'              => $monto > 0 ? $monto : null,
                         'id_tarifa'          => $idTarifa ?: null,
@@ -417,9 +429,14 @@ class LugarController extends Controller {
         $motivo = $nuevoEstado === 0 ? trim($_POST['motivo'] ?? 'Deshabilitado por administración') : null;
 
         $this->publicacionModel->cambiarHabilitacion($id, $nuevoEstado, $motivo);
-        try { (new \App\Models\OperacionAdmin())->registrar($id, (int)$_SESSION['admin_id'], $nuevoEstado ? 'FICHA_HABILITADA' : 'FICHA_SUSPENDIDA', $nuevoEstado ? 'La publicación fue habilitada.' : 'La publicación fue suspendida.'); } catch (\Throwable $ignored) {}
+        if ($nuevoEstado === 1) {
+            try {
+                (new \App\Models\CuentaNegocio())->cambiarEstadoActivo($id, 1);
+            } catch (\Throwable $ignored) {}
+        }
+        try { (new \App\Models\OperacionAdmin())->registrar($id, (int)$_SESSION['admin_id'], $nuevoEstado ? 'FICHA_HABILITADA' : 'FICHA_SUSPENDIDA', $nuevoEstado ? 'La publicación fue habilitada (reactivada).' : 'La publicación fue suspendida.'); } catch (\Throwable $ignored) {}
 
-        $_SESSION['admin_flash'] = $nuevoEstado ? "La ficha ha sido habilitada." : "La ficha ha sido deshabilitada.";
+        $_SESSION['admin_flash'] = $nuevoEstado ? "La ficha ha sido habilitada exitosamente." : "La ficha ha sido deshabilitada.";
         header("Location: {$this->config['base_url']}/admin/lugares");
         exit();
     }

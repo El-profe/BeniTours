@@ -42,13 +42,33 @@ class Publicacion {
     public function cambiarHabilitacion(int $idLugar, int $habilitado, ?string $motivo = null): bool {
         $sql = "UPDATE publicaciones 
                 SET habilitado = :habilitado, 
-                    motivo_suspension = :motivo 
+                    motivo_suspension = :motivo,
+                    baja_voluntaria = CASE WHEN :habilitado_flag = 1 THEN 0 ELSE baja_voluntaria END
                 WHERE id_lugar = :id_lugar";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':habilitado' => $habilitado,
-            ':motivo'     => $motivo,
-            ':id_lugar'   => $idLugar
+            ':habilitado'      => $habilitado,
+            ':motivo'          => $motivo,
+            ':habilitado_flag' => $habilitado,
+            ':id_lugar'        => $idLugar
+        ]);
+    }
+
+    public function registrarBajaVoluntaria(int $idLugar, string $motivo, ?string $comentario = null): bool {
+        $sql = "UPDATE publicaciones 
+                SET habilitado = 0,
+                    motivo_suspension = :motivo_susp,
+                    baja_voluntaria = 1,
+                    baja_fecha = NOW(),
+                    baja_motivo = :motivo,
+                    baja_comentario = :comentario
+                WHERE id_lugar = :id_lugar";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':motivo_susp' => 'Baja voluntaria solicitada por el titular: ' . $motivo,
+            ':motivo'      => mb_substr($motivo, 0, 100),
+            ':comentario'  => !empty($comentario) ? mb_substr(trim($comentario), 0, 1000) : null,
+            ':id_lugar'    => $idLugar
         ]);
     }
 }

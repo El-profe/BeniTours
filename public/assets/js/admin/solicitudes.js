@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mensaje = document.getElementById('solicitudAdminMensaje');
     const pendientes = new Set();
     const modalCredencialesEl = document.getElementById('modalCredencialesGeneradas');
-    const modalCredenciales = modalCredencialesEl && window.bootstrap ? new bootstrap.Modal(modalCredencialesEl) : null;
+    const modalCredenciales = null; // Delegado centralmente a BeniTursModalCredenciales
     const modalCobroEl = document.getElementById('modalConfirmarCobroEfectivo');
     const modalCobro = modalCobroEl && window.bootstrap ? new bootstrap.Modal(modalCobroEl) : null;
 

@@ -2,7 +2,7 @@
 $seccionActual = basename(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
 $opciones = [
     ['dashboard', 'Mi negocio', 'bi-shop'],
-    ['perfil', 'Editar Perfil', 'bi-pencil-square'],
+    ['perfil', 'Perfil & Cuenta', 'bi-person-gear'],
     ['fotos', 'Fotos', 'bi-images'],
     ['promociones', 'Promociones', 'bi-tag'],
     ['ubicacion', 'Ubicación', 'bi-geo-alt'],

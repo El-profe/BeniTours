@@ -5,17 +5,46 @@
     let modalInstance = null;
     let datosActuales = null;
 
-    function initModal() {
+    function obtenerModalInstance() {
         const modalEl = document.getElementById('modalCredencialesGeneradas');
-        if (!modalEl || typeof bootstrap === 'undefined') return;
-        if (!modalInstance) {
-            modalInstance = new bootstrap.Modal(modalEl);
+        if (!modalEl) return null;
+
+        if (window.bootstrap && window.bootstrap.Modal) {
+            modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         }
+        return modalInstance;
+    }
+
+    function initModal() {
+        obtenerModalInstance();
+    }
+
+    function cerrarModalCredenciales() {
+        const modalEl = document.getElementById('modalCredencialesGeneradas');
+        if (!modalEl) return;
+
+        const instance = obtenerModalInstance();
+        if (instance) {
+            instance.hide();
+        }
+
+        // Limpieza de respaldo forzada si Bootstrap no limpió los backdrops o clases
+        setTimeout(() => {
+            modalEl.classList.remove('show');
+            modalEl.style.display = 'none';
+            modalEl.setAttribute('aria-hidden', 'true');
+            modalEl.removeAttribute('aria-modal');
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        }, 150);
     }
 
     function mostrarModalCredenciales(data) {
         initModal();
-        if (!modalInstance) return;
+        const modalEl = document.getElementById('modalCredencialesGeneradas');
+        if (!modalEl) return;
         datosActuales = data;
 
         const elComercio = document.getElementById('modalCredComercio');
@@ -63,7 +92,16 @@
             };
         }
 
-        modalInstance.show();
+        const instance = obtenerModalInstance();
+        if (instance) {
+            instance.show();
+        } else {
+            // Fallback directo si bootstrap aún no inicializó
+            modalEl.classList.add('show');
+            modalEl.style.display = 'block';
+            modalEl.removeAttribute('aria-hidden');
+            document.body.classList.add('modal-open');
+        }
     }
 
     function imprimirRecibo(data) {
@@ -104,7 +142,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="brand">Beni<span>Turs</span></div>
+        <div class="brand">Beni<span>Tours</span></div>
         <div class="title">Comprobante Oficial de Membresía Comercial</div>
         <div style="font-size: 13px; color: #888; margin-top: 4px;">Trinidad, Departamento del Beni · Bolivia</div>
     </div>
@@ -147,6 +185,23 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         initModal();
+
+        // Asignar listeners explícitos a los botones de cerrar
+        const btnCerrarX = document.getElementById('btnCerrarModalCredencialesX');
+        if (btnCerrarX) {
+            btnCerrarX.addEventListener('click', (e) => {
+                e.preventDefault();
+                cerrarModalCredenciales();
+            });
+        }
+
+        const btnCerrarFooter = document.getElementById('btnCerrarModalCredencialesFooter');
+        if (btnCerrarFooter) {
+            btnCerrarFooter.addEventListener('click', (e) => {
+                e.preventDefault();
+                cerrarModalCredenciales();
+            });
+        }
 
         // Botón copiar mensaje completo
         const btnCopiar = document.getElementById('btnCopiarMensajeCompleto');
@@ -207,6 +262,7 @@
     // Exponer API global
     window.BeniTursModalCredenciales = {
         mostrar: mostrarModalCredenciales,
+        cerrar: cerrarModalCredenciales,
         imprimir: imprimirRecibo
     };
 })();

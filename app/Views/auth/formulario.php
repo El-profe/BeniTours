@@ -33,14 +33,19 @@ $escape = static fn($valor) => htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF
             </nav>
             <h1 class="h3 fw-bold mb-2 text-dark" id="tituloAcceso"><?= $esAdmin ? 'Acceso administrativo' : 'Bienvenido a tu negocio' ?></h1>
             <p class="text-secondary small mb-4"><?= $esAdmin ? 'Ingresa con tu cuenta de administrador.' : 'Usa el usuario y la contraseña que recibiste al aprobarse tu solicitud.' ?></p>
+            <?php if (!empty($mensaje)): ?>
+                <div class="alert alert-success small rounded-3" role="alert"><i class="bi bi-check-circle-fill me-2" aria-hidden="true"></i><?= $escape($mensaje) ?></div>
+            <?php endif; ?>
             <?php if (!empty($error)): ?>
-                <div class="alert alert-danger small" role="alert"><i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i><?= $escape($error) ?></div>
+                <div class="alert alert-danger small rounded-3" role="alert"><i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i><?= $escape($error) ?></div>
             <?php endif; ?>
             <form action="<?= $escape($baseUrl) ?>/<?= $tipoAcceso ?>/login" method="post" data-login-form>
                 <input type="hidden" name="csrf_token" value="<?= $escape($csrfToken) ?>">
                 <div class="mb-3">
-                    <label for="loginUsuario" class="form-label fw-semibold">Usuario o correo electrónico</label>
-                    <input id="loginUsuario" name="usuario" type="text" class="form-control form-control-lg" value="<?= $escape($usuarioAnterior ?? '') ?>" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="120" required>
+                    <label for="loginUsuario" class="form-label fw-semibold"><?= $esAdmin ? 'Usuario o correo electrónico' : 'Usuario, Celular / WhatsApp o Correo' ?></label>
+                    <input id="loginUsuario" name="usuario" type="text" class="form-control form-control-lg" 
+                           placeholder="<?= $esAdmin ? 'Ej. admin o correo' : 'Ej. tatu381 o tu número de celular' ?>"
+                           value="<?= $escape($usuarioAnterior ?? '') ?>" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="120" required>
                 </div>
                 <div class="mb-4">
                     <label for="loginPassword" class="form-label fw-semibold">Contraseña</label>

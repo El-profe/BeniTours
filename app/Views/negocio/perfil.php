@@ -130,4 +130,86 @@
             </div>
         </form>
     </div>
+
+    <!-- Zona de Gestión de Estado y Baja Voluntaria -->
+    <div class="card border border-danger-subtle shadow-sm rounded-4 p-4 p-md-4 mt-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-3 fs-4 bg-danger-subtle text-danger flex-shrink-0">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">Dar de baja mi establecimiento</h5>
+                    <p class="text-muted small mb-0">
+                        Si has cerrado tu local permanentemente o prefieres no figurar más en BeniTours, puedes solicitar la baja voluntaria.
+                    </p>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalBajaComercio">
+                    <i class="bi bi-x-circle me-1"></i> Dar de baja mi negocio
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación Segura: Baja Voluntaria -->
+<div class="modal fade" id="modalBajaComercio" tabindex="-1" aria-labelledby="modalBajaTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="<?= htmlspecialchars($baseUrl) ?>/negocio/baja-voluntaria" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+
+                <div class="modal-header bg-danger text-white border-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold" id="modalBajaTitulo">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Baja Voluntaria
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning border-0 rounded-3 small mb-3">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        <strong>Atención:</strong> Al confirmar la baja, tu establecimiento se ocultará de inmediato del catálogo general, buscador y mapa de BeniTours. Tus fotos y datos no se eliminarán; si en el futuro decides reabrir, podrás solicitar la reactivación a la administración.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="motivo_baja" class="form-label fw-bold text-dark small">¿Cuál es el motivo principal de la baja? <span class="text-danger">*</span></label>
+                        <select name="motivo_baja" id="motivo_baja" class="form-select rounded-3" required>
+                            <option value="" disabled selected>Selecciona un motivo...</option>
+                            <option value="Cierre definitivo del establecimiento">Cierre definitivo del establecimiento</option>
+                            <option value="Cambio de rubro comercial">Cambio de rubro comercial</option>
+                            <option value="Traslado a otra ciudad o departamento">Traslado a otra ciudad o departamento</option>
+                            <option value="Motivos económicos / presupuesto">Motivos económicos / presupuesto</option>
+                            <option value="Baja temporal prolongada">Baja temporal prolongada</option>
+                            <option value="Otro motivo">Otro motivo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="comentario_baja" class="form-label fw-bold text-dark small">Comentario adicional (Opcional)</label>
+                        <textarea name="comentario_baja" id="comentario_baja" rows="2" class="form-control rounded-3" 
+                                  placeholder="¿Tienes alguna sugerencia para BeniTours o detalle adicional?" maxlength="500"></textarea>
+                    </div>
+
+                    <div class="mb-3 p-3 bg-light rounded-3 border">
+                        <label for="password_confirm" class="form-label fw-bold text-danger small">
+                            <i class="bi bi-lock-fill me-1"></i>Ingresa tu contraseña actual para confirmar: <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" name="password_confirm" id="password_confirm" class="form-control rounded-3" 
+                               placeholder="Contraseña de tu cuenta" autocomplete="current-password" required>
+                        <div class="form-text extra-small">Medida de seguridad para evitar bajas accidentales.</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-trash3-fill me-1"></i> Sí, confirmar baja
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

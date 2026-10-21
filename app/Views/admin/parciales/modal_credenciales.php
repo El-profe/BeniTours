@@ -10,7 +10,7 @@
                         <small class="text-white-50">Credenciales listas para entregar al propietario</small>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" id="btnCerrarModalCredencialesX"></button>
             </div>
             <div class="modal-body p-4 p-md-5">
                 <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mb-4 flex-wrap gap-2 border">
@@ -87,7 +87,7 @@
                 </div>
             </div>
             <div class="modal-footer bg-light py-2 px-4">
-                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Listo, cerrar</button>
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal" id="btnCerrarModalCredencialesFooter">Listo, cerrar</button>
             </div>
         </div>
     </div>

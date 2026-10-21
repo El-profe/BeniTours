@@ -172,6 +172,10 @@
                         <p class="text-secondary small mb-3">
                             Este aviso se mostrará a los turistas en tu ficha del catálogo público para que sepan por qué no atiendes hoy y cuándo reabres, evitando confusiones o que se desplacen en vano.
                         </p>
+                        <div class="p-2 mb-3 bg-light rounded-3 border extra-small text-muted d-flex align-items-center justify-content-between">
+                            <span>¿Deseas dar de baja definitiva tu negocio en lugar de pausar por hoy?</span>
+                            <a href="<?= htmlspecialchars($baseUrl) ?>/negocio/perfil#modalBajaComercio" class="fw-bold text-danger text-decoration-none">Ir a Dar de baja</a>
+                        </div>
 
                         <!-- Botones de motivos rápidos -->
                         <label class="form-label fw-bold text-dark small mb-2">Selecciona un motivo común o escribe el tuyo:</label>

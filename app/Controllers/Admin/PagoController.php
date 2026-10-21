@@ -32,7 +32,7 @@ class PagoController extends Controller {
 
         // Identificar publicaciones comerciales próximas a vencer (en los siguientes 5 días) (RF-29)
         $db = Database::getConnection();
-        $sqlAlertas = "SELECT l.nombre, v.fecha_vencimiento, DATEDIFF(v.fecha_vencimiento, CURDATE()) AS dias_restantes
+        $sqlAlertas = "SELECT l.id_lugar, l.nombre, l.whatsapp_contacto, l.telefono_contacto, l.direccion, v.fecha_vencimiento, DATEDIFF(v.fecha_vencimiento, CURDATE()) AS dias_restantes
                        FROM vigencias v
                        INNER JOIN lugares l ON v.id_lugar = l.id_lugar
                        WHERE v.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 5 DAY)
@@ -100,8 +100,9 @@ class PagoController extends Controller {
     public function crear(): void {
         $db = Database::getConnection();
         
-        // Listar establecimientos comerciales con su ultimo vencimiento registrado
+        // Listar establecimientos comerciales con su ultimo vencimiento registrado y su fotografía principal
         $sqlComercios = "SELECT l.id_lugar, l.nombre, l.whatsapp_contacto, l.telefono_contacto, l.direccion, s.plan_solicitado,
+                                (SELECT f.nombre_archivo FROM fotografias f WHERE f.id_lugar = l.id_lugar AND f.es_principal = 1 LIMIT 1) AS imagen,
                                 (SELECT MAX(v.fecha_vencimiento) FROM vigencias v
                                  INNER JOIN pagos p ON p.id_pago = v.id_pago
                                  WHERE v.id_lugar = l.id_lugar AND p.estado = 'CONFIRMADO') AS ultimo_vencimiento

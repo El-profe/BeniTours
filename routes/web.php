@@ -108,6 +108,6 @@ $router->get('/negocio/perfil', [\App\Controllers\Negocio\PanelController::class
 $router->post('/negocio/perfil/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarPerfil']);
 $router->get('/negocio/renovar', [\App\Controllers\Negocio\PanelController::class, 'renovar']);
 $router->post('/negocio/renovar/guardar', [\App\Controllers\Negocio\PanelController::class, 'guardarRenovacion']);
+$router->get('/negocio/recibo', [\App\Controllers\Negocio\PanelController::class, 'recibo']);
 $router->post('/negocio/estado-operativo', [\App\Controllers\Negocio\PanelController::class, 'cambiarEstadoOperativo']);
-
-
+$router->post('/negocio/baja-voluntaria', [\App\Controllers\Negocio\PanelController::class, 'procesarBajaVoluntaria']);

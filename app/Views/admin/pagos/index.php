@@ -21,23 +21,124 @@
         </div>
     </div>
 
-    <!-- Alertas de Publicaciones Próximas a Vencer (RF-29) -->
-    <?php if (!empty($proximosVencimientos)): ?>
-        <div class="alert alert-warning border-0 rounded-4 shadow-sm mb-4 p-3 d-flex align-items-center gap-3">
-            <div class="widget-icon bg-warning text-dark flex-shrink-0">
-                <i class="bi bi-bell-fill fs-5"></i>
-            </div>
-            <div class="flex-grow-1">
-                <h6 class="fw-bold mb-1 text-dark">Publicaciones comerciales próximas a vencer (Siguientes 5 días):</h6>
-                <ul class="mb-0 small ps-3 text-secondary">
-                    <?php foreach ($proximosVencimientos as $pv): ?>
-                        <li>
-                            <strong><?= htmlspecialchars($pv['nombre']) ?></strong> vence el 
-                            <strong><?= date('d/m/Y', strtotime($pv['fecha_vencimiento'])) ?></strong> 
-                            (Quedan <span class="badge bg-warning text-dark"><?= $pv['dias_restantes'] ?> días</span>).
-                        </li>
+    <!-- Alertas de Publicaciones Próximas a Vencer (Opción A: Compacto + Expandible + WhatsApp) -->
+    <?php if (!empty($proximosVencimientos)): 
+        $totalVenc = count($proximosVencimientos);
+        $urgentes = array_slice($proximosVencimientos, 0, 3);
+        $restantes = array_slice($proximosVencimientos, 3);
+    ?>
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden card-alerta-vencimientos border-start border-4 border-warning">
+            <div class="p-3 p-md-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="badge-alerta-icon bg-warning-subtle text-warning-emphasis p-3 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                            <i class="bi bi-bell-fill fs-4 text-warning"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h6 class="fw-bold mb-0 text-dark">Publicaciones próximas a vencer (siguientes 5 días)</h6>
+                                <span class="badge bg-danger rounded-pill px-2 py-1 extra-small fw-bold">
+                                    <?= $totalVenc ?> <?= $totalVenc === 1 ? 'comercio' : 'comercios' ?>
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-0 mt-1">
+                                Comunícate directamente con los encargados para coordinar la renovación anticipada.
+                            </p>
+                        </div>
+                    </div>
+
+                    <?php if ($totalVenc > 3): ?>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-semibold d-flex align-items-center gap-1" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapseVencimientos" 
+                                    aria-expanded="false" 
+                                    aria-controls="collapseVencimientos"
+                                    id="btnToggleVencimientos"
+                                    onclick="const exp = this.getAttribute('aria-expanded') === 'true'; this.querySelector('.txt-btn-venc').innerText = exp ? 'Mostrar menos' : 'Ver todos (<?= $totalVenc ?>)';">
+                                <span class="txt-btn-venc">Ver todos (<?= $totalVenc ?>)</span>
+                                <i class="bi bi-chevron-down ms-1"></i>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Lista de los Primeros 3 (Siempre Visible) -->
+                <div class="row g-2 mt-3 pt-2 border-top">
+                    <?php foreach ($urgentes as $pv): 
+                        $telWa = preg_replace('/\D/', '', $pv['whatsapp_contacto'] ?: ($pv['telefono_contacto'] ?: ''));
+                        if (!empty($telWa) && strlen($telWa) === 8) $telWa = '591' . $telWa;
+                        $fechaFmt = date('d/m/Y', strtotime($pv['fecha_vencimiento']));
+                        $msgWa = "Hola *{$pv['nombre']}*, le saludamos del equipo de *BeniTours Trinidad*. Le recordamos cordialmente que su membresía comercial vence el {$fechaFmt} (quedan {$pv['dias_restantes']} días). ¿Desea que le compartamos el QR oficial para su renovación anticipada?";
+                        $urlWa = !empty($telWa) ? "https://api.whatsapp.com/send?phone=" . urlencode($telWa) . "&text=" . urlencode($msgWa) : null;
+                    ?>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-2 px-3 rounded-3 bg-light border d-flex align-items-center justify-content-between gap-2">
+                                <div class="text-truncate">
+                                    <strong class="d-block text-dark text-truncate small" title="<?= htmlspecialchars($pv['nombre']) ?>">
+                                        <?= htmlspecialchars($pv['nombre']) ?>
+                                    </strong>
+                                    <div class="d-flex align-items-center gap-1 extra-small text-muted">
+                                        <span><?= $fechaFmt ?></span> &bull; 
+                                        <span class="badge <?= $pv['dias_restantes'] <= 1 ? 'bg-danger text-white' : 'bg-warning text-dark' ?> rounded-pill px-2">
+                                            <?= $pv['dias_restantes'] === 0 ? 'Vence HOY' : "Quedan {$pv['dias_restantes']}d" ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <?php if ($urlWa): ?>
+                                        <a href="<?= htmlspecialchars($urlWa) ?>" target="_blank" class="btn btn-sm btn-success rounded-pill px-2 py-1 extra-small fw-bold shadow-xs text-nowrap" title="Enviar recordatorio a WhatsApp">
+                                            <i class="bi bi-whatsapp me-1"></i> Cobrar
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-muted extra-small" title="Sin WhatsApp registrado">S/N</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
-                </ul>
+                </div>
+
+                <!-- Lista Colapsable para los restantes (si hay más de 3) -->
+                <?php if (!empty($restantes)): ?>
+                    <div class="collapse" id="collapseVencimientos">
+                        <div class="row g-2 mt-2 pt-2 border-top">
+                            <?php foreach ($restantes as $pv): 
+                                $telWa = preg_replace('/\D/', '', $pv['whatsapp_contacto'] ?: ($pv['telefono_contacto'] ?: ''));
+                                if (!empty($telWa) && strlen($telWa) === 8) $telWa = '591' . $telWa;
+                                $fechaFmt = date('d/m/Y', strtotime($pv['fecha_vencimiento']));
+                                $msgWa = "Hola *{$pv['nombre']}*, le saludamos del equipo de *BeniTours Trinidad*. Le recordamos cordialmente que su membresía comercial vence el {$fechaFmt} (quedan {$pv['dias_restantes']} días). ¿Desea que le compartamos el QR oficial para su renovación anticipada?";
+                                $urlWa = !empty($telWa) ? "https://api.whatsapp.com/send?phone=" . urlencode($telWa) . "&text=" . urlencode($msgWa) : null;
+                            ?>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="p-2 px-3 rounded-3 bg-light border d-flex align-items-center justify-content-between gap-2">
+                                        <div class="text-truncate">
+                                            <strong class="d-block text-dark text-truncate small" title="<?= htmlspecialchars($pv['nombre']) ?>">
+                                                <?= htmlspecialchars($pv['nombre']) ?>
+                                            </strong>
+                                            <div class="d-flex align-items-center gap-1 extra-small text-muted">
+                                                <span><?= $fechaFmt ?></span> &bull; 
+                                                <span class="badge <?= $pv['dias_restantes'] <= 1 ? 'bg-danger text-white' : 'bg-warning text-dark' ?> rounded-pill px-2">
+                                                    <?= $pv['dias_restantes'] === 0 ? 'Vence HOY' : "Quedan {$pv['dias_restantes']}d" ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <?php if ($urlWa): ?>
+                                                <a href="<?= htmlspecialchars($urlWa) ?>" target="_blank" class="btn btn-sm btn-success rounded-pill px-2 py-1 extra-small fw-bold shadow-xs text-nowrap" title="Enviar recordatorio a WhatsApp">
+                                                    <i class="bi bi-whatsapp me-1"></i> Cobrar
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary-subtle text-muted extra-small" title="Sin WhatsApp registrado">S/N</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     <?php endif; ?>

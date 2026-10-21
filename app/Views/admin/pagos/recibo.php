@@ -4,8 +4,16 @@
  * Optimizado para pantalla y para impresión en formato Ticket / Recibo estándar (@media print)
  */
 $nombreComercio = $pago['nombre_establecimiento'] ?? 'Comercio Afiliado';
-$reciboNumero   = $pago['numero_comprobante'] ?: ('REC-' . date('Y', strtotime($pago['created_at'])) . '-' . str_pad((string)$pago['id_pago'], 4, '0', STR_PAD_LEFT));
-$fechaPago      = date('d/m/Y', strtotime($pago['fecha_pago_declarada']));
+
+// Generar o sanitizar número oficial correlativo
+$numComp = trim((string)($pago['numero_comprobante'] ?? ''));
+if ($numComp === '' || $numComp === 'SIN-NUMERO') {
+    $reciboNumero = 'REC-' . date('Y', strtotime($pago['created_at'])) . '-' . str_pad((string)$pago['id_pago'], 5, '0', STR_PAD_LEFT);
+} else {
+    $reciboNumero = $numComp;
+}
+
+$fechaPago      = date('d/m/Y', strtotime($pago['fecha_pago_declarada'] ?: $pago['created_at']));
 $fechaRegistro  = date('d/m/Y H:i', strtotime($pago['created_at']));
 $monto          = (float)$pago['monto'];
 $meses          = (int)$pago['meses_duracion'];
@@ -13,7 +21,9 @@ $metodo         = $pago['metodo_pago'];
 $estado         = $pago['estado'];
 $contacto       = $pago['whatsapp_contacto'] ?: ($pago['telefono_contacto'] ?: 'No registrado');
 $direccion      = $pago['direccion'] ?: 'Trinidad, Beni';
-$adminNombre    = $pago['nombre_admin'] ?? 'Administración BeniTours';
+
+// Corrección de nombre administrativo: siempre BeniTours
+$adminNombre    = str_replace('BeniTurs', 'BeniTours', (string)($pago['nombre_admin'] ?? 'Administración BeniTours'));
 
 $fechaInicio = !empty($pago['fecha_inicio']) ? date('d/m/Y', strtotime($pago['fecha_inicio'])) : 'Pendiente de activación';
 $fechaFin    = !empty($pago['fecha_vencimiento']) ? date('d/m/Y', strtotime($pago['fecha_vencimiento'])) : '—';
@@ -149,7 +159,23 @@ $waUrl = "https://api.whatsapp.com/send?phone=" . urlencode($waNumero) . "&text=
             </div>
         <?php endif; ?>
 
-        <!-- Firmas -->
+        <!-- Sello de Validación Digital y Firmas Físicas -->
+        <div class="recibo-seguridad-box my-3 p-3 rounded-3 bg-light border d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-patch-check-fill text-success fs-3"></i>
+                <div>
+                    <strong class="d-block text-dark small">Comprobante Certificado Digitalmente</strong>
+                    <span class="extra-small text-muted">ID Transacción: #<?= (int)$pago['id_pago'] ?> &bull; Emisión Oficial BeniTours &bull; <?= htmlspecialchars($fechaRegistro) ?></span>
+                </div>
+            </div>
+            <div class="text-md-end">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 extra-small fw-bold">
+                    <i class="bi bi-shield-lock me-1"></i> Válido sin firma manual para fines de difusión
+                </span>
+            </div>
+        </div>
+
+        <!-- Firmas para Impresión Física -->
         <div class="recibo-firmas">
             <div class="recibo-firma-box">
                 <div class="recibo-linea-firma"></div>

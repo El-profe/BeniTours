@@ -98,24 +98,27 @@
 
                 <!-- SECCIÓN 1.1: Aprovisionamiento Comercial (Condicional si es Comercial) -->
                 <div class="form-section-card border-success-subtle bg-success-subtle bg-opacity-10 d-none" id="seccionAprovisionamientoComercial">
-                    <div class="form-section-header border-success-subtle">
-                        <div class="form-section-icon bg-success text-white">
+                    <div class="form-section-header border-success-subtle pb-3 mb-3">
+                        <div class="form-section-icon bg-success text-white shadow-xs">
                             <i class="bi bi-person-check-fill"></i>
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <h2 class="form-section-title text-success mb-0">Membresía Comercial y Cobro Inicial</h2>
-                                <span class="badge bg-success rounded-pill px-3">Alta de Comerciante</span>
+                                <h2 class="form-section-title text-success mb-0 fw-bold">Membresía Comercial y Cobro Inicial</h2>
+                                <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-semibold">Alta Directa de Comerciante</span>
                             </div>
-                            <p class="form-section-desc">Habilita usuario, contraseña y vigencia pagada en un solo paso.</p>
+                            <p class="form-section-desc mb-0">Genera credenciales de acceso, cobra el primer periodo y activa la visibilidad en un solo paso.</p>
                         </div>
                     </div>
 
-                    <div class="form-check form-switch mb-3 p-2 bg-white rounded-3 border">
-                        <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" name="crear_cuenta" id="switchCrearCuenta" value="1" checked>
-                        <label class="form-check-label fw-bold text-dark small" for="switchCrearCuenta">
-                            Aprovisionar cuenta y registrar cobro en el sistema de inmediato
-                        </label>
+                    <div class="form-check form-switch mb-3 p-3 bg-white rounded-4 border shadow-xs d-flex align-items-center justify-content-between">
+                        <div>
+                            <label class="form-check-label fw-bold text-dark mb-0 d-block" for="switchCrearCuenta">
+                                Aprovisionar cuenta comercial y registrar cobro de inmediato
+                            </label>
+                            <small class="text-muted extra-small">Si está activo, se emitirá el recibo, credenciales automáticas y la vigencia inicial.</small>
+                        </div>
+                        <input class="form-check-input fs-4 ms-3" type="checkbox" role="switch" name="crear_cuenta" id="switchCrearCuenta" value="1" checked>
                     </div>
 
                     <div class="row g-3" id="camposAprovisionamiento">
@@ -131,14 +134,14 @@
                                 <label class="form-label fw-bold small text-dark mb-0">
                                     <i class="bi bi-calendar-check text-success me-1"></i>Plan de Membresía & Periodo Inicial
                                 </label>
-                                <span class="badge bg-white text-muted border">Tarifa Base: Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>/mes</span>
+                                <span class="badge bg-white text-muted border rounded-pill px-3 py-1">Tarifa Base: Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>/mes</span>
                             </div>
 
-                            <div class="btn-group w-100 p-1 bg-white rounded-4 border mb-3" role="group">
-                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-modo-lugar active" id="btnModoLugarEstandar" onclick="seleccionarModoPlanLugar('ESTANDAR')">
+                            <div class="btn-group w-100 p-1 bg-white rounded-4 border mb-3 shadow-xs" role="group">
+                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-modo-lugar active py-2" id="btnModoLugarEstandar" onclick="seleccionarModoPlanLugar('ESTANDAR')">
                                     <i class="bi bi-grid-fill me-1"></i> Planes Predefinidos
                                 </button>
-                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-modo-lugar" id="btnModoLugarPersonalizado" onclick="seleccionarModoPlanLugar('PERSONALIZADO')">
+                                <button type="button" class="btn btn-sm rounded-pill fw-semibold btn-modo-lugar py-2" id="btnModoLugarPersonalizado" onclick="seleccionarModoPlanLugar('PERSONALIZADO')">
                                     <i class="bi bi-star-fill text-warning me-1"></i> Plan Personalizado (A Medida)
                                 </button>
                             </div>
@@ -147,34 +150,35 @@
                             <div id="seccion-lugar-planes-estandar">
                                 <div class="row g-2">
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-2 text-center border-2 cursor-pointer active" id="cardPlanLugar1" onclick="elegirPlanEstandarLugar(1, 250.00, 1, 0, 'MENSUAL')">
-                                            <span class="badge bg-light text-muted extra-small mb-1">Básico</span>
-                                            <div class="fw-bold text-dark small">1 Mes</div>
-                                            <span class="text-success fw-bold small">Bs 250</span>
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer active" id="cardPlanLugar1" onclick="elegirPlanEstandarLugar(1, 250.00, 1, 0, 'MENSUAL')">
+                                            <span class="badge bg-light text-secondary rounded-pill extra-small mb-2 fw-semibold">Básico</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">1 Mes</div>
+                                            <div class="text-success fw-bold fs-5">Bs 250</div>
+                                            <small class="text-muted extra-small d-block mt-1">Tarifa mensual</small>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-2 text-center border-2 cursor-pointer" id="cardPlanLugar3" onclick="elegirPlanEstandarLugar(3, 712.50, 1, 37.50, 'MENSUAL')">
-                                            <span class="badge bg-info-subtle text-info-emphasis extra-small mb-1">Trimestral</span>
-                                            <div class="fw-bold text-dark small">3 Meses</div>
-                                            <span class="text-success fw-bold small">Bs 712.50</span>
-                                            <small class="text-success fw-semibold extra-small d-block">Ahorra 5%</small>
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar3" onclick="elegirPlanEstandarLugar(3, 712.50, 1, 37.50, 'MENSUAL')">
+                                            <span class="badge bg-info-subtle text-info-emphasis rounded-pill extra-small mb-2 fw-semibold">Trimestral</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">3 Meses</div>
+                                            <div class="text-success fw-bold fs-5">Bs 712.50</div>
+                                            <span class="badge bg-success-subtle text-success rounded-pill extra-small mt-1 fw-bold">Ahorra 5%</span>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-2 text-center border-2 cursor-pointer" id="cardPlanLugar6" onclick="elegirPlanEstandarLugar(6, 1350.00, 1, 150.00, 'MENSUAL')">
-                                            <span class="badge bg-primary-subtle text-primary extra-small mb-1">Semestral</span>
-                                            <div class="fw-bold text-dark small">6 Meses</div>
-                                            <span class="text-success fw-bold small">Bs 1,350</span>
-                                            <small class="text-success fw-semibold extra-small d-block">Ahorra 10%</small>
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar6" onclick="elegirPlanEstandarLugar(6, 1350.00, 1, 150.00, 'MENSUAL')">
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill extra-small mb-2 fw-semibold">Semestral</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">6 Meses</div>
+                                            <div class="text-success fw-bold fs-5">Bs 1,350</div>
+                                            <span class="badge bg-success-subtle text-success rounded-pill extra-small mt-1 fw-bold">Ahorra 10%</span>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-2 text-center border-2 cursor-pointer" id="cardPlanLugar12" onclick="elegirPlanEstandarLugar(12, 2500.00, 2, 500.00, 'ANUAL')">
-                                            <span class="badge bg-warning text-dark fw-bold extra-small mb-1">★ Anual</span>
-                                            <div class="fw-bold text-dark small">12 Meses</div>
-                                            <span class="text-success fw-bold small">Bs 2,500</span>
-                                            <small class="text-success fw-bold extra-small d-block">Ahorra Bs 500</small>
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer border-warning" id="cardPlanLugar12" onclick="elegirPlanEstandarLugar(12, 2500.00, 2, 500.00, 'ANUAL')">
+                                            <span class="badge bg-warning text-dark rounded-pill extra-small mb-2 fw-bold">★ Recomendado</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">12 Meses</div>
+                                            <div class="text-success fw-bold fs-5">Bs 2,500</div>
+                                            <span class="badge bg-warning text-dark rounded-pill extra-small mt-1 fw-bold">Ahorra Bs 500</span>
                                         </div>
                                     </div>
                                 </div>
@@ -201,7 +205,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold extra-small text-dark mb-1">Descuento o Beneficio de Ahorro:</label>
-                                        <select id="selectReglaLugar" class="form-select form-select-sm" onchange="recalcularPlanPersonalizadoLugar()">
+                                        <select id="selectReglaLugar" class="form-select form-select-sm rounded-3" onchange="recalcularPlanPersonalizadoLugar()">
                                             <option value="0">Sin descuento (Tarifa regular 100%)</option>
                                             <option value="5">5% de Descuento comercial</option>
                                             <option value="10" selected>10% de Descuento preferencial (Sugerido)</option>
@@ -216,85 +220,146 @@
                             </div>
                         </div>
 
-                        <!-- Tarjeta Dinámica de Liquidación & Ahorro -->
+                        <!-- Tarjeta Dinámica de Liquidación & Cobro POS -->
                         <div class="col-12">
-                            <div class="p-3 bg-white rounded-3 border">
-                                <div class="row g-2 align-items-center">
+                            <div class="p-3 p-md-4 bg-white rounded-4 border shadow-sm">
+                                <div class="row g-3 align-items-center">
                                     <div class="col-md-7">
-                                        <div class="d-flex justify-content-between align-items-center mb-1 text-muted extra-small">
-                                            <span>Precio regular (<span id="txt-lugar-calc-meses">5</span> meses × Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>):</span>
-                                            <span class="text-decoration-line-through fw-bold" id="txt-lugar-precio-regular">Bs 1,250.00</span>
+                                        <div class="d-flex justify-content-between align-items-center mb-2 text-muted extra-small">
+                                            <span>Precio regular (<span id="txt-lugar-calc-meses">1</span> mes(es) × Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>):</span>
+                                            <span class="text-decoration-line-through fw-bold" id="txt-lugar-precio-regular">Bs 250.00</span>
                                         </div>
 
-                                        <div id="caja-ahorro-lugar" class="alert alert-success py-2 px-3 mb-1 d-flex align-items-center gap-2 rounded-3 border border-success-subtle">
+                                        <div id="caja-ahorro-lugar" class="alert alert-light py-2 px-3 mb-2 d-flex align-items-center gap-2 rounded-3 border">
                                             <i class="bi bi-piggy-bank-fill fs-4 text-success flex-shrink-0"></i>
                                             <div>
                                                 <div class="fw-bold text-success small" id="txt-lugar-ahorro-banner">
-                                                    ¡El cliente se ahorra Bs 125.00 (10.0%)!
+                                                    Tarifa regular estándar (Bs 250.00/mes)
                                                 </div>
                                                 <div class="extra-small text-muted">
-                                                    Equivale a pagar <strong class="text-success" id="txt-lugar-costo-mensual">Bs 225.00</strong> por mes.
+                                                    Equivale a pagar <strong class="text-success" id="txt-lugar-costo-mensual">Bs 250.00</strong> por mes.
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="extra-small text-muted mt-1">
+                                        <div class="extra-small text-muted">
                                             <i class="bi bi-calendar-range text-primary me-1"></i>
                                             <span id="txt-lugar-proyeccion">Vigencia inicial proyectada...</span>
                                         </div>
                                     </div>
+
                                     <div class="col-md-5">
-                                        <label class="form-label fw-bold extra-small text-dark mb-1">Importe Inicial a Cobrar (Bs) *</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light text-success fw-bold border-end-0">Bs</span>
-                                            <input type="number" step="0.01" name="monto" id="inputLugarMonto" class="form-control fw-bold fs-5 text-success border-start-0 text-center" value="1125.00" required oninput="alCambiarMontoLugarManual()">
+                                        <div class="p-3 bg-light rounded-4 border text-center">
+                                            <label class="form-label fw-bold extra-small text-uppercase text-secondary mb-1 d-block">
+                                                Importe Inicial a Cobrar
+                                            </label>
+                                            <div class="input-group input-group-lg justify-content-center">
+                                                <span class="input-group-text bg-white text-success fw-bold border-end-0 rounded-start-pill">Bs</span>
+                                                <input type="number" step="0.01" name="monto" id="inputLugarMonto" class="form-control fw-bold fs-4 text-success border-start-0 text-center rounded-end-pill bg-white" value="250.00" required oninput="alCambiarMontoLugarManual()">
+                                            </div>
+                                            <small class="text-muted extra-small d-block mt-1">Monto que quedará registrado en el recibo de alta.</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Método de Cobro y Nº Comprobante -->
+                        <!-- Método de Cobro y Comprobante / Recibo -->
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-dark">Método de Cobro *</label>
-                            <select name="metodo_pago" id="selectMetodoPagoLugar" class="form-select form-select-sm">
+                            <label class="form-label fw-bold small text-dark">
+                                <i class="bi bi-wallet2 text-success me-1"></i>Método de Cobro *
+                            </label>
+                            <select name="metodo_pago" id="selectMetodoPagoLugar" class="form-select rounded-3">
                                 <option value="EFECTIVO" selected>💵 Efectivo (Cobrado en mano)</option>
                                 <option value="QR">📱 QR Simple</option>
                                 <option value="TRANSFERENCIA">🏦 Transferencia Bancaria</option>
                             </select>
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-dark">Nº Recibo / Talonario</label>
-                            <input type="text" name="numero_comprobante" class="form-control form-control-sm" placeholder="Ej. REC-001 (Opcional)">
+                            <label class="form-label fw-bold small text-dark">
+                                <i class="bi bi-hash text-secondary me-1"></i>Nº Recibo / Talonario / Ref.
+                            </label>
+                            <input type="text" name="numero_comprobante" class="form-control rounded-3" placeholder="Ej. REC-001 o Nº Transacción (Opcional)">
                         </div>
 
                         <?php
                             $qrPathLugar = !empty($cobro['qr_url']) ? $cobro['qr_url'] : '/assets/img/QR-Prueba.jpeg';
                             $qrFullPathLugar = $baseUrl . $qrPathLugar;
                         ?>
-                        <div class="col-12" id="panelQrMembresia" hidden>
-                            <div class="qr-membresia-panel rounded-4 p-3 p-md-4">
+
+                        <!-- Contenedor Unificado: Código QR y Carga de Comprobante (Para QR y Transferencia) -->
+                        <div class="col-12" id="contenedorComprobantePago" style="display: none;">
+                            <div class="p-3 p-md-4 rounded-4 bg-white border border-primary-subtle shadow-xs">
+                                
+                                <!-- Inputs file ocultos (para archivo y cámara directa) -->
+                                <input type="file" name="comprobante_pago" id="inputComprobantePago" class="d-none" accept="image/jpeg,image/png,image/webp">
+                                <input type="file" id="inputComprobanteCamara" class="d-none" accept="image/*" capture="environment">
+
                                 <div class="row align-items-center g-3">
-                                    <div class="col-md-auto text-center">
-                                        <div class="bg-white rounded-4 border shadow-sm p-2 d-inline-block">
-                                            <img src="<?= htmlspecialchars($qrFullPathLugar) ?>" alt="QR para el cobro de membresía" class="img-fluid rounded-3" style="width: 180px; height: 180px; object-fit: contain;">
+                                    
+                                    <!-- QR Oficial BeniTours (Visible en modo QR) -->
+                                    <div class="col-12 col-md-auto text-center" id="columnaQrMembresia">
+                                        <div class="bg-light p-2 rounded-4 border d-inline-block shadow-2xs">
+                                            <img src="<?= htmlspecialchars($qrFullPathLugar) ?>" 
+                                                 alt="QR Oficial BeniTours" 
+                                                 class="img-fluid rounded-3 qr-img-responsive" 
+                                                 id="imgQrMembresia">
+                                        </div>
+                                        <?php if (!empty($cobro['banco'])): ?>
+                                            <div class="mt-1 extra-small text-muted fw-semibold d-block">
+                                                <?= htmlspecialchars($cobro['banco']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Acciones de Comprobante: Botones y Previsualización -->
+                                    <div class="col-12 col-md">
+                                        <div class="d-flex flex-column justify-content-center h-100">
+                                            <!-- Botones Subir Archivo y Sacar Foto -->
+                                            <div class="d-flex flex-wrap gap-2 mb-2 justify-content-center justify-content-md-start">
+                                                <button type="button" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold shadow-xs" id="btnSubirComprobanteArchivo">
+                                                    <i class="bi bi-folder2-open me-1"></i> Subir Archivo
+                                                </button>
+                                                <button type="button" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-xs" id="btnTomarFotoComprobante">
+                                                    <i class="bi bi-camera-fill me-1"></i> Sacar Foto
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger rounded-pill px-2 py-2 d-none shadow-xs" id="btnEliminarComprobante" title="Quitar comprobante">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Nombre de archivo seleccionado -->
+                                            <div id="nombreArchivoComprobante" class="extra-small text-truncate text-secondary fw-semibold mb-2 text-center text-md-start" style="max-width: 100%;"></div>
+
+                                            <!-- Vista Previa / Estado del Comprobante -->
+                                            <div id="previewComprobanteBox" class="d-none text-center text-md-start">
+                                                <img src="" id="imgPreviewComprobante" alt="Comprobante" class="rounded-3 border shadow-sm" style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                                            </div>
+                                            <div id="placeholderComprobanteBox" class="p-2 p-md-3 text-muted border border-dashed rounded-3 bg-light extra-small text-center text-md-start">
+                                                <i class="bi bi-receipt text-secondary me-1"></i> Sin comprobante adjuntado aún
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md">
-                                        <span class="badge rounded-pill px-3 py-2 mb-2 bg-primary">
-                                            <i class="bi bi-qr-code-scan me-1"></i> Pago por QR
-                                        </span>
-                                        <h3 class="h6 fw-bold text-dark mb-2">Escanea el QR para cobrar la membresía</h3>
-                                        <p class="small text-muted mb-2">Confirma el pago antes de guardar la ficha comercial.</p>
-                                        <div class="small text-dark">
-                                            <strong class="d-block"><?= htmlspecialchars($cobro['banco'] ?? 'Banco Unión / Ganadero') ?></strong>
-                                            Titular: <?= htmlspecialchars($cobro['titular'] ?? 'Directorio BeniTours') ?><br>
-                                            Cuenta: <span class="font-monospace fw-semibold"><?= htmlspecialchars($cobro['cuenta'] ?? 'No configurada') ?></span>
-                                        </div>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Estilos inline responsivos para el QR -->
+                        <style>
+                            .qr-img-responsive {
+                                width: 170px;
+                                height: 170px;
+                                object-fit: contain;
+                            }
+                            @media (max-width: 767.98px) {
+                                .qr-img-responsive {
+                                    width: 240px;
+                                    height: 240px;
+                                }
+                            }
+                        </style>
                     </div>
                 </div>
 
@@ -507,27 +572,30 @@
 
 <style>
 .card-plan-lugar {
-    transition: all 0.2s ease-in-out;
-    background: #fff;
-    border-color: #dee2e6;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
 }
 .card-plan-lugar:hover {
-    border-color: #2A9D8F;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-color: #0d9488;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(13, 148, 136, 0.08);
 }
 .card-plan-lugar.active {
-    border-color: #2A9D8F !important;
-    background-color: rgba(42, 157, 143, 0.05);
+    border-color: #0d9488 !important;
+    background-color: #f0fdfa !important;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25), 0 8px 18px rgba(13, 148, 136, 0.12) !important;
+    transform: translateY(-2px);
 }
 .btn-modo-lugar.active {
     background-color: #ffffff !important;
-    color: #217E73 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    color: #0f766e !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .qr-membresia-panel {
-    background: linear-gradient(135deg, #EEF5F7, #DDF4F1);
-    border: 1px solid #9BD9D0;
+    background: linear-gradient(135deg, #f0fdfa, #e6fffa);
+    border: 1px solid #99f6e4;
 }
 </style>
 
@@ -665,14 +733,102 @@ function actualizarDesgloseAhorroLugar(meses, monto, ahorro) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    actualizarDesgloseAhorroLugar(1, TARIFA_BASE_LUGAR, 0);
+    // Inicializar siempre con Plan Básico de 1 Mes y Bs 250.00
+    elegirPlanEstandarLugar(1, TARIFA_BASE_LUGAR, 1, 0, 'MENSUAL');
 
     const metodoPago = document.getElementById('selectMetodoPagoLugar');
-    const panelQr = document.getElementById('panelQrMembresia');
-    const actualizarPanelQr = () => {
-        panelQr.hidden = metodoPago.value !== 'QR';
+    const columnaQr = document.getElementById('columnaQrMembresia');
+    const contenedorComprobante = document.getElementById('contenedorComprobantePago');
+    const inputComprobante = document.getElementById('inputComprobantePago');
+    const previewComprobanteBox = document.getElementById('previewComprobanteBox');
+    const placeholderComprobanteBox = document.getElementById('placeholderComprobanteBox');
+    const imgPreviewComprobante = document.getElementById('imgPreviewComprobante');
+
+    const actualizarMetodoPagoUI = () => {
+        const metodo = metodoPago?.value || 'EFECTIVO';
+        // Mostrar contenedor si es QR o Transferencia Bancaria
+        if (contenedorComprobante) {
+            contenedorComprobante.style.display = (metodo === 'QR' || metodo === 'TRANSFERENCIA') ? 'block' : 'none';
+        }
+        // El QR solo es necesario si el método es QR
+        if (columnaQr) {
+            columnaQr.style.display = (metodo === 'QR') ? 'block' : 'none';
+        }
     };
-    metodoPago.addEventListener('change', actualizarPanelQr);
-    actualizarPanelQr();
+
+    metodoPago?.addEventListener('change', actualizarMetodoPagoUI);
+    actualizarMetodoPagoUI();
+
+    // Elementos para gestión de comprobante de pago
+    const btnSubirArchivo = document.getElementById('btnSubirComprobanteArchivo');
+    const btnTomarFoto = document.getElementById('btnTomarFotoComprobante');
+    const btnEliminar = document.getElementById('btnEliminarComprobante');
+    const inputCamara = document.getElementById('inputComprobanteCamara');
+    const nombreArchivo = document.getElementById('nombreArchivoComprobante');
+
+    const mostrarPreviewComprobante = (file) => {
+        if (!file) {
+            limpiarComprobante();
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (imgPreviewComprobante) imgPreviewComprobante.src = e.target.result;
+            previewComprobanteBox?.classList.remove('d-none');
+            placeholderComprobanteBox?.classList.add('d-none');
+            btnEliminar?.classList.remove('d-none');
+            if (nombreArchivo) {
+                nombreArchivo.textContent = '📎 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const limpiarComprobante = () => {
+        if (inputComprobante) inputComprobante.value = '';
+        if (inputCamara) inputCamara.value = '';
+        if (imgPreviewComprobante) imgPreviewComprobante.src = '';
+        previewComprobanteBox?.classList.add('d-none');
+        placeholderComprobanteBox?.classList.remove('d-none');
+        btnEliminar?.classList.add('d-none');
+        if (nombreArchivo) nombreArchivo.textContent = '';
+    };
+
+    btnSubirArchivo?.addEventListener('click', () => {
+        inputComprobante?.click();
+    });
+
+    btnTomarFoto?.addEventListener('click', () => {
+        inputCamara?.click();
+    });
+
+    btnEliminar?.addEventListener('click', () => {
+        limpiarComprobante();
+    });
+
+    // Evento al seleccionar archivo desde el explorador / galería
+    inputComprobante?.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            mostrarPreviewComprobante(file);
+        } else {
+            limpiarComprobante();
+        }
+    });
+
+    // Evento al tomar foto con la cámara (transfiere el archivo al input principal del formulario)
+    inputCamara?.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file && inputComprobante) {
+            try {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                inputComprobante.files = dt.files;
+            } catch (err) {
+                console.warn('DataTransfer no soportado, manteniendo archivo de cámara', err);
+            }
+            mostrarPreviewComprobante(file);
+        }
+    });
 });
 </script>

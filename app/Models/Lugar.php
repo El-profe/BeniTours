@@ -105,6 +105,7 @@ class Lugar {
                        c.nombre AS categoria, c.icono AS categoria_icono,
                        m.nombre AS municipio, m.provincia AS municipio_provincia,
                        pub.aprobado, pub.habilitado, pub.motivo_suspension,
+                       pub.baja_voluntaria, pub.baja_fecha, pub.baja_motivo, pub.baja_comentario,
                        v.fecha_vencimiento,
                        (SELECT f.nombre_archivo FROM fotografias f WHERE f.id_lugar = l.id_lugar AND f.es_principal = 1 LIMIT 1) AS imagen,
                        CASE WHEN {$visibilidad} THEN 1 ELSE 0 END AS es_visible

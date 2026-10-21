@@ -17,7 +17,7 @@ class Pago {
     public function registrar(array $datos): int {
         $meses = filter_var($datos['meses_duracion'] ?? null, FILTER_VALIDATE_INT);
         if ($meses === false || $meses < 1 || $meses > 120) {
-            throw new \InvalidArgumentException('La duraciÃ³n del plan debe ser entre 1 y 120 meses.');
+            throw new \InvalidArgumentException('La duración del plan debe ser entre 1 y 120 meses.');
         }
         $sql = "INSERT INTO pagos (
                     id_lugar, id_tarifa, monto, meses_duracion, fecha_pago_declarada,
@@ -97,5 +97,23 @@ class Pago {
         $sql = "UPDATE pagos SET estado = 'ANULADO', observaciones = CONCAT(COALESCE(observaciones, ''), ' [ANULADO: ', :motivo, ']') WHERE id_pago = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':motivo' => $motivo, ':id' => $idPago]);
+    }
+
+    /**
+     * Retorna el historial de pagos y renovaciones de un lugar o comercio específico
+     */
+    public function listarPorLugar(int $idLugar): array {
+        $sql = "SELECT p.*, l.nombre AS nombre_establecimiento,
+                       v.fecha_inicio, v.fecha_vencimiento, v.tipo_periodo,
+                       a.nombre AS nombre_admin
+                FROM pagos p
+                INNER JOIN lugares l ON p.id_lugar = l.id_lugar
+                LEFT JOIN vigencias v ON v.id_pago = p.id_pago
+                LEFT JOIN administradores a ON p.id_administrador_confirmacion = a.id_administrador
+                WHERE p.id_lugar = :id_lugar
+                ORDER BY p.id_pago DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_lugar' => $idLugar]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

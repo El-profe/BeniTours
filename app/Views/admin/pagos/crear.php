@@ -35,34 +35,67 @@
                     <input type="hidden" name="tipo_plan_modalidad" id="tipo_plan_modalidad" value="ESTANDAR">
 
                     <div class="row g-3">
-                        <!-- 1. Selección del Comercio -->
+                        <!-- 1. Buscador Inteligente de Comercio con Tarjetas Interactivas -->
                         <div class="col-12">
-                            <label class="form-label fw-bold small text-dark">
-                                <i class="bi bi-shop me-1 text-primary"></i>Establecimiento Comercial *
-                            </label>
-                            <select name="id_lugar" id="pago-lugar" class="form-select form-select-lg fs-6" required>
-                                <option value="">Seleccione el comercio afiliado en Trinidad...</option>
-                                <?php foreach ($comercios as $c): ?>
-                                    <?php 
-                                        $esSeleccionado = ((int)$c['id_lugar'] === (int)$idLugarSeleccionado);
-                                        $vencimiento = !empty($c['ultimo_vencimiento']) ? date('d/m/Y', strtotime($c['ultimo_vencimiento'])) : '';
-                                        $vencimientoRaw = $c['ultimo_vencimiento'] ?? '';
-                                    ?>
-                                    <option value="<?= $c['id_lugar'] ?>" 
-                                            data-nombre="<?= htmlspecialchars($c['nombre'] ?? '') ?>"
-                                            data-whatsapp="<?= htmlspecialchars($c['whatsapp_contacto'] ?? '') ?>"
-                                            data-telefono="<?= htmlspecialchars($c['telefono_contacto'] ?? '') ?>"
-                                            data-direccion="<?= htmlspecialchars($c['direccion'] ?? '') ?>"
-                                            data-plan="<?= htmlspecialchars($c['plan_solicitado'] ?? '') ?>"
-                                            data-vencimiento="<?= htmlspecialchars($vencimientoRaw) ?>"
-                                            data-vencimiento-fmt="<?= htmlspecialchars($vencimiento) ?>"
-                                            <?= $esSeleccionado ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($c['nombre']) ?> <?= $vencimiento ? " (Vence: {$vencimiento})" : " (Sin vigencia previa)" ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            
-                            <!-- Banner contextual de vigencia actual del comercio -->
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                <label class="form-label fw-bold small text-dark mb-0">
+                                    <i class="bi bi-shop me-1 text-primary"></i>Buscar Comercio Afiliado *
+                                </label>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 extra-small">
+                                    <?= count($comercios) ?> comercios en Trinidad
+                                </span>
+                            </div>
+
+                            <!-- Input oculto para el envío del formulario -->
+                            <input type="hidden" name="id_lugar" id="pago-lugar" value="<?= $idLugarSeleccionado ?: '' ?>" required>
+
+                            <!-- Bloque de Búsqueda Activa -->
+                            <div id="bloqueBuscadorComercio">
+                                <div class="input-group input-group-lg shadow-xs rounded-4 overflow-hidden border border-primary-subtle">
+                                    <span class="input-group-text bg-white border-0 text-primary ps-3">
+                                        <i class="bi bi-search fs-5"></i>
+                                    </span>
+                                    <input type="text" id="inputBuscarComercio" class="form-control border-0 fs-6 ps-2" 
+                                           placeholder="Escribe el nombre del comercio (ej. Framon, El Cuadril, etc.)..." 
+                                           autocomplete="off">
+                                    <button class="btn btn-white border-0 text-muted pe-3" type="button" id="btnLimpiarBusqueda" title="Limpiar búsqueda" style="display: none;">
+                                        <i class="bi bi-x-circle-fill fs-5"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text extra-small text-muted mt-1 ps-1">
+                                    Escribe una o varias letras para ver las tarjetas con su foto y fecha de vencimiento.
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta de Comercio Seleccionado (Se muestra cuando se elige uno) -->
+                            <div id="tarjetaComercioFijado" class="p-3 rounded-4 bg-white border border-success shadow-xs d-none">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img id="fijadoFoto" src="" alt="Comercio" class="rounded-3 border shadow-2xs" style="width: 58px; height: 58px; object-fit: cover;">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <h5 class="fw-bold text-dark mb-0" id="fijadoNombre">Nombre</h5>
+                                                <span class="badge rounded-pill px-2 py-1 extra-small" id="fijadoBadgeEstado">Estado</span>
+                                            </div>
+                                            <div class="extra-small text-muted mt-1" id="fijadoDetalles">
+                                                <i class="bi bi-geo-alt me-1"></i>Trinidad, Beni
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-xs" id="btnCambiarComercio">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Cambiar Comercio
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor Dinámico de Tarjetas de Sugerencias -->
+                            <div id="contenedorTarjetasComercios" class="row g-2 mt-1" style="max-height: 380px; overflow-y: auto;">
+                                <!-- Se llenan dinámicamente con JavaScript -->
+                            </div>
+
+                            <!-- Tarjeta Contextual de Vigencia del Comercio Seleccionado -->
                             <div id="info-vigencia-comercio" class="mt-2" style="display: none;"></div>
                         </div>
 
@@ -291,58 +324,55 @@
                             </div>
                         </div>
 
-                        <!-- Panel B: Flujo Pago por QR / Transferencia (QR en pantalla + Cámara de Comprobante) -->
+                        <!-- Panel B: Flujo Pago por QR / Transferencia (QR responsivo + Botones limpios) -->
                         <div class="col-12" id="panelFlujoQR" style="display: none;">
-                            <div class="p-3 p-md-4 rounded-4 border border-primary-subtle bg-primary-subtle bg-opacity-10">
-                                <div class="row g-3 align-items-center">
-                                    <!-- Visualización del QR para que el cliente lo escanee -->
-                                    <div class="col-md-5 text-center border-end-md">
-                                        <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-bold mb-2">
-                                            <i class="bi bi-qr-code-scan me-1"></i> Escanear para Pagar
-                                        </span>
+                            <div class="p-3 p-md-4 rounded-4 border border-primary-subtle bg-white shadow-xs">
+                                <div class="row align-items-center g-3">
+                                    <!-- QR Oficial (Lateral en PC, Arriba y Grande en Móvil) -->
+                                    <div class="col-12 col-md-auto text-center" id="columnaQrCobro">
                                         <?php 
                                             $qrPath = $cobro['qr_url'] ?? '/assets/img/QR-Prueba.jpeg';
                                             $qrFullPath = $baseUrl . $qrPath;
                                         ?>
-                                        <div class="bg-white p-2 d-inline-block rounded-4 shadow-sm border my-2">
-                                            <img src="<?= htmlspecialchars($qrFullPath) ?>" id="imgQrCobro" alt="QR de Recaudación" class="img-fluid rounded-3" style="max-height: 190px; object-fit: contain;">
+                                        <div class="bg-light p-2 d-inline-block rounded-4 shadow-2xs border">
+                                            <img src="<?= htmlspecialchars($qrFullPath) ?>" id="imgQrCobro" alt="QR Oficial BeniTours" class="img-fluid rounded-3 qr-pago-responsive">
                                         </div>
-                                        <div class="extra-small text-muted">
-                                            <strong class="text-dark d-block"><?= htmlspecialchars($cobro['banco'] ?? 'Banco Unión / Ganadero') ?></strong>
-                                            Titular: <?= htmlspecialchars($cobro['titular'] ?? 'Directorio BeniTurs') ?><br>
-                                            Cta: <span class="font-monospace fw-bold text-dark"><?= htmlspecialchars($cobro['cuenta'] ?? '1234567890') ?></span>
-                                        </div>
+                                        <?php if (!empty($cobro['banco'])): ?>
+                                            <div class="mt-1 extra-small text-muted fw-semibold d-block">
+                                                <?= htmlspecialchars($cobro['banco']) ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
 
-                                    <!-- Captura directa de foto con cámara o carga de archivo -->
-                                    <div class="col-md-7">
-                                        <label class="form-label fw-bold small text-dark mb-1">
-                                            <i class="bi bi-camera-fill text-primary me-1"></i>Capturar / Subir Foto del Comprobante
-                                        </label>
-                                        <p class="extra-small text-muted mb-2">
-                                            Toma una foto al comprobante del cliente o selecciona la captura de pantalla:
-                                        </p>
+                                    <!-- Acciones de Comprobante: Botones y Previsualización -->
+                                    <div class="col-12 col-md">
+                                        <div class="d-flex flex-column justify-content-center h-100">
+                                            <!-- Botones Subir Archivo y Sacar Foto -->
+                                            <div class="d-flex flex-wrap gap-2 mb-2 justify-content-center justify-content-md-start">
+                                                <button type="button" class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold shadow-xs" id="btnSubirArchivoPago">
+                                                    <i class="bi bi-folder2-open me-1"></i> Subir Archivo
+                                                </button>
+                                                <button type="button" class="btn btn-outline-success rounded-pill px-3 py-2 fw-semibold shadow-xs" id="btnTomarFotoPago">
+                                                    <i class="bi bi-camera-fill me-1"></i> Sacar Foto
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger rounded-pill px-2 py-2 d-none shadow-xs" id="btnQuitarFoto" title="Quitar comprobante">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
 
-                                        <!-- Botonera de Cámara / Archivo -->
-                                        <div class="d-flex gap-2 flex-wrap mb-3">
-                                            <label class="btn btn-outline-primary rounded-pill px-3 py-2 btn-sm fw-bold cursor-pointer">
-                                                <i class="bi bi-camera me-1"></i> Sacar foto con Cámara
-                                                <input type="file" id="inputCamaraComprobante" name="comprobante_archivo" accept="image/*" capture="environment" class="d-none" onchange="procesarFotoComprobante(this)">
-                                            </label>
-                                            <label class="btn btn-light border rounded-pill px-3 py-2 btn-sm fw-semibold cursor-pointer">
-                                                <i class="bi bi-folder2-open me-1"></i> Elegir de Galería / PC
-                                                <input type="file" id="inputArchivoComprobante" accept="image/jpeg,image/png,image/webp" class="d-none" onchange="procesarFotoComprobante(this)">
-                                            </label>
-                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2" id="btnQuitarFoto" onclick="quitarFotoComprobante()" style="display: none;" title="Quitar comprobante">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
+                                            <!-- Inputs file ocultos -->
+                                            <input type="file" id="inputCamaraComprobante" name="comprobante_archivo" accept="image/*" capture="environment" class="d-none">
+                                            <input type="file" id="inputArchivoComprobante" accept="image/jpeg,image/png,image/webp" class="d-none">
 
-                                        <!-- Previsualización de la foto capturada -->
-                                        <div id="contenedorPreviewFoto" class="p-2 border rounded-3 bg-white text-center" style="display: none;">
-                                            <img id="previewFotoImg" src="" alt="Comprobante capturado" class="img-fluid rounded-2 shadow-xs" style="max-height: 180px;">
-                                            <div class="extra-small text-success fw-bold mt-1">
-                                                <i class="bi bi-check-circle-fill me-1"></i> Foto del comprobante cargada correctamente
+                                            <!-- Nombre de archivo seleccionado -->
+                                            <div id="nombreArchivoPago" class="extra-small text-truncate text-secondary fw-semibold mb-2 text-center text-md-start" style="max-width: 100%;"></div>
+
+                                            <!-- Previsualización de la foto capturada -->
+                                            <div id="contenedorPreviewFoto" class="d-none text-center text-md-start">
+                                                <img id="previewFotoImg" src="" alt="Comprobante capturado" class="rounded-3 border shadow-sm" style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                                            </div>
+                                            <div id="placeholderFotoBox" class="p-2 p-md-3 text-muted border border-dashed rounded-3 bg-light extra-small text-center text-md-start">
+                                                <i class="bi bi-receipt text-secondary me-1"></i> Sin comprobante adjuntado aún
                                             </div>
                                         </div>
                                     </div>
@@ -410,69 +440,298 @@
     color: #217E73 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
+.qr-pago-responsive {
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+}
+@media (max-width: 767.98px) {
+    .qr-pago-responsive {
+        width: 240px;
+        height: 240px;
+    }
+}
+.card-resultado-comercio {
+    transition: all 0.2s ease-in-out;
+    border-color: #e2e8f0;
+}
+.card-resultado-comercio:hover {
+    border-color: #0d9488 !important;
+    background-color: #f0fdfa !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.12);
+}
 </style>
 
 <script>
 const TARIFA_BASE_MENSUAL = <?= (float)($tarifa['monto_mensual'] ?? 250.00) ?>;
+const BASE_URL_APP = <?= json_encode($baseUrl) ?>;
+const COMERCIOS_DATA = <?= json_encode($comercios, JSON_UNESCAPED_UNICODE) ?>;
 let modoActual = 'ESTANDAR'; // 'ESTANDAR' o 'PERSONALIZADO'
 let mesesSeleccionados = 1;
 let reglaDescuentoManual = false;
+let comercioSeleccionadoObj = null;
+
+// Placeholder SVG institucional limpio en base64 para evitar errores 404 o bucles onerror
+const PLACEHOLDER_COMERCIO_SVG = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20fill%3D%22none%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20rx%3D%2212%22%20fill%3D%22%23F1F5F9%22%2F%3E%3Cpath%20d%3D%22M18%2038V28M42%2038V28M16%2028H44M20%2028L23%2020H37L40%2028M26%2038V32H34V38%22%20stroke%3D%22%230D9488%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E";
+
+function resolverFotoComercio(nombreArchivo) {
+    if (!nombreArchivo) return PLACEHOLDER_COMERCIO_SVG;
+    return `${BASE_URL_APP}/imagen?f=${encodeURIComponent(nombreArchivo)}`;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Escuchar cambio de comercio para mostrar estado de vigencia y recalcular
-    const selectLugar = document.getElementById('pago-lugar');
-    if (selectLugar) {
-        selectLugar.addEventListener('change', alCambiarComercio);
-        if (selectLugar.value) {
-            alCambiarComercio();
+    const inputOcultoLugar = document.getElementById('pago-lugar');
+    const inputBuscar = document.getElementById('inputBuscarComercio');
+    const btnLimpiar = document.getElementById('btnLimpiarBusqueda');
+    const contenedorTarjetas = document.getElementById('contenedorTarjetasComercios');
+    const bloqueBuscador = document.getElementById('bloqueBuscadorComercio');
+    const tarjetaFijado = document.getElementById('tarjetaComercioFijado');
+    const btnCambiar = document.getElementById('btnCambiarComercio');
+
+    // Inicializar si ya viene un id_lugar preseleccionado por URL
+    const idInicial = parseInt(inputOcultoLugar?.value || 0, 10);
+    if (idInicial > 0) {
+        const encontrado = COMERCIOS_DATA.find(c => parseInt(c.id_lugar, 10) === idInicial);
+        if (encontrado) {
+            seleccionarComercioCard(encontrado);
         }
     }
 
-    // Si viene preseleccionado o solicitud previa anual
-    const optSeleccionada = selectLugar?.selectedOptions[0];
-    if (optSeleccionada && optSeleccionada.dataset.plan === 'ANUAL') {
-        elegirPlanEstandar(12, 2500.00, 2, 500.00);
-    } else {
-        elegirPlanEstandar(1, TARIFA_BASE_MENSUAL, 1, 0);
-    }
+    // Buscador en vivo de comercios
+    inputBuscar?.addEventListener('input', function() {
+        const termino = this.value.trim().toLowerCase();
+        btnLimpiar.style.display = termino ? 'inline-block' : 'none';
+
+        if (!termino) {
+            contenedorTarjetas.innerHTML = '';
+            return;
+        }
+
+        const filtrados = COMERCIOS_DATA.filter(c => {
+            const nombre = (c.nombre || '').toLowerCase();
+            const direccion = (c.direccion || '').toLowerCase();
+            return nombre.includes(termino) || direccion.includes(termino);
+        });
+
+        renderizarTarjetasComercio(filtrados);
+    });
+
+    btnLimpiar?.addEventListener('click', function() {
+        inputBuscar.value = '';
+        this.style.display = 'none';
+        contenedorTarjetas.innerHTML = '';
+        inputBuscar.focus();
+    });
+
+    btnCambiar?.addEventListener('click', function() {
+        deseleccionarComercio();
+    });
+
+    // Plan inicial estándar
+    elegirPlanEstandar(1, TARIFA_BASE_MENSUAL, 1, 0);
 });
 
-function alCambiarComercio() {
-    const select = document.getElementById('pago-lugar');
-    const opt = select.selectedOptions[0];
+/**
+ * Renderiza las tarjetas de resultados de búsqueda
+ */
+function renderizarTarjetasComercio(comercios) {
+    const contenedor = document.getElementById('contenedorTarjetasComercios');
+    if (!contenedor) return;
+
+    if (!comercios || comercios.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-12">
+                <div class="p-3 text-center text-muted bg-light rounded-4 border extra-small">
+                    <i class="bi bi-search fs-4 d-block mb-1 text-secondary"></i>
+                    No se encontró ningún comercio con ese nombre.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+
+    let html = '';
+    comercios.slice(0, 10).forEach(c => {
+        const imgUrl = resolverFotoComercio(c.imagen);
+        let badgeEstado = '';
+        let textoVencimiento = '';
+
+        if (c.ultimo_vencimiento) {
+            const dVenc = new Date(c.ultimo_vencimiento + 'T00:00:00');
+            const fmt = dVenc.toLocaleDateString('es-BO');
+            if (dVenc >= hoy) {
+                badgeEstado = `<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small"><i class="bi bi-shield-check me-1"></i>Vence: ${fmt}</span>`;
+            } else {
+                badgeEstado = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill extra-small"><i class="bi bi-exclamation-triangle me-1"></i>Venció: ${fmt}</span>`;
+            }
+            textoVencimiento = fmt;
+        } else {
+            badgeEstado = `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill extra-small"><i class="bi bi-star me-1"></i>Primer periodo</span>`;
+        }
+
+        html += `
+            <div class="col-12 col-md-6">
+                <div class="card p-3 rounded-4 border shadow-2xs h-100 card-resultado-comercio cursor-pointer bg-white" onclick="seleccionarComercioPorId(${c.id_lugar})">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="${imgUrl}" alt="${c.nombre}" class="rounded-3 border flex-shrink-0 shadow-2xs" style="width: 54px; height: 54px; object-fit: cover;" onerror="this.onerror=null; this.src=PLACEHOLDER_COMERCIO_SVG;">
+                        <div class="flex-grow-1 text-truncate">
+                            <h6 class="fw-bold text-dark mb-1 text-truncate">${c.nombre}</h6>
+                            <div class="mb-1">${badgeEstado}</div>
+                            <small class="text-muted extra-small text-truncate d-block">
+                                <i class="bi bi-geo-alt me-1"></i>${c.direccion || 'Trinidad, Beni'}
+                            </small>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold shadow-xs">
+                                <i class="bi bi-check2"></i> Elegir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    contenedor.innerHTML = html;
+}
+
+/**
+ * Selecciona un comercio por su ID
+ */
+function seleccionarComercioPorId(id) {
+    const c = COMERCIOS_DATA.find(item => parseInt(item.id_lugar, 10) === parseInt(id, 10));
+    if (c) {
+        seleccionarComercioCard(c);
+    }
+}
+
+/**
+ * Fija el comercio seleccionado y actualiza la interfaz
+ */
+function seleccionarComercioCard(c) {
+    comercioSeleccionadoObj = c;
+
+    const inputOculto = document.getElementById('pago-lugar');
+    const bloqueBuscador = document.getElementById('bloqueBuscadorComercio');
+    const tarjetaFijado = document.getElementById('tarjetaComercioFijado');
+    const contenedorTarjetas = document.getElementById('contenedorTarjetasComercios');
+    const fijadoFoto = document.getElementById('fijadoFoto');
+    const fijadoNombre = document.getElementById('fijadoNombre');
+    const fijadoBadgeEstado = document.getElementById('fijadoBadgeEstado');
+    const fijadoDetalles = document.getElementById('fijadoDetalles');
+
+    if (inputOculto) inputOculto.value = c.id_lugar;
+
+    // Actualizar datos de la tarjeta fija
+    const imgUrl = resolverFotoComercio(c.imagen);
+    if (fijadoFoto) {
+        fijadoFoto.src = imgUrl;
+        fijadoFoto.onerror = () => { 
+            fijadoFoto.onerror = null; 
+            fijadoFoto.src = PLACEHOLDER_COMERCIO_SVG; 
+        };
+    }
+    if (fijadoNombre) fijadoNombre.textContent = c.nombre;
+
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+
+    if (fijadoBadgeEstado) {
+        if (c.ultimo_vencimiento) {
+            const dVenc = new Date(c.ultimo_vencimiento + 'T00:00:00');
+            const fmt = dVenc.toLocaleDateString('es-BO');
+            if (dVenc >= hoy) {
+                fijadoBadgeEstado.className = 'badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small';
+                fijadoBadgeEstado.innerHTML = `<i class="bi bi-shield-check me-1"></i>Vence: ${fmt}`;
+            } else {
+                fijadoBadgeEstado.className = 'badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill extra-small';
+                fijadoBadgeEstado.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>Venció: ${fmt}`;
+            }
+        } else {
+            fijadoBadgeEstado.className = 'badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill extra-small';
+            fijadoBadgeEstado.innerHTML = `<i class="bi bi-star me-1"></i>Primer periodo`;
+        }
+    }
+
+    if (fijadoDetalles) {
+        fijadoDetalles.innerHTML = `<i class="bi bi-geo-alt me-1"></i>${c.direccion || 'Trinidad, Beni'}` + (c.whatsapp_contacto ? ` &bull; <i class="bi bi-whatsapp text-success me-1"></i>${c.whatsapp_contacto}` : '');
+    }
+
+    // Cambiar visibilidad
+    bloqueBuscador?.classList.add('d-none');
+    tarjetaFijado?.classList.remove('d-none');
+    if (contenedorTarjetas) contenedorTarjetas.innerHTML = '';
+
+    // Mostrar banner de vigencia y proyectar
+    mostrarBannerVigencia(c);
+}
+
+/**
+ * Permite cambiar el comercio seleccionado
+ */
+function deseleccionarComercio() {
+    comercioSeleccionadoObj = null;
+
+    const inputOculto = document.getElementById('pago-lugar');
+    const bloqueBuscador = document.getElementById('bloqueBuscadorComercio');
+    const tarjetaFijado = document.getElementById('tarjetaComercioFijado');
+    const inputBuscar = document.getElementById('inputBuscarComercio');
     const contenedorInfo = document.getElementById('info-vigencia-comercio');
 
-    if (!opt || !opt.value) {
+    if (inputOculto) inputOculto.value = '';
+    bloqueBuscador?.classList.remove('d-none');
+    tarjetaFijado?.classList.add('d-none');
+    if (contenedorInfo) {
+        contenedorInfo.style.display = 'none';
+        contenedorInfo.innerHTML = '';
+    }
+    if (inputBuscar) {
+        inputBuscar.value = '';
+        inputBuscar.focus();
+    }
+    actualizarProyeccionVigencia();
+}
+
+/**
+ * Muestra el banner informativo de vigencia para el comercio seleccionado
+ */
+function mostrarBannerVigencia(c) {
+    const contenedorInfo = document.getElementById('info-vigencia-comercio');
+    if (!contenedorInfo) return;
+
+    if (!c) {
         contenedorInfo.style.display = 'none';
         contenedorInfo.innerHTML = '';
         actualizarProyeccionVigencia();
         return;
     }
 
-    const vencimientoRaw = opt.dataset.vencimiento;
-    const vencimientoFmt = opt.dataset.vencimientoFmt;
-
-    if (vencimientoRaw) {
-        const fechaVenc = new Date(vencimientoRaw + 'T00:00:00');
+    if (c.ultimo_vencimiento) {
+        const dVenc = new Date(c.ultimo_vencimiento + 'T00:00:00');
         const hoy = new Date();
         hoy.setHours(0,0,0,0);
+        const fmt = dVenc.toLocaleDateString('es-BO');
 
-        if (fechaVenc >= hoy) {
+        if (dVenc >= hoy) {
             contenedorInfo.innerHTML = `
-                <div class="alert alert-success py-2 px-3 mb-0 small rounded-3 d-flex align-items-center gap-2">
+                <div class="alert alert-success py-2 px-3 mb-0 small rounded-4 d-flex align-items-center gap-2 border shadow-2xs">
                     <i class="bi bi-shield-check fs-5 text-success"></i>
                     <div>
-                        <strong>Membresía activa al día:</strong> Vence el <strong>${vencimientoFmt}</strong>. 
+                        <strong>Membresía activa al día:</strong> Vence el <strong>${fmt}</strong>. 
                         Este pago sumará los meses contratados directamente a partir de esa fecha sin perder días.
                     </div>
                 </div>
             `;
         } else {
             contenedorInfo.innerHTML = `
-                <div class="alert alert-warning py-2 px-3 mb-0 small rounded-3 d-flex align-items-center gap-2">
+                <div class="alert alert-warning py-2 px-3 mb-0 small rounded-4 d-flex align-items-center gap-2 border shadow-2xs">
                     <i class="bi bi-clock-history fs-5 text-warning-emphasis"></i>
                     <div>
-                        <strong>Membresía vencida el ${vencimientoFmt}:</strong> 
+                        <strong>Membresía vencida el ${fmt}:</strong> 
                         Este pago reactivará la publicación a partir de la fecha declarada del abono.
                     </div>
                 </div>
@@ -480,7 +739,7 @@ function alCambiarComercio() {
         }
     } else {
         contenedorInfo.innerHTML = `
-            <div class="alert alert-info py-2 px-3 mb-0 small rounded-3 d-flex align-items-center gap-2">
+            <div class="alert alert-info py-2 px-3 mb-0 small rounded-4 d-flex align-items-center gap-2 border shadow-2xs">
                 <i class="bi bi-star fs-5 text-info"></i>
                 <div>
                     <strong>Primer periodo de membresía:</strong> La cobertura iniciará a partir de la fecha de pago declarada.
@@ -676,12 +935,10 @@ function actualizarDesgloseAhorro(meses, monto, ahorro) {
  * Calcula y proyecta las fechas de inicio y vencimiento en tiempo real
  */
 function actualizarProyeccionVigencia() {
-    const select = document.getElementById('pago-lugar');
-    const opt = select?.selectedOptions[0];
     const fechaDeclaradaStr = document.getElementById('inputFechaDeclarada')?.value || new Date().toISOString().slice(0, 10);
     const txtProyeccion = document.getElementById('txt-proyeccion-vigencia');
 
-    const vencimientoRaw = opt?.dataset.vencimiento;
+    const vencimientoRaw = comercioSeleccionadoObj?.ultimo_vencimiento;
     const hoyStr = new Date().toISOString().slice(0, 10);
 
     let fechaInicio = fechaDeclaradaStr;
@@ -755,48 +1012,90 @@ function seleccionarCanalPago(canal) {
 /**
  * Manejo de Captura de Foto del Comprobante
  */
+document.addEventListener('DOMContentLoaded', () => {
+    const btnSubir = document.getElementById('btnSubirArchivoPago');
+    const btnTomarFoto = document.getElementById('btnTomarFotoPago');
+    const btnQuitar = document.getElementById('btnQuitarFoto');
+    const inputArchivo = document.getElementById('inputArchivoComprobante');
+    const inputCamara = document.getElementById('inputCamaraComprobante');
+
+    btnSubir?.addEventListener('click', () => inputArchivo?.click());
+    btnTomarFoto?.addEventListener('click', () => inputCamara?.click());
+    btnQuitar?.addEventListener('click', () => quitarFotoComprobante());
+
+    inputArchivo?.addEventListener('change', function() {
+        procesarFotoComprobante(this);
+    });
+
+    inputCamara?.addEventListener('change', function() {
+        procesarFotoComprobante(this);
+    });
+});
+
 function procesarFotoComprobante(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
     
-    // Si viene del input de galería, asignarlo también al input que viajará en el form si es necesario
+    // Si viene del input de galería, asignarlo también al input principal que viaja en el formulario
     if (input.id === 'inputArchivoComprobante') {
         const camaraInput = document.getElementById('inputCamaraComprobante');
-        // Usar DataTransfer para transferir el archivo si el navegador lo soporta
-        if (window.DataTransfer) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            camaraInput.files = dt.files;
+        if (window.DataTransfer && camaraInput) {
+            try {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                camaraInput.files = dt.files;
+            } catch (e) {
+                console.warn('DataTransfer no soportado', e);
+            }
         }
+    }
+
+    const nombreArchivo = document.getElementById('nombreArchivoPago');
+    if (nombreArchivo) {
+        nombreArchivo.textContent = '📎 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
     }
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        document.getElementById('previewFotoImg').src = e.target.result;
-        document.getElementById('contenedorPreviewFoto').style.display = 'block';
-        document.getElementById('btnQuitarFoto').style.display = 'inline-block';
+        const previewImg = document.getElementById('previewFotoImg');
+        const contenedorPreview = document.getElementById('contenedorPreviewFoto');
+        const placeholder = document.getElementById('placeholderFotoBox');
+        const btnQuitar = document.getElementById('btnQuitarFoto');
+
+        if (previewImg) previewImg.src = e.target.result;
+        if (contenedorPreview) contenedorPreview.classList.remove('d-none');
+        if (placeholder) placeholder.classList.add('d-none');
+        if (btnQuitar) btnQuitar.classList.remove('d-none');
     };
     reader.readAsDataURL(file);
 }
 
 function quitarFotoComprobante() {
-    document.getElementById('inputCamaraComprobante').value = '';
-    document.getElementById('inputArchivoComprobante').value = '';
-    document.getElementById('previewFotoImg').src = '';
-    document.getElementById('contenedorPreviewFoto').style.display = 'none';
-    document.getElementById('btnQuitarFoto').style.display = 'none';
+    const inputCamara = document.getElementById('inputCamaraComprobante');
+    const inputArchivo = document.getElementById('inputArchivoComprobante');
+    const previewImg = document.getElementById('previewFotoImg');
+    const contenedorPreview = document.getElementById('contenedorPreviewFoto');
+    const placeholder = document.getElementById('placeholderFotoBox');
+    const btnQuitar = document.getElementById('btnQuitarFoto');
+    const nombreArchivo = document.getElementById('nombreArchivoPago');
+
+    if (inputCamara) inputCamara.value = '';
+    if (inputArchivo) inputArchivo.value = '';
+    if (previewImg) previewImg.src = '';
+    if (contenedorPreview) contenedorPreview.classList.add('d-none');
+    if (placeholder) placeholder.classList.remove('d-none');
+    if (btnQuitar) btnQuitar.classList.add('d-none');
+    if (nombreArchivo) nombreArchivo.textContent = '';
 }
 
 /**
  * Generación de datos autocompletados del Recibo
  */
 function obtenerDatosReciboActual() {
-    const select = document.getElementById('pago-lugar');
-    const opt = select?.selectedOptions[0];
-    const nombreComercio = opt ? (opt.dataset.nombre || opt.textContent.split('(')[0].trim()) : 'Comercio no seleccionado';
-    const whatsapp = opt?.dataset.whatsapp || '';
-    const telefono = opt?.dataset.telefono || '';
-    const direccion = opt?.dataset.direccion || 'Trinidad, Beni';
+    const nombreComercio = comercioSeleccionadoObj ? (comercioSeleccionadoObj.nombre || 'Comercio') : 'Comercio no seleccionado';
+    const whatsapp = comercioSeleccionadoObj?.whatsapp_contacto || '';
+    const telefono = comercioSeleccionadoObj?.telefono_contacto || '';
+    const direccion = comercioSeleccionadoObj?.direccion || 'Trinidad, Beni';
     const monto = parseFloat(document.getElementById('inputMontoFinal')?.value || 0).toFixed(2);
     const meses = mesesSeleccionados;
     const fecha = document.getElementById('inputFechaDeclarada')?.value || new Date().toISOString().slice(0, 10);

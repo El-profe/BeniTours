@@ -23,14 +23,17 @@ class AuthController extends Controller {
         }
 
         $error = $_SESSION['negocio_auth_error'] ?? null;
+        $mensaje = $_SESSION['negocio_auth_flash'] ?? null;
         $usuarioAnterior = $_SESSION['negocio_auth_usuario'] ?? '';
         unset($_SESSION['negocio_auth_usuario']);
         unset($_SESSION['negocio_auth_error']);
+        unset($_SESSION['negocio_auth_flash']);
 
         $this->render('negocio/login', [
             'titulo'          => 'Portal de Negocios y Comercios',
             'bodyClass'       => 'page-login',
             'error'           => $error,
+            'mensaje'         => $mensaje,
             'usuarioAnterior' => $usuarioAnterior,
             'csrfToken'       => CsrfMiddleware::obtenerToken()
         ], 'publico');

@@ -72,17 +72,14 @@ class SolicitudService {
             $db->prepare('UPDATE lugares SET id_solicitud_origen = ? WHERE id_lugar = ?')->execute([$idSolicitud, $idLugar]);
             // Los indicadores de aprobación y habilitación pertenecen a publicaciones en este MVC.
             (new Publicacion())->crear($idLugar, 1, 1, $idAdmin);
-            $slug = $db->prepare('SELECT slug FROM lugares WHERE id_lugar = ?');
-            $slug->execute([$idLugar]);
-            $baseUsuario = substr(str_replace('-', '_', $slug->fetchColumn()), 0, 42) ?: 'negocio';
-            $usuario = $baseUsuario . '_' . $idSolicitud . '_' . bin2hex(random_bytes(3));
+            $usuario = CredencialService::generarUsuarioCorto($s['nombre_establecimiento'] ?? 'negocio', $idLugar);
             $clave = CredencialService::generarClave();
             $db->prepare('INSERT INTO cuentas_negocio (id_lugar,usuario,email,password_hash) VALUES (?,?,?,?)')
                 ->execute([$idLugar, $usuario, $s['email_contacto'] ?? '', password_hash($clave, PASSWORD_BCRYPT)]);
             $idCuenta = (int)$db->lastInsertId();
             $hoy = date('Y-m-d');
             $metodoRegistro = $esEfectivo ? 'Efectivo' : 'Transferencia bancaria / QR';
-            $numeroComp = $numeroRecibo ?: ($s['numero_comprobante'] ?: ($esEfectivo ? 'RECIBO-EFECTIVO-' . $idSolicitud : 'SIN-NUMERO'));
+            $numeroComp = !empty($numeroRecibo) ? $numeroRecibo : (!empty($s['numero_comprobante']) && $s['numero_comprobante'] !== 'SIN-NUMERO' ? $s['numero_comprobante'] : ('REC-' . date('Y') . '-' . str_pad((string)$idSolicitud, 5, '0', STR_PAD_LEFT)));
             $db->prepare("INSERT INTO pagos (id_lugar,id_tarifa,monto,meses_duracion,fecha_pago_declarada,
                 numero_comprobante,comprobante_archivo,metodo_pago,estado,id_administrador_confirmacion,fecha_confirmacion,es_registro_inicial)
                 VALUES (?,?,?,?,?,?,?,?,'CONFIRMADO',?,NOW(),1)")
@@ -147,7 +144,7 @@ class SolicitudService {
         $config = require dirname(__DIR__, 2) . '/config/app.php';
         $texto = "Hola, se ha generado tu nueva clave de acceso para tu comercio \"{$cuenta['nombre']}\" en BeniTours:\n" .
             'Accede a tu portal: ' . rtrim($config['base_url'], '/') . "/negocio/login\n" .
-            "Usuario: {$cuenta['usuario']}\n" .
+            "Usuario: {$cuenta['usuario']} (o tu celular)\n" .
             "Nueva Clave: {$nuevaClave}";
 
         $whatsapp = !empty($telefono) ? 'https://wa.me/' . $telefono . '?text=' . rawurlencode($texto) : null;
@@ -175,9 +172,7 @@ class SolicitudService {
             $lugar = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$lugar) throw new RuntimeException('Lugar no encontrado.');
 
-            $slug = $lugar['slug'] ?: 'negocio_' . $idLugar;
-            $baseUsuario = substr(str_replace('-', '_', $slug), 0, 42) ?: 'negocio';
-            $usuario = $baseUsuario . '_' . bin2hex(random_bytes(3));
+            $usuario = CredencialService::generarUsuarioCorto($lugar['nombre'] ?? 'negocio', $idLugar);
             $clave = CredencialService::generarClave();
 
             $db->prepare('INSERT INTO cuentas_negocio (id_lugar,usuario,email,password_hash) VALUES (?,?,?,?)')
@@ -198,12 +193,13 @@ class SolicitudService {
             $observaciones = trim($datosPago['observaciones'] ?? '');
             $metodo = trim($datosPago['metodo_pago'] ?? 'Efectivo');
             $numRecibo = trim($datosPago['numero_comprobante'] ?? ('RECIBO-DIR-' . $idLugar . '-' . date('Ymd')));
+            $comprobanteArchivo = !empty($datosPago['comprobante_archivo']) ? trim($datosPago['comprobante_archivo']) : null;
             $hoy = date('Y-m-d');
 
             $db->prepare("INSERT INTO pagos (id_lugar,id_tarifa,monto,meses_duracion,fecha_pago_declarada,
-                numero_comprobante,metodo_pago,estado,id_administrador_confirmacion,fecha_confirmacion,observaciones,es_registro_inicial)
-                VALUES (?,?,?,?,?,?,?,'CONFIRMADO',?,NOW(),?,1)")
-                ->execute([$idLugar, $idTarifa, $monto, $meses, $hoy, $numRecibo, $metodo, $idAdmin, $observaciones]);
+                numero_comprobante,comprobante_archivo,metodo_pago,estado,id_administrador_confirmacion,fecha_confirmacion,observaciones,es_registro_inicial)
+                VALUES (?,?,?,?,?,?,?,?,'CONFIRMADO',?,NOW(),?,1)")
+                ->execute([$idLugar, $idTarifa, $monto, $meses, $hoy, $numRecibo, $comprobanteArchivo, $metodo, $idAdmin, $observaciones]);
             $idPago = (int)$db->lastInsertId();
 
             $periodo = VigenciaService::calcularPeriodo($hoy, null, $meses);
@@ -216,7 +212,7 @@ class SolicitudService {
             $config = require dirname(__DIR__, 2) . '/config/app.php';
             $texto = "Hola, ¡tu negocio \"{$lugar['nombre']}\" ya está activo en BeniTours!\n" .
                 'Accede a tu portal comercial: ' . rtrim($config['base_url'], '/') . "/negocio/login\n" .
-                "Usuario: {$usuario}\n" .
+                "Usuario: {$usuario} (o tu celular)\n" .
                 "Clave: {$clave}\n" .
                 "Vigencia: {$periodo['fecha_inicio']} al {$periodo['fecha_vencimiento']} ({$tarifa['nombre']})";
 

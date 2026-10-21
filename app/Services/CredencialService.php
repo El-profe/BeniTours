@@ -2,16 +2,70 @@
 namespace App\Services;
 
 use RuntimeException;
+use App\Core\Database;
 
 class CredencialService {
+    /**
+     * Genera una contraseña corta, memorable y fácil de escribir en celular.
+     * Formato: "Beni" + 3 dígitos aleatorios (ej: "Beni385", "Beni742").
+     * Total: 7 caracteres, 1 mayúscula, números.
+     */
     public static function generarClave(): string {
-        $letras = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-        $alfabeto = $letras . '23456789';
-        do {
-            $clave = '';
-            for ($i = 0; $i < 8; $i++) $clave .= $alfabeto[random_int(0, strlen($alfabeto) - 1)];
-        } while (!preg_match('/[a-zA-Z]/', $clave) || !preg_match('/[0-9]/', $clave));
-        return $clave;
+        return 'Beni' . random_int(100, 999);
+    }
+
+    /**
+     * Genera un nombre de usuario corto, limpio y representativo del comercio.
+     * Toma palabras clave del nombre (evitando palabras comunes como restaurante, el, la, etc.)
+     * y le concatena 3 dígitos para garantizar unicidad.
+     * Total aproximado: 6 a 12 caracteres (ej: "tatu381", "bernardo512", "mentirosa219").
+     */
+    public static function generarUsuarioCorto(string $nombreComercio, int $idLugar = 0): string {
+        // 1. Limpiar acentos y caracteres especiales
+        $nombreLimpio = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nombreComercio);
+        $nombreLimpio = strtolower(preg_replace('/[^a-zA-Z0-9\s]/', '', $nombreLimpio));
+
+        // 2. Palabras vacías a ignorar para buscar la palabra más representativa
+        $stopWords = [
+            'restaurante', 'restauran', 'restaurant', 'cafe', 'bar', 'hotel', 'alojamiento',
+            'karaoke', 'snack', 'picanteria', 'churrasqueria', 'salteñeria', 'salteneria',
+            'comercial', 'tienda', 'el', 'la', 'los', 'las', 'de', 'del', 'y', 'en', 'san', 'santa',
+            'don', 'dona', 'doña'
+        ];
+
+        $palabras = preg_split('/\s+/', trim($nombreLimpio));
+        $palabraElegida = '';
+
+        foreach ($palabras as $p) {
+            $p = trim($p);
+            if (strlen($p) >= 3 && !in_array($p, $stopWords, true)) {
+                $palabraElegida = $p;
+                break;
+            }
+        }
+
+        // Si todas eran stop words o quedó vacía, tomar la primera disponible o "negocio"
+        if ($palabraElegida === '') {
+            $palabraElegida = !empty($palabras[0]) && strlen($palabras[0]) >= 3 ? $palabras[0] : 'negocio';
+        }
+
+        // Limitar a máximo 8 caracteres para mantenerlo súper corto
+        $base = substr($palabraElegida, 0, 8);
+
+        // 3. Buscar sufijo único corto
+        $db = Database::getConnection();
+        for ($intento = 0; $intento < 15; $intento++) {
+            $sufijo = (string)random_int(100, 999);
+            $candidato = $base . $sufijo;
+            $stmt = $db->prepare('SELECT COUNT(*) FROM cuentas_negocio WHERE usuario = ?');
+            $stmt->execute([$candidato]);
+            if ((int)$stmt->fetchColumn() === 0) {
+                return $candidato;
+            }
+        }
+
+        // Fallback con ID si hubo muchas colisiones
+        return $base . ($idLugar > 0 ? $idLugar : random_int(1000, 9999));
     }
 
     private static function llave(): string {
