@@ -49,13 +49,18 @@ class SolicitudService {
                 throw new RuntimeException('La categoría comercial ya no está disponible.');
             }
             $tarifa = (new \App\Models\Tarifa())->buscarPorId((int)$s['id_tarifa']);
-            if ($tarifa && (!(int)$tarifa['activo'] || $tarifa['vigente_desde'] > date('Y-m-d')
-                || $tarifa['codigo_plan'] !== $s['plan_solicitado'])) $tarifa = null;
-            if (!$tarifa) throw new RuntimeException('No existe una tarifa vigente para registrar el pago.');
-            if (!in_array($s['plan_solicitado'], ['MENSUAL','ANUAL'], true)) throw new RuntimeException('Plan inválido.');
-            $meses = (int)($tarifa['meses_duracion'] ?? ($s['plan_solicitado'] === 'ANUAL' ? 12 : 1));
-            $monto = (float)($tarifa['monto'] ?? ($meses === 12 ? 2500.00 : 250.00));
-            if ((float)$s['monto_declarado'] !== $monto) throw new RuntimeException('El monto declarado no corresponde al plan.');
+            if (!$tarifa && !empty($s['plan_solicitado'])) {
+                $tarifa = (new \App\Models\Tarifa())->obtenerTarifaVigente($s['plan_solicitado']);
+            }
+            if ($tarifa && (!(int)$tarifa['activo'] || $tarifa['vigente_desde'] > date('Y-m-d'))) {
+                $tarifa = null;
+            }
+            if (!$tarifa) throw new RuntimeException('No existe una tarifa activa y vigente para registrar el pago.');
+            $meses = (int)($tarifa['meses_duracion'] ?? 1);
+            $monto = (float)$tarifa['monto'];
+            if (abs((float)$s['monto_declarado'] - $monto) > 0.01) {
+                throw new RuntimeException('El monto declarado no corresponde a la tarifa del plan seleccionado.');
+            }
             (new Solicitud())->cambiarEstado($idSolicitud, 'ACEPTADA', $idAdmin, $esEfectivo ? 'Pago en efectivo cobrado; aprovisionamiento completo.' : 'Comprobante verificado; aprovisionamiento completo.');
             $idLugar = (new Lugar())->crear([
                 'id_municipio'      => (int)($s['id_municipio'] ?? 1),

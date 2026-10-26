@@ -24,7 +24,11 @@ class CatalogoController extends Controller {
 
     public function index(): void {
         AnaliticaVisitasService::registrarVisita();
-        $categorias = $this->categoriaModel->listarTodasActivas();
+        $todasCategorias = $this->categoriaModel->listarTodasActivas();
+        // Filtrar transporte para que no se mezcle con las categorías turísticas generales
+        $categorias = array_values(array_filter($todasCategorias, function ($c) {
+            return (int)$c['id_categoria'] !== 9 && ($c['slug'] ?? '') !== 'transporte-radiomoviles';
+        }));
         $municipios = $this->municipioModel->listarActivos();
 
         $categoriaSeleccionada = null;
@@ -38,8 +42,19 @@ class CatalogoController extends Controller {
 
         $idMunicipio = !empty($_GET['municipio']) ? (int)$_GET['municipio'] : null;
         $lugares = $this->lugarModel->listarPublicos($categoriaSeleccionada, null, $idMunicipio);
+        if ($categoriaSeleccionada === null) {
+            // Excluir transporte del listado general de atractivos/destinos turísticos
+            $lugares = array_values(array_filter($lugares, fn($l) => (int)$l['id_categoria'] !== 9));
+        }
         $promocionesVigentes = (new Promocion())->listarTodasVigentesPublicas();
         $eventosDestacados = (new \App\Models\Evento())->listarVigentesPublicos();
+        $rutasRecomendadas = \App\Services\RutaTuristicaService::obtenerRutasRecomendadas($idMunicipio);
+        $radiomoviles = $this->lugarModel->listarPublicos(9, null, $idMunicipio ?: 1);
+        $paradasTransporte = (new \App\Models\LugarParada())->listarTodasActivas();
+
+        // Galería destacada de postales turísticas y fotos libres
+        $galeriaFotos = (new \App\Models\GaleriaFoto())->listarActivas(8);
+        $fotosMapa = (new \App\Models\MapaProvinciaFoto())->listarTodasIndexadas();
 
         $ogMeta = [
             'title'       => 'BeniTours - Directorio Turístico y Comercial del Beni',
@@ -60,6 +75,11 @@ class CatalogoController extends Controller {
             'lugares'               => $lugares,
             'promocionesVigentes'   => $promocionesVigentes,
             'eventosDestacados'     => $eventosDestacados,
+            'rutasRecomendadas'     => $rutasRecomendadas,
+            'radiomoviles'          => $radiomoviles,
+            'paradasTransporte'     => $paradasTransporte,
+            'galeriaFotos'          => $galeriaFotos,
+            'fotosMapa'             => $fotosMapa,
             'ogMeta'                => $ogMeta
         ], 'publico');
     }
@@ -114,12 +134,19 @@ class CatalogoController extends Controller {
             'type'        => 'place'
         ];
 
+        // Si es lugar de transporte o sindicato, cargar sus paradas y casetas oficiales
+        $paradasTransporte = [];
+        if ((int)($lugar['id_categoria'] ?? 0) === 9 || mb_stripos($lugar['nombre'], 'radio') !== false || mb_stripos($lugar['nombre'], 'taxi') !== false) {
+            $paradasTransporte = (new \App\Models\LugarParada())->listarPorLugar((int)$lugar['id_lugar']);
+        }
+
         $this->render('publico/catalogo/detalle', [
             'titulo'            => $lugar['nombre'],
             'lugar'             => $lugar,
             'fotografias'       => $fotografias,
             'mapa'              => MapaService::desdeCoordenadas($lugar['coordenadas_gps'] ?? null),
             'promociones'       => $promociones,
+            'paradasTransporte' => $paradasTransporte,
             'ogMeta'            => $ogMeta
         ], 'publico');
     }
@@ -133,6 +160,10 @@ class CatalogoController extends Controller {
         $termino = !empty($_GET['q']) ? trim($_GET['q']) : null;
 
         $resultados = $this->lugarModel->listarPublicos($idCategoria, $termino, $idMunicipio);
+        if ($idCategoria === null) {
+            // Excluir transporte del listado general de atractivos/destinos turísticos
+            $resultados = array_values(array_filter($resultados, fn($l) => (int)$l['id_categoria'] !== 9));
+        }
         foreach ($resultados as &$resultado) {
             $resultado['estado_horario'] = \App\Services\HorarioHelper::evaluarEstado(
                 $resultado['horario_atencion'] ?? null,
@@ -147,6 +178,22 @@ class CatalogoController extends Controller {
             'success'      => true,
             'total'        => count($resultados),
             'resultados'   => $resultados
+        ]);
+    }
+
+    /**
+     * Endpoint API para consultar rutas turísticas recomendadas optimizadas
+     */
+    public function apiRutasRecomendadas(): void {
+        $idMunicipio = !empty($_GET['municipio']) ? (int)$_GET['municipio'] : null;
+        $userLat = isset($_GET['lat']) && is_numeric($_GET['lat']) ? (float)$_GET['lat'] : null;
+        $userLng = isset($_GET['lng']) && is_numeric($_GET['lng']) ? (float)$_GET['lng'] : null;
+
+        $rutas = \App\Services\RutaTuristicaService::obtenerRutasRecomendadas($idMunicipio, $userLat, $userLng);
+
+        $this->json([
+            'success' => true,
+            'rutas'   => $rutas
         ]);
     }
 

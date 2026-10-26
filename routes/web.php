@@ -8,6 +8,7 @@ use App\Controllers\Admin\LugarController;
 use App\Controllers\Admin\SolicitudController as AdminSolicitudController;
 use App\Controllers\Admin\PagoController;
 use App\Controllers\Admin\ComercioController;
+use App\Controllers\Admin\GaleriaController;
 
 /**
  * Catálogo Público
@@ -15,6 +16,7 @@ use App\Controllers\Admin\ComercioController;
 $router->get('/', [CatalogoController::class, 'index']);
 $router->get('/catalogo', [CatalogoController::class, 'index']);
 $router->get('/catalogo/detalle', [CatalogoController::class, 'detalle']);
+$router->get('/api/rutas/recomendadas', [CatalogoController::class, 'apiRutasRecomendadas']);
 $router->post('/api/telemetria/evento', [CatalogoController::class, 'apiRegistrarEvento']);
 $router->get('/imagen', [ImagenController::class, 'ver']);
 
@@ -46,6 +48,16 @@ $router->post('/admin/lugares/eliminar-foto', [LugarController::class, 'eliminar
 $router->post('/admin/lugares/establecer-portada', [LugarController::class, 'establecerPortada']);
 $router->post('/admin/lugares/restablecer-clave', [LugarController::class, 'restablecerClave']);
 $router->post('/admin/lugares/crear-cuenta', [LugarController::class, 'crearCuenta']);
+$router->post('/admin/lugares/guardar-parada', [LugarController::class, 'guardarParada']);
+$router->post('/admin/lugares/eliminar-parada', [LugarController::class, 'eliminarParada']);
+
+// Galería Turística & Fotos del Mapa
+$router->get('/admin/galeria', [GaleriaController::class, 'index']);
+$router->post('/admin/galeria/guardar', [GaleriaController::class, 'guardar']);
+$router->post('/admin/galeria/actualizar-mapa', [GaleriaController::class, 'actualizarMapaProvincia']);
+$router->post('/admin/galeria/cambiar-estado', [GaleriaController::class, 'cambiarEstado']);
+$router->post('/admin/galeria/destacar', [GaleriaController::class, 'destacar']);
+$router->post('/admin/galeria/eliminar', [GaleriaController::class, 'eliminar']);
 
 // Vista operativa 360 y seguimiento de comercios
 $router->get('/admin/comercios/detalle', [ComercioController::class, 'detalle']);

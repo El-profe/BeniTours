@@ -6,10 +6,20 @@
     <title><?= htmlspecialchars($titulo ?? 'Panel') ?> | BeniTours Admin</title>
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo2.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo2.png') ?>">
 
+    <!-- Preconexión y optimización de DNS para recursos externos -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
     <!-- Bootstrap 5.3.3 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
     <!-- Bootstrap Icons (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap-icons/bootstrap-icons.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
+    <!-- Font Awesome 6 Free -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/css/admin.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/admin.css') ?>">
 </head>
 <body class="admin-theme">
@@ -54,6 +64,12 @@
                     <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares/crear" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'crear')) ? 'active' : '' ?>">
                         <i class="bi bi-plus-circle-fill"></i>
                         <span>Nueva Ficha</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria')) ? 'active' : '' ?>">
+                        <i class="bi bi-camera-fill"></i>
+                        <span>Galería de Fotos</span>
                     </a>
                 </li>
             </ul>
@@ -144,6 +160,10 @@
                 <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares" class="admin-top-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'lugares') && !str_contains($_SERVER['REQUEST_URI'] ?? '', 'crear') ? 'active' : '' ?>">
                     <i class="bi bi-geo-alt-fill"></i>
                     <span>Lugares</span>
+                </a>
+                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria" class="admin-top-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria') ? 'active' : '' ?>">
+                    <i class="bi bi-camera-fill"></i>
+                    <span>Galería</span>
                 </a>
                 <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares/crear" class="admin-top-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'crear') ? 'active' : '' ?>">
                     <i class="bi bi-plus-circle-fill"></i>

@@ -10,6 +10,7 @@ use App\Models\Fotografia;
 use App\Models\CuentaNegocio;
 use App\Models\Vigencia;
 use App\Models\Tarifa;
+use App\Models\LugarParada;
 use App\Services\ImagenService;
 use App\Services\SolicitudService;
 use App\Services\ComprobanteService;
@@ -129,6 +130,9 @@ class LugarController extends Controller {
                 'coordenadas_gps'      => trim($_POST['coordenadas_gps'] ?? ''),
                 'telefono_contacto'    => trim($_POST['telefono_contacto'] ?? ''),
                 'whatsapp_contacto'    => trim($_POST['whatsapp_contacto'] ?? ''),
+                'facebook_url'         => trim($_POST['facebook_url'] ?? ''),
+                'instagram_url'        => trim($_POST['instagram_url'] ?? ''),
+                'tiktok_url'           => trim($_POST['tiktok_url'] ?? ''),
                 'email_contacto'       => trim($_POST['email_contacto'] ?? ''),
                 'horario_atencion'     => trim($_POST['horario_atencion'] ?? '')
             ]);
@@ -244,6 +248,7 @@ class LugarController extends Controller {
         $cuentaNegocio = (new CuentaNegocio())->buscarPorLugar($id);
         $ultimoVencimiento = (new Vigencia())->obtenerUltimoVencimiento($id);
         $tarifas = (new Tarifa())->listarPlanesActivos();
+        $paradas = (new LugarParada())->listarPorLugar($id, false);
         $mensaje     = $_SESSION['admin_flash'] ?? null;
         $error       = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
@@ -257,6 +262,7 @@ class LugarController extends Controller {
             'cuentaNegocio'     => $cuentaNegocio,
             'ultimoVencimiento' => $ultimoVencimiento,
             'tarifas'           => $tarifas,
+            'paradas'           => $paradas,
             'mensaje'           => $mensaje,
             'error'             => $error,
             'csrfToken'         => CsrfMiddleware::obtenerToken()
@@ -295,6 +301,9 @@ class LugarController extends Controller {
                 'coordenadas_gps'      => trim($_POST['coordenadas_gps'] ?? ''),
                 'telefono_contacto'    => trim($_POST['telefono_contacto'] ?? ''),
                 'whatsapp_contacto'    => trim($_POST['whatsapp_contacto'] ?? ''),
+                'facebook_url'         => trim($_POST['facebook_url'] ?? ''),
+                'instagram_url'        => trim($_POST['instagram_url'] ?? ''),
+                'tiktok_url'           => trim($_POST['tiktok_url'] ?? ''),
                 'email_contacto'       => trim($_POST['email_contacto'] ?? ''),
                 'horario_atencion'     => trim($_POST['horario_atencion'] ?? '')
             ]);
@@ -513,6 +522,77 @@ class LugarController extends Controller {
         } catch (\Throwable $e) {
             $this->responderJson(false, $e->getMessage(), null, 400);
         }
+    }
+
+    /**
+     * Guarda una parada física para un sindicato / lugar de transporte
+     */
+    public function guardarParada(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Sesión expirada o token inválido.';
+            header("Location: {$this->config['base_url']}/admin/lugares");
+            exit();
+        }
+
+        $idLugar = (int)($_POST['id_lugar'] ?? 0);
+        $nombreParada = trim($_POST['nombre_parada'] ?? '');
+        $tipoParada = trim($_POST['tipo_parada'] ?? 'PARADA_URBANA');
+        $direccion = trim($_POST['direccion'] ?? '');
+        $referencia = trim($_POST['referencia'] ?? '');
+        $latitud = !empty($_POST['latitud']) ? (float)$_POST['latitud'] : null;
+        $longitud = !empty($_POST['longitud']) ? (float)$_POST['longitud'] : null;
+        $telefono = trim($_POST['telefono_directo'] ?? '');
+        $whatsapp = trim($_POST['whatsapp_directo'] ?? '');
+
+        if ($idLugar <= 0 || empty($nombreParada)) {
+            $_SESSION['admin_error'] = 'El nombre de la parada es obligatorio.';
+            header("Location: {$this->config['base_url']}/admin/lugares/editar?id={$idLugar}");
+            exit();
+        }
+
+        try {
+            $paradaModel = new LugarParada();
+            $paradaModel->crear([
+                'id_lugar'         => $idLugar,
+                'nombre_parada'    => $nombreParada,
+                'tipo_parada'      => in_array($tipoParada, ['CENTRAL', 'TERMINAL', 'AEROPUERTO', 'PARADA_URBANA', 'MERCADO']) ? $tipoParada : 'PARADA_URBANA',
+                'direccion'        => $direccion,
+                'referencia'       => $referencia,
+                'latitud'          => $latitud,
+                'longitud'         => $longitud,
+                'telefono_directo' => $telefono,
+                'whatsapp_directo' => $whatsapp
+            ]);
+            $_SESSION['admin_flash'] = "Parada '{$nombreParada}' registrada exitosamente.";
+        } catch (\Throwable $e) {
+            $_SESSION['admin_error'] = 'Error al registrar la parada: ' . $e->getMessage();
+        }
+
+        header("Location: {$this->config['base_url']}/admin/lugares/editar?id={$idLugar}#seccion-paradas");
+        exit();
+    }
+
+    /**
+     * Elimina una parada de un sindicato
+     */
+    public function eliminarParada(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Sesión expirada o token inválido.';
+            header("Location: {$this->config['base_url']}/admin/lugares");
+            exit();
+        }
+
+        $idParada = (int)($_POST['id_parada'] ?? 0);
+        $idLugar  = (int)($_POST['id_lugar'] ?? 0);
+
+        if ($idParada > 0) {
+            $paradaModel = new LugarParada();
+            $paradaModel->eliminar($idParada, $idLugar > 0 ? $idLugar : null);
+            $_SESSION['admin_flash'] = 'Parada eliminada correctamente.';
+        }
+
+        header("Location: {$this->config['base_url']}/admin/lugares/editar?id={$idLugar}#seccion-paradas");
+        exit();
     }
 
     private function responderJson(bool $exito, string $mensaje, ?array $datos = null, int $statusCode = 200): void {

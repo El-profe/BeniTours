@@ -70,17 +70,20 @@ class Promocion {
     }
 
     public function crear(array $datos): int {
-        $sql = "INSERT INTO promociones (id_lugar, titulo, descripcion, descuento_texto, imagen_archivo, fecha_inicio, fecha_fin, activo)
-                VALUES (:id_lugar, :titulo, :descripcion, :descuento, :imagen_archivo, :inicio, :fin, 1)";
+        $sql = "INSERT INTO promociones (id_lugar, titulo, descripcion, descuento_texto, tiktok_url, facebook_url, instagram_url, imagen_archivo, fecha_inicio, fecha_fin, activo)
+                VALUES (:id_lugar, :titulo, :descripcion, :descuento, :tiktok_url, :facebook_url, :instagram_url, :imagen_archivo, :inicio, :fin, 1)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id_lugar'        => $datos['id_lugar'],
-            ':titulo'          => $datos['titulo'],
-            ':descripcion'     => $datos['descripcion'],
-            ':descuento'       => $datos['descuento_texto'] ?? null,
-            ':imagen_archivo'  => $datos['imagen_archivo'] ?? null,
-            ':inicio'          => $datos['fecha_inicio'],
-            ':fin'             => $datos['fecha_fin']
+            ':id_lugar'           => $datos['id_lugar'],
+            ':titulo'             => $datos['titulo'],
+            ':descripcion'        => $datos['descripcion'],
+            ':descuento'          => $datos['descuento_texto'] ?? null,
+            ':tiktok_url'         => !empty($datos['tiktok_url']) ? $datos['tiktok_url'] : null,
+            ':facebook_url'       => !empty($datos['facebook_url']) ? $datos['facebook_url'] : null,
+            ':instagram_url'      => !empty($datos['instagram_url']) ? $datos['instagram_url'] : null,
+            ':imagen_archivo'     => $datos['imagen_archivo'] ?? null,
+            ':inicio'             => $datos['fecha_inicio'],
+            ':fin'                => $datos['fecha_fin']
         ]);
         return (int)$this->db->lastInsertId();
     }
@@ -109,36 +112,48 @@ class Promocion {
                         titulo = :titulo, 
                         descripcion = :descripcion, 
                         descuento_texto = :descuento, 
+                        tiktok_url = :tiktok_url,
+                        facebook_url = :facebook_url,
+                        instagram_url = :instagram_url,
                         imagen_archivo = :imagen, 
                         fecha_inicio = :inicio, 
                         fecha_fin = :fin
                     WHERE id_promocion = :id AND id_lugar = :id_lugar";
             $params = [
-                ':titulo'      => $datos['titulo'],
-                ':descripcion' => $datos['descripcion'],
-                ':descuento'   => $datos['descuento_texto'] ?? null,
-                ':imagen'      => $datos['imagen_archivo'] ?? null,
-                ':inicio'      => $datos['fecha_inicio'],
-                ':fin'         => $datos['fecha_fin'],
-                ':id'          => $idPromocion,
-                ':id_lugar'    => $idLugar
+                ':titulo'             => $datos['titulo'],
+                ':descripcion'        => $datos['descripcion'],
+                ':descuento'          => $datos['descuento_texto'] ?? null,
+                ':tiktok_url'         => !empty($datos['tiktok_url']) ? $datos['tiktok_url'] : null,
+                ':facebook_url'       => !empty($datos['facebook_url']) ? $datos['facebook_url'] : null,
+                ':instagram_url'      => !empty($datos['instagram_url']) ? $datos['instagram_url'] : null,
+                ':imagen'             => $datos['imagen_archivo'] ?? null,
+                ':inicio'             => $datos['fecha_inicio'],
+                ':fin'                => $datos['fecha_fin'],
+                ':id'                 => $idPromocion,
+                ':id_lugar'           => $idLugar
             ];
         } else {
             $sql = "UPDATE promociones SET 
                         titulo = :titulo, 
                         descripcion = :descripcion, 
                         descuento_texto = :descuento, 
+                        tiktok_url = :tiktok_url,
+                        facebook_url = :facebook_url,
+                        instagram_url = :instagram_url,
                         fecha_inicio = :inicio, 
                         fecha_fin = :fin
                     WHERE id_promocion = :id AND id_lugar = :id_lugar";
             $params = [
-                ':titulo'      => $datos['titulo'],
-                ':descripcion' => $datos['descripcion'],
-                ':descuento'   => $datos['descuento_texto'] ?? null,
-                ':inicio'      => $datos['fecha_inicio'],
-                ':fin'         => $datos['fecha_fin'],
-                ':id'          => $idPromocion,
-                ':id_lugar'    => $idLugar
+                ':titulo'             => $datos['titulo'],
+                ':descripcion'        => $datos['descripcion'],
+                ':descuento'          => $datos['descuento_texto'] ?? null,
+                ':tiktok_url'         => !empty($datos['tiktok_url']) ? $datos['tiktok_url'] : null,
+                ':facebook_url'       => !empty($datos['facebook_url']) ? $datos['facebook_url'] : null,
+                ':instagram_url'      => !empty($datos['instagram_url']) ? $datos['instagram_url'] : null,
+                ':inicio'             => $datos['fecha_inicio'],
+                ':fin'                => $datos['fecha_fin'],
+                ':id'                 => $idPromocion,
+                ':id_lugar'           => $idLugar
             ];
         }
 

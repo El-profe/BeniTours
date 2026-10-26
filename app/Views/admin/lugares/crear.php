@@ -96,6 +96,165 @@
                     </div>
                 </div>
 
+                <!-- SECCIÓN 2: Categoría & Detalles del Servicio -->
+                <div class="form-section-card">
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="bi bi-tags-fill"></i>
+                        </div>
+                        <div>
+                            <h2 class="form-section-title">Clasificación & Descripción</h2>
+                            <p class="form-section-desc">Selecciona la categoría temática y detalla qué ofrece este lugar.</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Selector de Categorías Compacto -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-dark d-block">Categoría del Catálogo *</label>
+                            <div class="category-pill-grid">
+                                <?php foreach ($categorias as $indice => $c): ?>
+                                    <label class="category-pill-card">
+                                        <input type="radio" name="id_categoria" value="<?= (int)$c['id_categoria'] ?>" data-nombre-cat="<?= htmlspecialchars($c['nombre']) ?>" <?= $indice === 0 ? 'checked' : '' ?> required>
+                                        <i class="bi <?= htmlspecialchars($c['icono'] ?? 'bi-tag') ?> category-pill-icon"></i>
+                                        <span class="category-pill-name" title="<?= htmlspecialchars($c['nombre']) ?>">
+                                            <?= htmlspecialchars($c['nombre']) ?>
+                                        </span>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <!-- Horario de Atención Visual y Flexible -->
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-4 border">
+                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                    <label class="form-label fw-bold small text-dark mb-0">
+                                        <i class="bi bi-clock-history text-success me-1"></i>Días y Horarios de Atención
+                                    </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check form-switch m-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input" type="checkbox" id="switchHorario24h">
+                                            <label class="form-check-label extra-small text-muted fw-semibold" for="switchHorario24h">Abierto 24 Horas</label>
+                                        </div>
+                                        <button type="button" class="btn btn-link btn-sm text-decoration-none extra-small text-secondary p-0 ms-2" id="btnAlternarModoHorarioManual">
+                                            <i class="bi bi-pencil-square me-1"></i><span id="txtModoHorario">Modo manual</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Contenedor del Constructor Visual -->
+                                <div id="panelHorarioConstructor">
+                                    <!-- Selección de Días -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
+                                            <span class="extra-small text-muted fw-bold text-uppercase">1. Días de atención:</span>
+                                            <!-- Atajos rápidos -->
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="L-V">Lun - Vie</button>
+                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="L-S">Lun - Sáb</button>
+                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="S-D">Sáb y Dom</button>
+                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="TODOS">Todos los días</button>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group w-100 shadow-2xs rounded-3 overflow-hidden" role="group" id="grupoBotonesDias">
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_lun" value="Lun" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_lun">Lun</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_mar" value="Mar" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_mar">Mar</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_mie" value="Mié" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_mie">Mié</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_jue" value="Jue" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_jue">Jue</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_vie" value="Vie" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_vie">Vie</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_sab" value="Sáb" autocomplete="off" checked>
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_sab">Sáb</label>
+
+                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_dom" value="Dom" autocomplete="off">
+                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_dom">Dom</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Configuración de Horas (Turno 1 y Turno 2 opcional) -->
+                                    <div class="row g-2 align-items-center mb-2" id="filaHorasTurno1">
+                                        <div class="col-12 col-sm-auto">
+                                            <span class="extra-small text-muted fw-bold text-uppercase d-block d-sm-inline">2. Horario:</span>
+                                        </div>
+                                        <div class="col-5 col-sm">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-open"></i></span>
+                                                <input type="time" class="form-control" id="horaApertura1" value="08:00">
+                                            </div>
+                                        </div>
+                                        <div class="col-2 col-sm-auto text-center text-muted small fw-bold">hasta</div>
+                                        <div class="col-5 col-sm">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-closed"></i></span>
+                                                <input type="time" class="form-control" id="horaCierre1" value="22:00">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-auto text-end text-sm-start">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 extra-small" id="btnToggleTurno2">
+                                                <i class="bi bi-plus-circle me-1"></i>Segundo Turno
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Turno 2 (opcional partido, ej. tarde/noche) -->
+                                    <div class="row g-2 align-items-center mb-2 d-none" id="filaHorasTurno2">
+                                        <div class="col-12 col-sm-auto">
+                                            <span class="extra-small text-muted fw-bold text-uppercase d-block d-sm-inline">Turno 2:</span>
+                                        </div>
+                                        <div class="col-5 col-sm">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-open"></i></span>
+                                                <input type="time" class="form-control" id="horaApertura2" value="15:00">
+                                            </div>
+                                        </div>
+                                        <div class="col-2 col-sm-auto text-center text-muted small fw-bold">hasta</div>
+                                        <div class="col-5 col-sm">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-closed"></i></span>
+                                                <input type="time" class="form-control" id="horaCierre2" value="22:00">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-auto text-end text-sm-start">
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 extra-small" id="btnQuitarTurno2" title="Quitar segundo turno">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vista previa del resultado y campo que se envía al servidor -->
+                                <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                        <span class="badge bg-white text-dark border extra-small">Resultado:</span>
+                                        <div class="fw-bold text-success small flex-grow-1" id="previewHorarioSintetizado">
+                                            Lun - Sáb: 08:00 - 22:00
+                                        </div>
+                                    </div>
+                                    <!-- Input oculto para modo visual o visible para modo manual -->
+                                    <input type="text" name="horario_atencion" id="inputHorarioAtencion" class="form-control form-control-sm rounded-3 d-none mt-1" placeholder="Ej. Lunes a Sábado, 08:00 a 22:00" value="Lun - Sáb: 08:00 - 22:00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción Completa -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-dark">Descripción Completa *</label>
+                            <textarea name="descripcion" id="inputDescripcionLugar" rows="3" class="form-control rounded-3" placeholder="Describe los atractivos, historia, platos típicos o servicios especiales que brinda el lugar..." required></textarea>
+                            <small class="text-muted extra-small">Una buena descripción mejora la visibilidad en las búsquedas turísticas.</small>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SECCIÓN 1.1: Aprovisionamiento Comercial (Condicional si es Comercial) -->
                 <div class="form-section-card border-success-subtle bg-success-subtle bg-opacity-10 d-none" id="seccionAprovisionamientoComercial">
                     <div class="form-section-header border-success-subtle pb-3 mb-3">
@@ -134,7 +293,7 @@
                                 <label class="form-label fw-bold small text-dark mb-0">
                                     <i class="bi bi-calendar-check text-success me-1"></i>Plan de Membresía & Periodo Inicial
                                 </label>
-                                <span class="badge bg-white text-muted border rounded-pill px-3 py-1">Tarifa Base: Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>/mes</span>
+                                <span class="badge bg-white text-muted border rounded-pill px-3 py-1" id="badgeTarifaBaseDisplay">Tarifa Base: Bs <?= number_format((float)($tarifaVigente['monto_mensual'] ?? 250.00), 2) ?>/mes</span>
                             </div>
 
                             <div class="btn-group w-100 p-1 bg-white rounded-4 border mb-3 shadow-xs" role="group">
@@ -146,7 +305,7 @@
                                 </button>
                             </div>
 
-                            <!-- Sección A: Planes Rápidos Predefinidos -->
+                            <!-- Sección A1: Planes Rápidos para Comercio General (Restaurantes, Hoteles) -->
                             <div id="seccion-lugar-planes-estandar">
                                 <div class="row g-2">
                                     <div class="col-6 col-md-3">
@@ -158,7 +317,7 @@
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar3" onclick="elegirPlanEstandarLugar(3, 712.50, 1, 37.50, 'MENSUAL')">
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar3" onclick="elegirPlanEstandarLugar(3, 712.50, 5, 37.50, 'TRIMESTRAL')">
                                             <span class="badge bg-info-subtle text-info-emphasis rounded-pill extra-small mb-2 fw-semibold">Trimestral</span>
                                             <div class="fw-bold text-dark fs-6 mb-1">3 Meses</div>
                                             <div class="text-success fw-bold fs-5">Bs 712.50</div>
@@ -166,7 +325,7 @@
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar6" onclick="elegirPlanEstandarLugar(6, 1350.00, 1, 150.00, 'MENSUAL')">
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanLugar6" onclick="elegirPlanEstandarLugar(6, 1350.00, 6, 150.00, 'SEMESTRAL')">
                                             <span class="badge bg-primary-subtle text-primary rounded-pill extra-small mb-2 fw-semibold">Semestral</span>
                                             <div class="fw-bold text-dark fs-6 mb-1">6 Meses</div>
                                             <div class="text-success fw-bold fs-5">Bs 1,350</div>
@@ -179,6 +338,31 @@
                                             <div class="fw-bold text-dark fs-6 mb-1">12 Meses</div>
                                             <div class="text-success fw-bold fs-5">Bs 2,500</div>
                                             <span class="badge bg-warning text-dark rounded-pill extra-small mt-1 fw-bold">Ahorra Bs 500</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección A2: Planes Especiales para Sindicatos y Radiomóviles (Tarifas Institucionales) -->
+                            <div id="seccion-lugar-planes-transporte" style="display: none;">
+                                <div class="alert alert-info py-2 px-3 mb-2 rounded-3 small border-0 bg-info bg-opacity-10 text-dark">
+                                    <i class="bi bi-taxi-front-fill text-warning me-1"></i> Tarifa especial institucional para Sindicatos y Asociaciones de Radiomóviles (Bs 100/mes).
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer" id="cardPlanTransporte1" onclick="elegirPlanEstandarLugar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL')">
+                                            <span class="badge bg-light text-secondary rounded-pill extra-small mb-2 fw-semibold">Mensual Gremial</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">1 Mes</div>
+                                            <div class="text-success fw-bold fs-5">Bs 100</div>
+                                            <small class="text-muted extra-small d-block mt-1">Tarifa institucional para todo el sindicato</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="card card-plan-lugar h-100 p-3 text-center rounded-4 cursor-pointer border-warning" id="cardPlanTransporte12" onclick="elegirPlanEstandarLugar(12, 800.00, 8, 400.00, 'TRANSPORTE_ANUAL')">
+                                            <span class="badge bg-warning text-dark rounded-pill extra-small mb-2 fw-bold">★ Anual Sindicato</span>
+                                            <div class="fw-bold text-dark fs-6 mb-1">12 Meses (1 Año)</div>
+                                            <div class="text-success fw-bold fs-5">Bs 800</div>
+                                            <span class="badge bg-warning text-dark rounded-pill extra-small mt-1 fw-bold">Ahorra Bs 400 al año</span>
                                         </div>
                                     </div>
                                 </div>
@@ -363,50 +547,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 2: Categoría & Detalles del Servicio -->
-                <div class="form-section-card">
-                    <div class="form-section-header">
-                        <div class="form-section-icon">
-                            <i class="bi bi-tags-fill"></i>
-                        </div>
-                        <div>
-                            <h2 class="form-section-title">Clasificación & Descripción</h2>
-                            <p class="form-section-desc">Selecciona la categoría temática y detalla qué ofrece este lugar.</p>
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        <!-- Selector de Categorías Compacto -->
-                        <div class="col-12">
-                            <label class="form-label fw-bold small text-dark d-block">Categoría del Catálogo *</label>
-                            <div class="category-pill-grid">
-                                <?php foreach ($categorias as $indice => $c): ?>
-                                    <label class="category-pill-card">
-                                        <input type="radio" name="id_categoria" value="<?= (int)$c['id_categoria'] ?>" data-nombre-cat="<?= htmlspecialchars($c['nombre']) ?>" <?= $indice === 0 ? 'checked' : '' ?> required>
-                                        <i class="bi <?= htmlspecialchars($c['icono'] ?? 'bi-tag') ?> category-pill-icon"></i>
-                                        <span class="category-pill-name" title="<?= htmlspecialchars($c['nombre']) ?>">
-                                            <?= htmlspecialchars($c['nombre']) ?>
-                                        </span>
-                                    </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-
-                        <!-- Horario de Atención -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-dark">Horario de Atención</label>
-                            <input type="text" name="horario_atencion" class="form-control rounded-3" placeholder="Ej. Lunes a Sábado, 08:00 a 22:00">
-                        </div>
-
-                        <!-- Descripción Completa -->
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold small text-dark">Descripción Completa *</label>
-                            <textarea name="descripcion" id="inputDescripcionLugar" rows="3" class="form-control rounded-3" placeholder="Describe los atractivos, historia, platos típicos o servicios especiales que brinda el lugar..." required></textarea>
-                            <small class="text-muted extra-small">Una buena descripción mejora la visibilidad en las búsquedas turísticas.</small>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- SECCIÓN 3: Galería Fotográfica y Portada -->
                 <div class="form-section-card">
                     <div class="form-section-header">
@@ -494,6 +634,36 @@
                         <div class="col-md-4 mt-3">
                             <label class="form-label fw-bold small text-dark"><i class="bi bi-envelope-fill text-secondary me-1"></i>Correo Electrónico</label>
                             <input type="email" name="email_contacto" class="form-control rounded-3" placeholder="contacto@ejemplo.bo">
+                        </div>
+
+                        <!-- Redes Sociales Oficiales -->
+                        <div class="col-12 mt-3 pt-3 border-top">
+                            <label class="form-label fw-bold small text-dark mb-2">
+                                <i class="bi bi-share text-primary me-1"></i>Redes Sociales Oficiales
+                            </label>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark text-white"><i class="bi bi-tiktok"></i></span>
+                                        <input type="url" name="tiktok_url" class="form-control" placeholder="https://tiktok.com/@...">
+                                    </div>
+                                    <small class="text-muted extra-small">TikTok</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-primary text-white"><i class="bi bi-facebook"></i></span>
+                                        <input type="url" name="facebook_url" class="form-control" placeholder="https://facebook.com/...">
+                                    </div>
+                                    <small class="text-muted extra-small">Facebook</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text text-white" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="bi bi-instagram"></i></span>
+                                        <input type="url" name="instagram_url" class="form-control" placeholder="https://instagram.com/...">
+                                    </div>
+                                    <small class="text-muted extra-small">Instagram</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -597,12 +767,84 @@
     background: linear-gradient(135deg, #f0fdfa, #e6fffa);
     border: 1px solid #99f6e4;
 }
+
+/* Botón flotante para eliminar foto de previsualización */
+.image-preview-card {
+    position: relative;
+    overflow: hidden;
+}
+.btn-remove-foto {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(220, 53, 69, 0.9);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.btn-remove-foto:hover {
+    background: #dc3545;
+    transform: scale(1.12);
+    color: #ffffff;
+}
+
+/* Atajos de días de atención */
+[data-preset-dias] {
+    transition: all 0.15s ease;
+}
+[data-preset-dias]:hover {
+    background-color: #e6f4ea !important;
+    color: #0f766e !important;
+    border-color: #0f766e !important;
+}
 </style>
 
 <script>
-const TARIFA_BASE_LUGAR = <?= (float)($tarifaVigente['monto_mensual'] ?? 250.00) ?>;
+let TARIFA_BASE_LUGAR = <?= (float)($tarifaVigente['monto_mensual'] ?? 250.00) ?>;
+const TARIFA_BASE_COMERCIO = <?= (float)($tarifaVigente['monto_mensual'] ?? 250.00) ?>;
+const TARIFA_BASE_TRANSPORTE = 100.00;
 let modoPlanLugar = 'ESTANDAR';
 let mesesPlanLugar = 1;
+let esCategoriaTransporte = false;
+
+window.alternarTarifasPorCategoria = function(idCat) {
+    esCategoriaTransporte = (parseInt(idCat, 10) === 9);
+    const secEst = document.getElementById('seccion-lugar-planes-estandar');
+    const secTra = document.getElementById('seccion-lugar-planes-transporte');
+    const badgeBase = document.getElementById('badgeTarifaBaseDisplay');
+
+    if (esCategoriaTransporte) {
+        TARIFA_BASE_LUGAR = TARIFA_BASE_TRANSPORTE;
+        if (badgeBase) badgeBase.textContent = 'Tarifa Sindicato: Bs ' + TARIFA_BASE_TRANSPORTE.toFixed(2) + '/mes';
+        if (modoPlanLugar === 'ESTANDAR') {
+            if (secEst) secEst.style.display = 'none';
+            if (secTra) secTra.style.display = 'block';
+            elegirPlanEstandarLugar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL');
+        } else {
+            recalcularPlanPersonalizadoLugar();
+        }
+    } else {
+        TARIFA_BASE_LUGAR = TARIFA_BASE_COMERCIO;
+        if (badgeBase) badgeBase.textContent = 'Tarifa Base: Bs ' + TARIFA_BASE_COMERCIO.toFixed(2) + '/mes';
+        if (modoPlanLugar === 'ESTANDAR') {
+            if (secTra) secTra.style.display = 'none';
+            if (secEst) secEst.style.display = 'block';
+            elegirPlanEstandarLugar(1, TARIFA_BASE_COMERCIO, 1, 0, 'MENSUAL');
+        } else {
+            recalcularPlanPersonalizadoLugar();
+        }
+    }
+}
 
 function seleccionarModoPlanLugar(modo) {
     modoPlanLugar = modo;
@@ -611,18 +853,27 @@ function seleccionarModoPlanLugar(modo) {
     const btnEst = document.getElementById('btnModoLugarEstandar');
     const btnPer = document.getElementById('btnModoLugarPersonalizado');
     const secEst = document.getElementById('seccion-lugar-planes-estandar');
+    const secTra = document.getElementById('seccion-lugar-planes-transporte');
     const secPer = document.getElementById('seccion-lugar-plan-personalizado');
 
     if (modo === 'ESTANDAR') {
         btnEst.classList.add('active');
         btnPer.classList.remove('active');
-        secEst.style.display = 'block';
         secPer.style.display = 'none';
-        elegirPlanEstandarLugar(1, TARIFA_BASE_LUGAR, 1, 0, 'MENSUAL');
+        if (esCategoriaTransporte) {
+            secEst.style.display = 'none';
+            secTra.style.display = 'block';
+            elegirPlanEstandarLugar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL');
+        } else {
+            secTra.style.display = 'none';
+            secEst.style.display = 'block';
+            elegirPlanEstandarLugar(1, TARIFA_BASE_COMERCIO, 1, 0, 'MENSUAL');
+        }
     } else {
         btnPer.classList.add('active');
         btnEst.classList.remove('active');
         secEst.style.display = 'none';
+        secTra.style.display = 'none';
         secPer.style.display = 'block';
         document.querySelectorAll('.card-plan-lugar').forEach(c => c.classList.remove('active'));
         document.getElementById('lugar_codigo_plan').value = 'PERSONALIZADO';
@@ -633,7 +884,14 @@ function seleccionarModoPlanLugar(modo) {
 function elegirPlanEstandarLugar(meses, monto, idTarifa, ahorro, codigoPlan) {
     mesesPlanLugar = meses;
     document.querySelectorAll('.card-plan-lugar').forEach(c => c.classList.remove('active'));
-    document.getElementById('cardPlanLugar' + meses)?.classList.add('active');
+    
+    if (codigoPlan === 'TRANSPORTE_MENSUAL') {
+        document.getElementById('cardPlanTransporte1')?.classList.add('active');
+    } else if (codigoPlan === 'TRANSPORTE_ANUAL') {
+        document.getElementById('cardPlanTransporte12')?.classList.add('active');
+    } else {
+        document.getElementById('cardPlanLugar' + meses)?.classList.add('active');
+    }
 
     document.getElementById('lugar_meses_duracion').value = meses;
     document.getElementById('lugar_id_tarifa').value = idTarifa;

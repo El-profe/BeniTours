@@ -21,7 +21,7 @@ class Lugar {
         $sql = "SELECT l.id_lugar, l.id_municipio, l.nombre, l.slug, l.descripcion, l.direccion, 
                        l.referencia_ubicacion, l.horario_atencion, l.tipo_lugar,
                        l.estado_operativo, l.aviso_temporal_motivo, l.aviso_temporal_reapertura,
-                       l.whatsapp_contacto, l.telefono_contacto, l.id_categoria,
+                       l.whatsapp_contacto, l.telefono_contacto, l.facebook_url, l.instagram_url, l.tiktok_url, l.id_categoria,
                        l.latitud, l.longitud,
                        CONCAT(COALESCE(l.latitud, ''), ',', COALESCE(l.longitud, '')) AS coordenadas_gps,
                        c.nombre AS categoria, c.icono AS categoria_icono,
@@ -243,29 +243,34 @@ class Lugar {
         $sql = "INSERT INTO lugares (
                     id_municipio, id_categoria, nombre, slug, descripcion, direccion, 
                     referencia_ubicacion, latitud, longitud, telefono_contacto, 
-                    whatsapp_contacto, email_contacto, horario_atencion, tipo_lugar
+                    whatsapp_contacto, facebook_url, instagram_url, tiktok_url,
+                    email_contacto, horario_atencion, tipo_lugar
                 ) VALUES (
                     :id_municipio, :id_categoria, :nombre, :slug, :descripcion, :direccion,
                     :referencia, :latitud, :longitud, :telefono,
-                    :whatsapp, :email, :horario, :tipo_lugar
+                    :whatsapp, :facebook_url, :instagram_url, :tiktok_url,
+                    :email, :horario, :tipo_lugar
                 )";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':id_municipio' => (int)($datos['id_municipio'] ?? 1),
-            ':id_categoria' => (int)$datos['id_categoria'],
-            ':nombre'       => $datos['nombre'],
-            ':slug'         => $slugFinal,
-            ':descripcion'  => $datos['descripcion'],
-            ':direccion'    => $datos['direccion'],
-            ':referencia'   => $datos['referencia_ubicacion'] ?? null,
-            ':latitud'      => $coords['latitud'],
-            ':longitud'     => $coords['longitud'],
-            ':telefono'     => $datos['telefono_contacto'] ?? null,
-            ':whatsapp'     => $datos['whatsapp_contacto'] ?? null,
-            ':email'        => $datos['email_contacto'] ?? null,
-            ':horario'      => $datos['horario_atencion'] ?? null,
-            ':tipo_lugar'   => $datos['tipo_lugar']
+            ':id_municipio'   => (int)($datos['id_municipio'] ?? 1),
+            ':id_categoria'   => (int)$datos['id_categoria'],
+            ':nombre'         => $datos['nombre'],
+            ':slug'           => $slugFinal,
+            ':descripcion'    => $datos['descripcion'],
+            ':direccion'      => $datos['direccion'],
+            ':referencia'     => $datos['referencia_ubicacion'] ?? null,
+            ':latitud'        => $coords['latitud'],
+            ':longitud'       => $coords['longitud'],
+            ':telefono'       => $datos['telefono_contacto'] ?? null,
+            ':whatsapp'       => $datos['whatsapp_contacto'] ?? null,
+            ':facebook_url'   => $datos['facebook_url'] ?? null,
+            ':instagram_url'  => $datos['instagram_url'] ?? null,
+            ':tiktok_url'     => $datos['tiktok_url'] ?? null,
+            ':email'          => $datos['email_contacto'] ?? null,
+            ':horario'        => $datos['horario_atencion'] ?? null,
+            ':tipo_lugar'     => $datos['tipo_lugar']
         ]);
 
         return (int)$this->db->lastInsertId();
@@ -288,6 +293,9 @@ class Lugar {
                     longitud = :longitud,
                     telefono_contacto = :telefono,
                     whatsapp_contacto = :whatsapp,
+                    facebook_url = :facebook_url,
+                    instagram_url = :instagram_url,
+                    tiktok_url = :tiktok_url,
                     email_contacto = :email,
                     horario_atencion = :horario,
                     tipo_lugar = :tipo_lugar
@@ -295,20 +303,23 @@ class Lugar {
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':id_municipio' => (int)($datos['id_municipio'] ?? 1),
-            ':id_categoria' => (int)$datos['id_categoria'],
-            ':nombre'       => $datos['nombre'],
-            ':descripcion'  => $datos['descripcion'],
-            ':direccion'    => $datos['direccion'],
-            ':referencia'   => $datos['referencia_ubicacion'] ?? null,
-            ':latitud'      => $coords['latitud'],
-            ':longitud'     => $coords['longitud'],
-            ':telefono'     => $datos['telefono_contacto'] ?? null,
-            ':whatsapp'     => $datos['whatsapp_contacto'] ?? null,
-            ':email'        => $datos['email_contacto'] ?? null,
-            ':horario'      => $datos['horario_atencion'] ?? null,
-            ':tipo_lugar'   => $datos['tipo_lugar'],
-            ':id'           => $id
+            ':id_municipio'   => (int)($datos['id_municipio'] ?? 1),
+            ':id_categoria'   => (int)$datos['id_categoria'],
+            ':nombre'         => $datos['nombre'],
+            ':descripcion'    => $datos['descripcion'],
+            ':direccion'      => $datos['direccion'],
+            ':referencia'     => $datos['referencia_ubicacion'] ?? null,
+            ':latitud'        => $coords['latitud'],
+            ':longitud'       => $coords['longitud'],
+            ':telefono'       => $datos['telefono_contacto'] ?? null,
+            ':whatsapp'       => $datos['whatsapp_contacto'] ?? null,
+            ':facebook_url'   => $datos['facebook_url'] ?? null,
+            ':instagram_url'  => $datos['instagram_url'] ?? null,
+            ':tiktok_url'     => $datos['tiktok_url'] ?? null,
+            ':email'          => $datos['email_contacto'] ?? null,
+            ':horario'        => $datos['horario_atencion'] ?? null,
+            ':tipo_lugar'     => $datos['tipo_lugar'],
+            ':id'             => $id
         ]);
     }
 
@@ -324,18 +335,24 @@ class Lugar {
                     whatsapp_contacto = :whatsapp,
                     email_contacto = :email,
                     horario_atencion = :horario,
-                    enlace_menu = :enlace_menu";
+                    enlace_menu = :enlace_menu,
+                    facebook_url = :facebook_url,
+                    instagram_url = :instagram_url,
+                    tiktok_url = :tiktok_url";
 
         $params = [
-            ':descripcion'  => $datos['descripcion'],
-            ':direccion'    => $datos['direccion'],
-            ':referencia'   => $datos['referencia_ubicacion'] ?? null,
-            ':telefono'     => $datos['telefono_contacto'] ?? null,
-            ':whatsapp'     => $datos['whatsapp_contacto'] ?? null,
-            ':email'        => $datos['email_contacto'] ?? null,
-            ':horario'      => $datos['horario_atencion'] ?? null,
-            ':enlace_menu'  => $datos['enlace_menu'] ?? null,
-            ':id'           => $id
+            ':descripcion'   => $datos['descripcion'],
+            ':direccion'     => $datos['direccion'],
+            ':referencia'    => $datos['referencia_ubicacion'] ?? null,
+            ':telefono'      => $datos['telefono_contacto'] ?? null,
+            ':whatsapp'      => $datos['whatsapp_contacto'] ?? null,
+            ':email'         => $datos['email_contacto'] ?? null,
+            ':horario'       => $datos['horario_atencion'] ?? null,
+            ':enlace_menu'   => $datos['enlace_menu'] ?? null,
+            ':facebook_url'  => $datos['facebook_url'] ?? null,
+            ':instagram_url' => $datos['instagram_url'] ?? null,
+            ':tiktok_url'    => $datos['tiktok_url'] ?? null,
+            ':id'            => $id
         ];
 
         if (isset($datos['id_municipio']) && (int)$datos['id_municipio'] > 0) {

@@ -46,6 +46,33 @@
 
                         <p class="text-muted small flex-grow-1"><?= htmlspecialchars($p['descripcion']) ?></p>
 
+                        <?php if (!empty($p['tiktok_url']) || !empty($p['facebook_url']) || !empty($p['instagram_url'])): ?>
+                            <div class="mb-2 d-flex align-items-center gap-2">
+                                <span class="extra-small text-muted fw-semibold">Publicado en:</span>
+                                <?php if (!empty($p['tiktok_url'])): ?>
+                                    <a href="<?= htmlspecialchars($p['tiktok_url']) ?>" target="_blank" rel="noopener noreferrer" 
+                                       class="btn btn-sm btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center shadow-xs" 
+                                       style="width: 30px; height: 30px;" title="Ver video en TikTok">
+                                        <i class="bi bi-tiktok text-white" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (!empty($p['facebook_url'])): ?>
+                                    <a href="<?= htmlspecialchars($p['facebook_url']) ?>" target="_blank" rel="noopener noreferrer" 
+                                       class="btn btn-sm text-white rounded-circle p-0 d-flex align-items-center justify-content-center shadow-xs" 
+                                       style="width: 30px; height: 30px; background-color: #1877f2;" title="Ver en Facebook">
+                                        <i class="bi bi-facebook" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (!empty($p['instagram_url'])): ?>
+                                    <a href="<?= htmlspecialchars($p['instagram_url']) ?>" target="_blank" rel="noopener noreferrer" 
+                                       class="btn btn-sm text-white rounded-circle p-0 d-flex align-items-center justify-content-center shadow-xs" 
+                                       style="width: 30px; height: 30px; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);" title="Ver en Instagram">
+                                        <i class="bi bi-instagram" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="border-top pt-2 mt-3 small text-muted d-flex justify-content-between align-items-center">
                             <span><i class="bi bi-calendar3 me-1"></i> Hasta: <?= date('d/m/Y', strtotime($p['fecha_fin'])) ?></span>
                             
@@ -144,7 +171,43 @@
                 </div>
 
                 <div class="promo-form-section mt-4">
-                    <div class="promo-form-section-title"><span>2</span><div><strong>Imagen de la oferta</strong><small>Opcional, pero ayuda a captar más miradas.</small></div></div>
+                    <div class="promo-form-section-title"><span>2</span><div><strong>Redes Sociales de la Oferta</strong><small>Opcional: pega el link directo donde publicaste tu promo para que el turista lo vea.</small></div></div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" for="promoTiktokUrl">
+                                <i class="bi bi-tiktok text-dark me-1"></i> TikTok (Video / Reel)
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark text-white"><i class="bi bi-tiktok"></i></span>
+                                <input id="promoTiktokUrl" type="url" name="tiktok_url" class="form-control" maxlength="500" placeholder="https://vm.tiktok.com/...">
+                            </div>
+                            <small class="text-muted extra-small">Enlace al video promocional.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" for="promoFacebookUrl">
+                                <i class="bi bi-facebook text-primary me-1"></i> Facebook (Publicación)
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-primary text-white"><i class="bi bi-facebook"></i></span>
+                                <input id="promoFacebookUrl" type="url" name="facebook_url" class="form-control" maxlength="500" placeholder="https://facebook.com/...">
+                            </div>
+                            <small class="text-muted extra-small">Enlace al post de Facebook.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" for="promoInstagramUrl">
+                                <i class="bi bi-instagram text-danger me-1"></i> Instagram (Reel / Post)
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text text-white" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="bi bi-instagram"></i></span>
+                                <input id="promoInstagramUrl" type="url" name="instagram_url" class="form-control" maxlength="500" placeholder="https://instagram.com/p/...">
+                            </div>
+                            <small class="text-muted extra-small">Enlace a la publicación en Instagram.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="promo-form-section mt-4">
+                    <div class="promo-form-section-title"><span>3</span><div><strong>Imagen de la oferta</strong><small>Opcional, pero ayuda a captar más miradas.</small></div></div>
                     
                     <!-- Control para imagen existente cuando se edita -->
                     <div id="promoImgActualBox" class="alert alert-light border d-flex align-items-center justify-content-between p-2 mb-3 rounded-3 d-none">
@@ -166,7 +229,7 @@
                 </div>
 
                 <div class="promo-form-section mt-4">
-                    <div class="promo-form-section-title"><span>3</span><div><strong>Vigencia</strong><small>Define cuándo estará disponible tu oferta.</small></div></div>
+                    <div class="promo-form-section-title"><span>4</span><div><strong>Vigencia</strong><small>Define cuándo estará disponible tu oferta.</small></div></div>
                     <div class="row g-3">
                         <div class="col-sm-6">
                             <label class="form-label fw-semibold small" for="promoFechaInicio">Fecha de inicio <span class="text-danger">*</span></label>

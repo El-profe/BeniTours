@@ -16,6 +16,34 @@ try {
     http_response_code(403); exit('{"ok":false}');
 }
 if (!$callback) exit('{"ok":true}');
+
+// Manejar callbacks de comandos interactivos (Vencimientos, Vencidos, Resumen)
+if (($callback['tipo'] ?? '') === 'callback_comando') {
+    try {
+        App\Services\TelegramService::responderCallback($callback['callback_id'], 'Cargando...');
+        match ($callback['comando']) {
+            'resumen'      => App\Services\TelegramService::enviarResumenEjecutivo($callback['chat_id']),
+            'vencimientos' => App\Services\TelegramService::enviarAlertaVencimientos($callback['chat_id']),
+            'vencidos'     => App\Services\TelegramService::enviarAlertaVencidos($callback['chat_id']),
+            default        => null,
+        };
+    } catch (Throwable $e) {
+        error_log('Error callback comando Telegram: ' . $e->getMessage());
+    }
+    exit('{"ok":true}');
+}
+
+// Manejar mensajes de texto directos enviados por el administrador
+if (($callback['tipo'] ?? '') === 'mensaje') {
+    try {
+        App\Services\TelegramService::procesarComandoMensaje($callback['texto'] ?? '', $callback['chat_id']);
+    } catch (Throwable $e) {
+        error_log('Error procesar mensaje Telegram: ' . $e->getMessage());
+    }
+    exit('{"ok":true}');
+}
+
+// Flujo existente: Aprobación / Rechazo de solicitudes de registro
 try {
     if ($callback['accion'] === 'aprobar') {
         App\Services\SolicitudService::aprovisionarNegocioCompleto($callback['id_solicitud'], $callback['admin_id']);

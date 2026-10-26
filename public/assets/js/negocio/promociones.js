@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('promoTitulo');
     const discount = document.getElementById('promoDescuento');
     const description = document.getElementById('promoDescripcion');
+    const tiktokUrl = document.getElementById('promoTiktokUrl');
+    const facebookUrl = document.getElementById('promoFacebookUrl');
+    const instagramUrl = document.getElementById('promoInstagramUrl');
     const fechaInicio = document.getElementById('promoFechaInicio');
     const fechaFin = document.getElementById('promoFechaFin');
     const flyer = document.getElementById('promoFlyer');
@@ -52,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
         if (promoId) promoId.value = '';
         if (quitarImg) quitarImg.value = '0';
+        if (tiktokUrl) tiktokUrl.value = '';
+        if (facebookUrl) facebookUrl.value = '';
+        if (instagramUrl) instagramUrl.value = '';
         
         // Fechas por defecto: hoy y en 15 días
         const hoy = new Date().toISOString().split('T')[0];
@@ -109,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (title) title.value = data.titulo || '';
             if (discount) discount.value = data.descuento_texto || '';
             if (description) description.value = data.descripcion || '';
+            if (tiktokUrl) tiktokUrl.value = data.tiktok_url || '';
+            if (facebookUrl) facebookUrl.value = data.facebook_url || '';
+            if (instagramUrl) instagramUrl.value = data.instagram_url || '';
             if (fechaInicio) fechaInicio.value = data.fecha_inicio || '';
             if (fechaFin) fechaFin.value = data.fecha_fin || '';
 

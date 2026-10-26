@@ -46,7 +46,7 @@ class Database {
                 self::$instance = new PDO($dsn, $config['username'], $config['password'], $options);
             } catch (PDOException $e) {
                 error_log("Fallo crítico de conexión PDO: " . $e->getMessage());
-                throw new RuntimeException("Error al conectar con la base de datos MariaDB: " . $e->getMessage());
+                throw new RuntimeException("Error al conectar con el servicio de base de datos.");
             }
         }
 

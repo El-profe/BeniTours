@@ -8,6 +8,7 @@ use App\Models\Tarifa;
 use App\Middleware\CsrfMiddleware;
 use App\Services\SolicitudEntradaService;
 use App\Services\TelegramService;
+use App\Services\RateLimiterService;
 use InvalidArgumentException;
 use Throwable;
 
@@ -33,8 +34,28 @@ class SolicitudController extends Controller {
             $this->json(['success'=>false, 'error'=>'Método no permitido.'], 405);
             return;
         }
+
+        // 1. Verificación Anti-Fuerza Bruta / Rate Limiter por IP (máx 5 solicitudes por 10 min)
+        $ip = RateLimiterService::obtenerIpCliente();
+        $rateKey = 'solicitud_ip_' . $ip;
+        if (!RateLimiterService::estaPermitido($rateKey, 5, 600)) {
+            $segundos = RateLimiterService::segundosRestantes($rateKey);
+            $minutos = max(1, (int)ceil($segundos / 60));
+            $this->json(['success' => false, 'error' => "Demasiadas solicitudes enviadas recientemente. Por seguridad, espere {$minutos} minuto(s) antes de intentar."], 429);
+            return;
+        }
+
+        // 2. Trampa Anti-Bot (Honeypot)
+        $honeypot = trim($_POST['campo_antispam_fax'] ?? '');
+        if ($honeypot !== '') {
+            // Respuesta simulada de éxito para despistar al bot sin realizar ninguna acción
+            $this->json(['success' => true, 'message' => 'Solicitud recibida correctamente.']);
+            return;
+        }
+
         $token = $_POST['csrf_token'] ?? null;
         if (!is_string($token) || !CsrfMiddleware::validarToken($token)) {
+            RateLimiterService::registrarFallo($rateKey, 5, 600);
             $this->json(['success'=>false, 'error'=>'Sesión expirada o carga demasiado grande. Recargue el formulario; el comprobante admite hasta 5 MB.'], 403);
             return;
         }

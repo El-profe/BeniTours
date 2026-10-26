@@ -33,10 +33,20 @@
         <meta name="twitter:image" content="<?= htmlspecialchars($ogMeta['image']) ?>">
     <?php endif; ?>
 
+    <!-- Preconexión y optimización de DNS para recursos externos -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
     <!-- Bootstrap 5.3.3 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
     <!-- Bootstrap Icons (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap-icons/bootstrap-icons.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
+    <!-- Font Awesome 6 Free (Iconos Universales) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- Leaflet 1.9.4 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/leaflet/leaflet.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/leaflet/leaflet.css') ?>">
     <!-- Estilos propios -->
@@ -87,7 +97,17 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#promociones" data-nav-link="promociones">
-                            <i class="bi bi-tag-fill me-1 " aria-hidden="true"></i> Promociones
+                            <i class="bi bi-tag-fill me-1" aria-hidden="true"></i> Promociones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#transporte" data-nav-link="transporte">
+                            <i class="bi bi-taxi-front-fill me-1" aria-hidden="true"></i> Transporte
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#galeria" data-nav-link="galeria">
+                            <i class="bi bi-camera-fill me-1" aria-hidden="true"></i> Galería
                         </a>
                     </li>
                     
@@ -240,12 +260,12 @@
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/leaflet/leaflet.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/leaflet/leaflet.js') ?>"></script>
 
     <!-- Botón Flotante para Negocios (Esquina Inferior) -->
-    <div class="dropdown position-fixed bottom-0 end-0 m-3 m-md-4" style="z-index: 1045;">
-        <button class="btn btn-teal-action rounded-pill fw-bold px-3 py-2 shadow-lg text-white dropdown-toggle d-flex align-items-center gap-2 border border-white border-opacity-25" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.92rem; backdrop-filter: blur(8px);">
+    <div class="dropdown position-fixed bottom-0 end-0 m-3 m-md-4 floating-negocios-container">
+        <button class="btn btn-teal-action rounded-pill fw-bold px-3 py-2 shadow-lg text-white dropdown-toggle d-flex align-items-center gap-2 border border-white border-opacity-25 btn-floating-negocios" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-shop fs-5"></i>
             <span class="d-none d-sm-inline">Negocios</span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 border-0 mb-2 py-2" style="min-width: 230px;">
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 border-0 mb-2 py-2 dropdown-menu-floating">
             <li>
                 <a class="dropdown-item py-2 px-3 fw-semibold text-dark" href="<?= htmlspecialchars($baseUrl) ?>/solicitar-incorporacion">
                     <i class="bi bi-plus-circle-fill text-teal me-2"></i> Publicar mi Negocio
@@ -261,7 +281,7 @@
     </div>
 
     <!-- Botón Flotante para Mi Itinerario -->
-    <button type="button" id="btnFlotanteItinerario" class="btn btn-teal-action rounded-pill shadow-lg position-fixed bottom-0 start-0 m-3 m-md-4 py-2 px-3 align-items-center gap-2 d-none" style="z-index: 1040;" data-bs-toggle="modal" data-bs-target="#modalItinerario" title="Ver mi ruta planificada">
+    <button type="button" id="btnFlotanteItinerario" class="btn btn-teal-action rounded-pill shadow-lg position-fixed bottom-0 start-0 m-3 m-md-4 py-2 px-3 align-items-center gap-2 d-none floating-itinerario-btn" data-bs-toggle="modal" data-bs-target="#modalItinerario" title="Ver mi ruta planificada">
         <i class="bi bi-heart-fill text-danger fs-5"></i>
         <span class="fw-bold d-none d-sm-inline">Mi Itinerario</span>
         <span class="badge bg-white text-dark rounded-pill contador-itinerario">0</span>

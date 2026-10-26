@@ -13,7 +13,7 @@ class SolicitudEntradaService {
         $limites = ['nombre_establecimiento'=>150, 'nombre_solicitante'=>120,
             'telefono_contacto'=>30, 'email_contacto'=>120, 'direccion'=>255,
             'descripcion'=>10000, 'horarios'=>150,
-            'numero_comprobante'=>100, 'plan_solicitado'=>7];
+            'numero_comprobante'=>100, 'plan_solicitado'=>30];
         foreach ($limites as $campo => $maximo) {
             if (isset($entrada[$campo]) && !is_string($entrada[$campo])) {
                 throw new InvalidArgumentException('Formato de campo inválido: ' . $campo);
@@ -27,12 +27,14 @@ class SolicitudEntradaService {
         foreach (['nombre_establecimiento','nombre_solicitante','telefono_contacto','direccion','descripcion'] as $campo) {
             if ($datos[$campo] === '') throw new InvalidArgumentException('Complete todos los campos obligatorios.');
         }
-        if (!in_array($datos['plan_solicitado'], ['MENSUAL','ANUAL'], true)) {
-            throw new InvalidArgumentException('Seleccione un plan mensual o anual.');
+        if ($datos['plan_solicitado'] === '') {
+            $datos['plan_solicitado'] = 'MENSUAL';
         }
-        // El precio y las credenciales nunca se aceptan del navegador.
+        // El precio y las credenciales nunca se aceptan del navegador; se resuelven contra la tarifa activa.
         $tarifa = (new \App\Models\Tarifa())->obtenerTarifaVigente($datos['plan_solicitado']);
-        if (!$tarifa) throw new InvalidArgumentException('El plan seleccionado no está disponible.');
+        if (!$tarifa) {
+            throw new InvalidArgumentException('El plan seleccionado no es válido o no está disponible.');
+        }
         $datos['monto_declarado'] = (float)$tarifa['monto'];
         if ($datos['email_contacto'] !== '' && !filter_var($datos['email_contacto'], FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException('El correo electrónico no es válido.');

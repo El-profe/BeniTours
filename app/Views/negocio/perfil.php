@@ -97,6 +97,49 @@
                 </div>
             </div>
 
+            <!-- Redes Sociales Oficiales -->
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-share text-primary me-2"></i>Redes Sociales Oficiales</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label for="tiktok_url" class="form-label small fw-semibold">
+                        <i class="bi bi-tiktok text-dark me-1"></i> Perfil de TikTok
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white border-end-0"><i class="bi bi-tiktok"></i></span>
+                        <input type="url" id="tiktok_url" name="tiktok_url" class="form-control" 
+                               value="<?= htmlspecialchars($lugar['tiktok_url'] ?? '') ?>" 
+                               placeholder="https://www.tiktok.com/@tunegocio" maxlength="255">
+                    </div>
+                    <small class="text-muted extra-small">Enlace a tu perfil de TikTok para ver tus videos virales.</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="facebook_url" class="form-label small fw-semibold">
+                        <i class="bi bi-facebook text-primary me-1"></i> Página de Facebook
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-primary text-white border-end-0"><i class="bi bi-facebook"></i></span>
+                        <input type="url" id="facebook_url" name="facebook_url" class="form-control" 
+                               value="<?= htmlspecialchars($lugar['facebook_url'] ?? '') ?>" 
+                               placeholder="https://facebook.com/tunegocio" maxlength="255">
+                    </div>
+                    <small class="text-muted extra-small">Enlace a tu Fanpage para ver publicaciones y menú del día.</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="instagram_url" class="form-label small fw-semibold">
+                        <i class="bi bi-instagram text-danger me-1"></i> Cuenta de Instagram
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text text-white border-end-0" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"><i class="bi bi-instagram"></i></span>
+                        <input type="url" id="instagram_url" name="instagram_url" class="form-control" 
+                               value="<?= htmlspecialchars($lugar['instagram_url'] ?? '') ?>" 
+                               placeholder="https://instagram.com/tunegocio" maxlength="255">
+                    </div>
+                    <small class="text-muted extra-small">Enlace a tu feed para mostrar las mejores fotos de tus platos y ambiente.</small>
+                </div>
+            </div>
+
             <!-- Ubicación y Descripción -->
             <h5 class="fw-bold text-dark mb-3"><i class="bi bi-card-text text-primary me-2"></i>Información del Establecimiento</h5>
             <div class="row g-3 mb-4">

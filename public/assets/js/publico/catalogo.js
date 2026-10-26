@@ -53,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'inicio', linkAttr: 'inicio' },
         { id: 'explorar', linkAttr: 'explorar' },
         { id: 'promociones', linkAttr: 'promociones' },
-        { id: 'guia-trinidad', linkAttr: 'guia-trinidad' }
+        { id: 'guia-trinidad', linkAttr: 'guia-trinidad' },
+        { id: 'transporte', linkAttr: 'transporte' },
+        { id: 'galeria', linkAttr: 'galeria' }
     ];
 
     let tickingScroll = false;
@@ -112,8 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let ordenOriginalTarjetas = Array.from(contenedor.querySelectorAll('.tarjeta-lugar-col'));
     let modoVistaActual = 'grid'; // 'grid' | 'mapa'
 
-    // Control de límite de 3 filas iniciales (9 tarjetas) y botón Ver más
-    const LIMITE_FILAS_INICIAL = 9;
+    // Control de límite de 2 filas iniciales (6 tarjetas) y botón Ver más
+    const LIMITE_FILAS_INICIAL = 6;
     let catalogoExpandido = false;
     const contenedorVerMas = document.getElementById('contenedorVerMasLugares');
     const btnVerMas = document.getElementById('btnVerMasLugares');
@@ -181,7 +183,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let marcadorUsuario = null;
     let circuloPrecisionUsuario = null;
     let circuloRadio1Km = null;
+    let rutaPolylineLayer = null; // Capa de línea de ruta turística
+    let rutaMarcadoresLayer = null; // Capa de marcadores numerados de la ruta
+    let idRutaActiva = 'todos';
     const COORDENADAS_TRINIDAD = [-14.8333, -64.9000];
+
+    // Cargar datos de rutas inteligentes embebidas
+    let rutasDisponibles = [];
+    const scriptRutasJson = document.getElementById('rutasInicialesJson');
+    if (scriptRutasJson) {
+        try {
+            rutasDisponibles = JSON.parse(scriptRutasJson.textContent || '[]');
+        } catch (e) {
+            console.error('Error parseando rutas inteligentes:', e);
+        }
+    }
+
+    // Elementos del panel de rutas inteligentes
+    const selectorRutasContainer = document.getElementById('selectorRutasTuristicas');
+    const panelInfoRuta = document.getElementById('panelInfoRutaActiva');
+    const rutaInfoBadge = document.getElementById('rutaInfoBadge');
+    const rutaInfoTitulo = document.getElementById('rutaInfoTitulo');
+    const rutaInfoSubtitulo = document.getElementById('rutaInfoSubtitulo');
+    const rutaInfoParadas = document.getElementById('rutaInfoParadas');
+    const rutaInfoDistancia = document.getElementById('rutaInfoDistancia');
+    const rutaInfoTiempo = document.getElementById('rutaInfoTiempo');
+    const rutaBtnGoogleMaps = document.getElementById('rutaBtnGoogleMaps');
+    const rutaBtnVolverGeneral = document.getElementById('rutaBtnVolverGeneral');
 
     // Cargar datos iniciales del catálogo desde el script JSON embebido
     let lugaresActuales = [];
@@ -477,19 +505,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const ico = (icono || '').toLowerCase();
 
         // 1. Museos y Patrimonio Cultural (Dorado/Ámbar) - Comprobar antes de building
-        if (cat.includes('museo') || cat.includes('patrimon') || cat.includes('cultur') || ico.includes('bank')) {
+        if (cat.includes('museo') || cat.includes('patrimon') || cat.includes('cultur') || ico.includes('bank') || ico.includes('landmark')) {
             return 'pin-museum';
         }
-        // 2. Bares y Vida Nocturna (Violeta/Morado) - Comprobar antes de gastro para evitar que 'straw' o 'cup' colisionen
-        if (cat.includes('bar') || cat.includes('nocturn') || cat.includes('pub') || cat.includes('karaoke') || ico.includes('straw') || ico.includes('moon')) {
+        // 2. Bares y Vida Nocturna (Violeta/Morado)
+        if (cat.includes('bar') || cat.includes('nocturn') || cat.includes('pub') || cat.includes('karaoke') || ico.includes('straw') || ico.includes('moon') || ico.includes('martini') || ico.includes('wine')) {
             return 'pin-night';
         }
         // 3. Gastronomía y Sabores (Naranja Ámbar)
-        if (cat.includes('restauran') || cat.includes('gastro') || cat.includes('comida') || cat.includes('sabor') || ico.includes('egg') || ico.includes('cup-hot')) {
+        if (cat.includes('restauran') || cat.includes('gastro') || cat.includes('comida') || cat.includes('sabor') || ico.includes('egg') || ico.includes('cup-hot') || ico.includes('utensil')) {
             return 'pin-gastro';
         }
         // 4. Hoteles y Hospedajes (Azul Cielo)
-        if (cat.includes('hotel') || cat.includes('hospedaj') || cat.includes('alojam') || ico.includes('building') || ico.includes('houses')) {
+        if (cat.includes('hotel') || cat.includes('hospedaj') || cat.includes('alojam') || ico.includes('building') || ico.includes('houses') || ico.includes('bed')) {
             return 'pin-hotel';
         }
         // 5. Balnearios y Recreación Acuática (Turquesa / Cian)
@@ -500,7 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cat.includes('atractiv') || cat.includes('naturaleza') || cat.includes('turist') || ico.includes('compass') || ico.includes('tree')) {
             return 'pin-nature';
         }
-        // 7. Comercio / Tiendas (Rosa Coral)
+        // 7. Radiomóviles y Transporte (Amarillo Taxi)
+        if (cat.includes('transporte') || cat.includes('movil') || cat.includes('móvil') || cat.includes('taxi') || ico.includes('taxi') || ico.includes('car')) {
+            return 'pin-taxi';
+        }
+        // 8. Comercio / Tiendas (Rosa Coral)
         if (cat.includes('artesan') || cat.includes('comercio') || cat.includes('tienda') || ico.includes('shop') || ico.includes('bag')) {
             return 'pin-shop';
         }
@@ -525,6 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).addTo(mapa);
 
         marcadoresLayer = L.featureGroup().addTo(mapa);
+        rutaMarcadoresLayer = L.featureGroup().addTo(mapa);
 
         // Si el usuario ya tenía ubicación activa previa
         if (ubicacionUsuario) {
@@ -602,9 +635,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 icono = 'bi-bank';
             }
 
+            const iconoTag = icono.startsWith('fa-') ? `<i class="${icono}"></i>` : `<i class="bi ${icono}"></i>`;
             const customIcon = L.divIcon({
                 className: 'beniturs-map-marker',
-                html: `<div class="beniturs-marker-pin ${pinClass}"><i class="bi ${icono}"></i></div>`,
+                html: `<div class="beniturs-marker-pin ${pinClass}">${iconoTag}</div>`,
                 iconSize: [36, 36],
                 iconAnchor: [18, 36],
                 popupAnchor: [0, -34]
@@ -725,6 +759,177 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnVistaGrid?.addEventListener('click', () => cambiarModoVista('grid'));
     btnVistaMapa?.addEventListener('click', () => cambiarModoVista('mapa'));
+
+    // 5.1. Manejo del Algoritmo de Rutas Turísticas Inteligentes
+    function activarRutaTuristica(idRuta) {
+        if (!mapa || !window.L) {
+            inicializarMapa();
+            if (!mapa) return;
+        }
+
+        idRutaActiva = idRuta;
+
+        // Actualizar estados visuales de los botones del selector
+        if (selectorRutasContainer) {
+            selectorRutasContainer.querySelectorAll('.btn-filtro-ruta').forEach(btn => {
+                const coincide = btn.getAttribute('data-ruta-id') === idRuta;
+                btn.classList.toggle('active', coincide);
+                btn.classList.toggle('btn-teal-action', coincide);
+                btn.classList.toggle('btn-white', !coincide);
+            });
+        }
+
+        // Limpiar trazado y marcadores anteriores de ruta
+        if (rutaPolylineLayer) {
+            mapa.removeLayer(rutaPolylineLayer);
+            rutaPolylineLayer = null;
+        }
+        if (rutaMarcadoresLayer) {
+            rutaMarcadoresLayer.clearLayers();
+        }
+
+        // Si se selecciona "Todos los lugares", restaurar vista normal
+        if (idRuta === 'todos') {
+            panelInfoRuta?.classList.add('d-none');
+            marcadoresLayer.addTo(mapa);
+            actualizarMarcadoresMapa(lugaresActuales);
+            return;
+        }
+
+        // Buscar la ruta en el set disponible
+        const ruta = rutasDisponibles.find(r => r.id === idRuta);
+        if (!ruta || !ruta.paradas || ruta.paradas.length === 0) {
+            return;
+        }
+
+        // Ocultar marcadores generales para enfocar la ruta
+        if (mapa.hasLayer(marcadoresLayer)) {
+            mapa.removeLayer(marcadoresLayer);
+        }
+
+        // Mostrar panel informativo
+        if (panelInfoRuta) {
+            panelInfoRuta.classList.remove('d-none');
+            if (rutaInfoBadge) {
+                rutaInfoBadge.textContent = ruta.badge || 'Ruta Inteligente';
+                rutaInfoBadge.style.backgroundColor = ruta.color || '#0d9488';
+            }
+            if (rutaInfoTitulo) rutaInfoTitulo.textContent = ruta.titulo;
+            if (rutaInfoSubtitulo) rutaInfoSubtitulo.textContent = ruta.subtitulo;
+            if (rutaInfoParadas) rutaInfoParadas.textContent = ruta.paradas.length;
+            if (rutaInfoDistancia) rutaInfoDistancia.textContent = `${ruta.distancia_km} km`;
+            if (rutaInfoTiempo) rutaInfoTiempo.textContent = ruta.tiempo_estimado;
+            if (rutaBtnGoogleMaps) {
+                rutaBtnGoogleMaps.href = ruta.google_maps_url || '#';
+            }
+        }
+
+        // 1. Trazar la polilínea conectando los puntos ordenados
+        const latLngs = ruta.puntos_coords || [];
+        if (latLngs.length >= 2) {
+            rutaPolylineLayer = L.polyline(latLngs, {
+                color: ruta.color || '#0d9488',
+                weight: 5,
+                opacity: 0.85,
+                dashArray: '8, 8',
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(mapa);
+        }
+
+        // 2. Colocar pines numerados (Inicio, Intermedios, Fin)
+        const baseUrl = window.APP_CONFIG?.baseUrl || '';
+        ruta.paradas.forEach((parada, idx) => {
+            const lat = parseFloat(parada.latitud);
+            const lng = parseFloat(parada.longitud);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const esInicio = (idx === 0);
+            const esFin = (idx === ruta.paradas.length - 1);
+            let badgeTexto = `${parada.numero_parada}`;
+            let pinBg = ruta.color || '#0d9488';
+            let pinLabel = `Parada ${parada.numero_parada}`;
+
+            if (esInicio) {
+                badgeTexto = '<i class="bi bi-play-fill"></i>';
+                pinBg = '#15803d'; // Verde inicio
+                pinLabel = '🟢 1. INICIO';
+            } else if (esFin) {
+                badgeTexto = '<i class="bi bi-flag-fill"></i>';
+                pinBg = '#b91c1c'; // Rojo meta
+                pinLabel = `🏁 ${parada.numero_parada}. META / FIN`;
+            }
+
+            const customRutaIcon = L.divIcon({
+                className: 'beniturs-ruta-pin-wrapper',
+                html: `
+                    <div class="beniturs-ruta-pin" style="background-color: ${pinBg};">
+                        <span class="ruta-pin-numero">${badgeTexto}</span>
+                    </div>
+                `,
+                iconSize: [38, 38],
+                iconAnchor: [19, 38],
+                popupAnchor: [0, -36]
+            });
+
+            const imgHtml = parada.imagen
+                ? `<img src="${baseUrl}/imagen?f=${encodeURIComponent(parada.imagen)}" alt="${escapeHtml(parada.nombre)}" class="beniturs-popup-img" loading="lazy">`
+                : '';
+
+            const popupContent = `
+                <div class="beniturs-map-popup">
+                    ${imgHtml}
+                    <div class="p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge rounded-pill px-2 py-1 extra-small text-white fw-bold" style="background-color: ${pinBg};">
+                                ${pinLabel}
+                            </span>
+                            <span class="badge bg-light text-dark border rounded-pill extra-small">
+                                <i class="bi bi-heart-fill text-danger me-1"></i>${parada.total_favoritos || 0} votos
+                            </span>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-dark">${escapeHtml(parada.nombre)}</h6>
+                        <p class="extra-small text-muted mb-2">${escapeHtml(parada.categoria_nombre || '')}</p>
+                        ${parada.direccion ? `<p class="extra-small text-secondary mb-2 text-truncate"><i class="bi bi-geo-alt me-1 text-danger"></i>${escapeHtml(parada.direccion)}</p>` : ''}
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            <a href="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(parada.slug)}" 
+                               class="btn btn-sm btn-teal-action rounded-pill flex-grow-1 extra-small py-1 fw-semibold">
+                                Ver Ficha
+                            </a>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener noreferrer" 
+                               class="btn btn-sm btn-outline-secondary rounded-pill extra-small px-2 py-1" title="Cómo llegar">
+                                <i class="bi bi-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const marker = L.marker([lat, lng], { icon: customRutaIcon, zIndexOffset: 1500 - idx }).addTo(rutaMarcadoresLayer);
+            marker.bindPopup(popupContent, { maxWidth: 280, minWidth: 240, className: 'beniturs-leaflet-popup' });
+        });
+
+        // 3. Ajustar el mapa al circuito completo
+        if (rutaMarcadoresLayer.getLayers().length > 0) {
+            mapa.fitBounds(rutaMarcadoresLayer.getBounds(), { padding: [60, 60], maxZoom: 16 });
+        }
+    }
+
+    // Eventos del selector de rutas
+    if (selectorRutasContainer) {
+        selectorRutasContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-filtro-ruta');
+            if (!btn) return;
+            const idRuta = btn.getAttribute('data-ruta-id');
+            if (idRuta) {
+                activarRutaTuristica(idRuta);
+            }
+        });
+    }
+
+    rutaBtnVolverGeneral?.addEventListener('click', () => {
+        activarRutaTuristica('todos');
+    });
 
     btnCentrarTrinidad?.addEventListener('click', () => {
         if (mapa) {
@@ -865,48 +1070,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const munBadge = lug.municipio ? ` · <i class="bi bi-geo-alt text-warning"></i> ${escapeHtml(lug.municipio)}` : '';
             const munHeader = lug.municipio ? ` · ${escapeHtml(lug.municipio)}` : '';
+            const catIcoStr = lug.categoria_icono || 'bi-geo-alt';
+            const catIcoTag = catIcoStr.startsWith('fa-') ? `<i class="${catIcoStr} me-1"></i>` : `<i class="bi ${catIcoStr} me-1"></i>`;
+            const catIcoBubble = catIcoStr.startsWith('fa-') ? `<i class="${catIcoStr} fs-3 text-success"></i>` : `<i class="bi ${catIcoStr} fs-3 text-success"></i>`;
 
-            let cabeceraHtml = '';
-            if (lug.imagen) {
-                cabeceraHtml = `
-                    <div class="position-relative" style="height: 200px; background-color: #092611;">
-                        <img src="${baseUrl}/imagen?f=${encodeURIComponent(lug.imagen)}" 
-                             alt="${escapeHtml(lug.nombre)}" 
-                             class="w-100 h-100 object-fit-cover"
-                             loading="lazy"
-                             decoding="async">
-                        <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 rounded-pill fw-bold shadow-sm">
-                            <i class="bi ${lug.categoria_icono} me-1"></i> ${escapeHtml(lug.categoria)}${munBadge}
-                        </span>
-                        ${lug.promo_activa_texto ? `
-                            <span class="badge bg-danger text-white position-absolute bottom-0 start-0 m-3 rounded-pill fw-bold shadow-sm" style="z-index: 5;">
-                                <i class="bi bi-tag-fill me-1"></i> ${escapeHtml(lug.promo_activa_texto)}
-                            </span>
-                        ` : ''}
-                        <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
-                    </div>
-                `;
-            } else {
-                cabeceraHtml = `
-                    <div class="card-header-place p-4 text-white text-center position-relative">
-                        <div class="place-icon-bubble mx-auto mb-2 shadow-sm">
-                            <i class="bi ${lug.categoria_icono || 'bi-geo-alt'} fs-3 text-success"></i>
-                        </div>
-                        <h5 class="fw-bold mb-1 text-white text-truncate">${escapeHtml(lug.nombre)}</h5>
-                        <span class="extra-small text-white-50 text-uppercase fw-semibold tracking-wide">
-                            ${escapeHtml(lug.categoria)}${munHeader}
-                        </span>
-                        ${lug.promo_activa_texto ? `
-                            <div class="mt-2">
-                                <span class="badge bg-danger text-white rounded-pill fw-bold shadow-sm px-3 py-1">
-                                    <i class="bi bi-tag-fill me-1"></i> Promo: ${escapeHtml(lug.promo_activa_texto)}
-                                </span>
-                            </div>
-                        ` : ''}
-                        <div class="badge-distancia-container distance-badge-position position-absolute end-0 bottom-0 m-3"></div>
-                    </div>
-                `;
+            const urlFicha = `${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}`;
+
+            // Redes sociales compactas si existen
+            let redesSocialesHtml = '';
+            if (lug.tiktok_url || lug.facebook_url || lug.instagram_url) {
+                redesSocialesHtml = `<div class="d-flex align-items-center gap-1 ms-1">`;
+                if (lug.tiktok_url) {
+                    redesSocialesHtml += `
+                        <a href="${escapeHtml(lug.tiktok_url)}" target="_blank" rel="noopener noreferrer" 
+                           class="btn btn-sm btn-dark rounded-circle p-0 d-flex align-items-center justify-content-center" 
+                           style="width: 28px; height: 28px;" title="Ver en TikTok" onclick="event.stopPropagation();">
+                            <i class="bi bi-tiktok text-white" style="font-size: 0.75rem;"></i>
+                        </a>
+                    `;
+                }
+                if (lug.facebook_url) {
+                    redesSocialesHtml += `
+                        <a href="${escapeHtml(lug.facebook_url)}" target="_blank" rel="noopener noreferrer" 
+                           class="btn btn-sm text-white rounded-circle p-0 d-flex align-items-center justify-content-center" 
+                           style="width: 28px; height: 28px; background-color: #1877f2;" title="Ver en Facebook" onclick="event.stopPropagation();">
+                            <i class="bi bi-facebook" style="font-size: 0.75rem;"></i>
+                        </a>
+                    `;
+                }
+                if (lug.instagram_url) {
+                    redesSocialesHtml += `
+                        <a href="${escapeHtml(lug.instagram_url)}" target="_blank" rel="noopener noreferrer" 
+                           class="btn btn-sm text-white rounded-circle p-0 d-flex align-items-center justify-content-center" 
+                           style="width: 28px; height: 28px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);" title="Ver en Instagram" onclick="event.stopPropagation();">
+                            <i class="bi bi-instagram" style="font-size: 0.75rem;"></i>
+                        </a>
+                    `;
+                }
+                redesSocialesHtml += `</div>`;
             }
+
+            const mediaHtml = lug.imagen ? `
+                <img src="${baseUrl}/imagen?f=${encodeURIComponent(lug.imagen)}" 
+                     alt="${escapeHtml(lug.nombre)}" 
+                     class="w-100 h-100 object-fit-cover place-card-img"
+                     loading="lazy"
+                     decoding="async">
+            ` : `
+                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, #09252a 0%, #0d9488 100%); min-height: 280px;">
+                    <div class="place-icon-bubble shadow-sm mb-2">
+                        ${catIcoBubble}
+                    </div>
+                    <span class="small text-white-50">${escapeHtml(lug.categoria || 'Lugar de Interés')}</span>
+                </div>
+            `;
 
             const cardHtml = `
                 <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col"
@@ -915,39 +1132,69 @@ document.addEventListener('DOMContentLoaded', () => {
                      data-categoria="${escapeHtml(lug.id_categoria)}"
                      data-municipio="${escapeHtml(lug.id_municipio || 1)}"
                      data-coordenadas="${escapeHtml(lug.coordenadas_gps || '')}">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative place-card">
-                        <button type="button"
-                                class="btn btn-light bg-white bg-opacity-75 rounded-circle shadow-sm position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center p-0 border-0"
-                                style="width: 38px; height: 38px; z-index: 10;"
-                                data-btn-favorito
-                                data-id="${escapeHtml(lug.id_lugar)}"
-                                data-nombre="${escapeHtml(lug.nombre)}"
-                                data-slug="${escapeHtml(lug.slug)}"
-                                data-categoria="${escapeHtml(lug.categoria)}"
-                                data-imagen="${escapeHtml(lug.imagen || '')}"
-                                data-municipio="${escapeHtml(lug.municipio || '')}"
-                                data-url="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}"
-                                title="Guardar en mi itinerario"
-                                aria-label="Guardar en mi itinerario"
-                                aria-pressed="false">
-                            <i class="bi bi-heart text-secondary fs-6"></i>
-                        </button>
-                        ${cabeceraHtml}
-                        <div class="card-body p-4 d-flex flex-column">
-                            ${lug.imagen ? `
-                                <h5 class="fw-bold text-dark text-truncate mb-2">${escapeHtml(lug.nombre)}</h5>
+                    <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative place-card place-card-editorial">
+                        <!-- Contenedor de Imagen Inmersiva -->
+                        <div class="place-card-media-wrapper position-relative">
+                            ${mediaHtml}
+                            <!-- Badges Superiores Flotantes: Categoría y Municipio -->
+                            <div class="position-absolute top-0 start-0 m-3 d-flex flex-wrap gap-1" style="z-index: 4;">
+                                <span class="badge bg-dark bg-opacity-75 text-white rounded-pill fw-semibold shadow-sm extra-small">
+                                    ${catIcoTag} ${escapeHtml(lug.categoria)}${munBadge}
+                                </span>
+                            </div>
+                            ${lug.promo_activa_texto ? `
+                                <span class="badge bg-danger text-white position-absolute top-0 end-0 m-3 rounded-pill fw-bold shadow-sm extra-small" style="z-index: 5;">
+                                    <i class="bi bi-tag-fill me-1"></i> Promo
+                                </span>
                             ` : ''}
-                            <p class="card-text text-secondary small flex-grow-1 line-clamp-3 mb-3">
-                                ${escapeHtml(desc)}
-                            </p>
-                            ${horarioHtml ? `<div class="place-meta border-top pt-3 mb-3 small d-flex justify-content-between align-items-center gap-2">
-                                ${horarioHtml}
-                                ${estadoHorarioHtml}
-                            </div>` : ''}
-                            <div class="d-flex gap-2">
-                                <a href="${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(lug.slug)}" 
-                                   class="btn btn-teal-action rounded-pill w-100 fw-semibold btn-sm py-2">
-                                    Ver Ficha <i class="bi bi-arrow-right ms-1"></i>
+                            <div class="badge-distancia-container distance-badge-position position-absolute end-0 top-0 mt-5 me-3" style="z-index: 4;"></div>
+                        </div>
+
+                        <!-- Panel Flotante Curvado Estilo Editorial (Inspirado en la Referencia) -->
+                        <div class="place-card-panel-editorial position-relative p-3 p-sm-4 d-flex flex-column justify-content-between">
+                            <div class="place-card-header-info mb-2">
+                                <h5 class="fw-bold text-dark mb-1 place-card-title-link">
+                                    <a href="${urlFicha}" class="text-decoration-none text-dark stretched-link">
+                                        ${escapeHtml(lug.nombre)}
+                                    </a>
+                                </h5>
+                                <p class="text-muted extra-small mb-0 line-clamp-2 place-card-desc-preview">
+                                    ${escapeHtml(desc)}
+                                </p>
+                            </div>
+
+                            <!-- Barra de Acciones Revelables en Hover -->
+                            <div class="place-card-hover-actions d-flex align-items-center justify-content-between pt-2">
+                                <div class="d-flex align-items-center gap-2 position-relative" style="z-index: 6;">
+                                    <button type="button" 
+                                            class="btn btn-white bg-white rounded-circle shadow-xs place-btn-icon" 
+                                            data-btn-favorito
+                                            data-id="${escapeHtml(lug.id_lugar)}"
+                                            data-nombre="${escapeHtml(lug.nombre)}"
+                                            data-slug="${escapeHtml(lug.slug)}"
+                                            data-categoria="${escapeHtml(lug.categoria)}"
+                                            data-imagen="${escapeHtml(lug.imagen || '')}"
+                                            data-municipio="${escapeHtml(lug.municipio || '')}"
+                                            data-url="${urlFicha}"
+                                            title="Guardar en mi itinerario"
+                                            aria-label="Guardar en mi itinerario">
+                                        <i class="bi bi-heart text-danger fs-6"></i>
+                                    </button>
+
+                                    ${estadoHorarioHtml || `
+                                        <span class="badge bg-light text-secondary border rounded-pill extra-small" title="Información disponible">
+                                            <i class="bi bi-info-circle text-teal"></i> Info
+                                        </span>
+                                    `}
+
+                                    ${redesSocialesHtml}
+                                </div>
+
+                                <a href="${urlFicha}" 
+                                   class="btn-place-arrow-circle d-flex align-items-center justify-content-center text-white shadow-sm position-relative" 
+                                   style="z-index: 6;"
+                                   title="Ver todos los detalles">
+                                    <i class="bi bi-arrow-right fs-5"></i>
                                 </a>
                             </div>
                         </div>
@@ -1136,6 +1383,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Redes Sociales de la Promoción (Solo íconos circulares)
+            const redesContainer = document.getElementById('modalPromoRedesContainer');
+            const btnTiktok = document.getElementById('modalPromoBtnTiktok');
+            const btnFacebook = document.getElementById('modalPromoBtnFacebook');
+            const btnInstagram = document.getElementById('modalPromoBtnInstagram');
+
+            let tieneRedes = false;
+            if (btnTiktok) {
+                if (data.tiktok_url) {
+                    btnTiktok.href = data.tiktok_url;
+                    btnTiktok.classList.remove('d-none');
+                    tieneRedes = true;
+                } else {
+                    btnTiktok.classList.add('d-none');
+                }
+            }
+            if (btnFacebook) {
+                if (data.facebook_url) {
+                    btnFacebook.href = data.facebook_url;
+                    btnFacebook.classList.remove('d-none');
+                    tieneRedes = true;
+                } else {
+                    btnFacebook.classList.add('d-none');
+                }
+            }
+            if (btnInstagram) {
+                if (data.instagram_url) {
+                    btnInstagram.href = data.instagram_url;
+                    btnInstagram.classList.remove('d-none');
+                    tieneRedes = true;
+                } else {
+                    btnInstagram.classList.add('d-none');
+                }
+            }
+            if (redesContainer) {
+                if (tieneRedes) {
+                    redesContainer.classList.remove('d-none');
+                } else {
+                    redesContainer.classList.add('d-none');
+                }
+            }
+
             const btnFicha = document.getElementById('modalPromoBtnFicha');
             if (btnFicha) {
                 btnFicha.href = data.url_ficha || `${baseUrl}/catalogo/detalle?slug=${encodeURIComponent(data.lugar_slug || '')}`;
@@ -1247,6 +1536,320 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Manejador del Modal de Solicitud de Radiomóviles en Portada
+    let radioActualModal = { nombre: '', wa: '', id: 0 };
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-pedir-radio');
+        if (!btn) return;
+        radioActualModal = {
+            nombre: btn.getAttribute('data-nombre') || 'Radiomóvil',
+            wa: btn.getAttribute('data-wa') || '',
+            id: parseInt(btn.getAttribute('data-id') || '0', 10)
+        };
+        const titleNombre = document.getElementById('modalPedirRadioIndexNombre');
+        if (titleNombre) {
+            titleNombre.textContent = radioActualModal.nombre;
+        }
+    });
+
+    const btnRadioIndexUsarGps = document.getElementById('btnRadioIndexUsarGps');
+    const radioIndexMiUbi = document.getElementById('radioIndexMiUbicacion');
+    const radioIndexDest = document.getElementById('radioIndexDestino');
+    const radioIndexServ = document.getElementById('radioIndexTipoServicio');
+    const btnEnviarPedidoIndex = document.getElementById('btnEnviarPedidoRadioIndex');
+
+    btnRadioIndexUsarGps?.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+            alert('La geolocalización no está disponible en tu navegador.');
+            return;
+        }
+        btnRadioIndexUsarGps.disabled = true;
+        btnRadioIndexUsarGps.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Obteniendo...';
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            radioIndexMiUbi.value = `Ubicación GPS: https://maps.google.com/?q=${lat},${lng}`;
+            btnRadioIndexUsarGps.disabled = false;
+            btnRadioIndexUsarGps.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> Ubicación lista';
+        }, () => {
+            btnRadioIndexUsarGps.disabled = false;
+            btnRadioIndexUsarGps.innerHTML = '<i class="bi bi-cursor-fill me-1"></i> Mi GPS';
+            alert('No se pudo obtener tu ubicación actual.');
+        });
+    });
+
+    btnEnviarPedidoIndex?.addEventListener('click', () => {
+        const servicio = radioIndexServ?.value || 'Carrera Urbana';
+        const origen = radioIndexMiUbi?.value.trim() || 'Mi ubicación actual';
+        const destino = radioIndexDest?.value.trim() || 'Por definir con el conductor';
+
+        const texto = `Hola Central de ${radioActualModal.nombre} 🚕\nSolicito un móvil:\n📍 *Punto de recogida:* ${origen}\n🏁 *Destino:* ${destino}\n🛠️ *Tipo de servicio:* ${servicio}\n\n¿Me confirman disponibilidad y tarifa por favor?`;
+        
+        if (radioActualModal.id > 0) {
+            window.BeniTursItinerario?.registrarEvento(radioActualModal.id, 'WHATSAPP');
+        }
+        window.open(`https://wa.me/${radioActualModal.wa}?text=${encodeURIComponent(texto)}`, '_blank');
+
+        const modalEl = document.getElementById('modalPedirRadiomovilIndex');
+        if (modalEl && window.bootstrap?.Modal) {
+            window.bootstrap.Modal.getInstance(modalEl)?.hide();
+        }
+    });
+
+    // =========================================================================
+    // 7. MAPA DE PARADAS FIJAS DE RADIOMÓVILES (Leaflet)
+    // =========================================================================
+    let mapaTransporte = null;
+    let marcadoresTransporte = [];
+    let grupoTransporte = null;
+
+    function inicializarMapaTransporte() {
+        const contenedor = document.getElementById('mapaTransporte');
+        if (!contenedor || !window.L || mapaTransporte) return;
+
+        const paradas = window.BeniToursRadiomoviles || [];
+        if (!Array.isArray(paradas) || paradas.length === 0) return;
+
+        // Coordenadas base (Trinidad Casco Viejo)
+        const latInicial = -14.8333;
+        const lngInicial = -64.9000;
+
+        mapaTransporte = L.map('mapaTransporte', {
+            zoomControl: true,
+            scrollWheelZoom: false,
+            attributionControl: true
+        }).setView([latInicial, lngInicial], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(mapaTransporte);
+
+        grupoTransporte = L.featureGroup().addTo(mapaTransporte);
+
+        const paletaColoresSindicatos = [
+            { bg: '#f59e0b', text: '#111827', border: '#d97706' }, // Amarillo
+            { bg: '#0284c7', text: '#ffffff', border: '#0369a1' }, // Azul
+            { bg: '#10b981', text: '#ffffff', border: '#047857' }, // Verde
+            { bg: '#ea580c', text: '#ffffff', border: '#c2410c' }, // Naranja
+            { bg: '#8b5cf6', text: '#ffffff', border: '#6d28d9' }, // Violeta
+            { bg: '#e11d48', text: '#ffffff', border: '#be123c' }  // Rojo
+        ];
+
+        // Mapeo determinístico de color por id_lugar
+        const idsUnicosSindicatos = [...new Set(paradas.map(p => p.id_lugar))];
+        const colorPorLugar = {};
+        idsUnicosSindicatos.forEach((id, idx) => {
+            colorPorLugar[id] = paletaColoresSindicatos[idx % paletaColoresSindicatos.length];
+        });
+
+        marcadoresTransporte = [];
+
+        paradas.forEach((rm) => {
+            if (!rm.latitud || !rm.longitud) return;
+
+            const lat = parseFloat(rm.latitud);
+            const lng = parseFloat(rm.longitud);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const idLug = parseInt(rm.id_lugar, 10);
+            const idPar = parseInt(rm.id_parada || '0', 10);
+            const color = colorPorLugar[idLug] || paletaColoresSindicatos[0];
+            const esCentral = (rm.tipo_parada === 'CENTRAL' || idPar === 0);
+
+            // Icono temático con el color específico del sindicato
+            const iconoTaxi = L.divIcon({
+                className: `beniturs-map-marker marker-parada-taxi ${!esCentral ? 'marker-parada-secundaria' : ''}`,
+                html: `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background-color:${color.bg};color:${color.text};box-shadow:0 3px 10px rgba(0,0,0,0.35);border:2.5px solid ${esCentral ? '#ffffff' : color.border};">
+                        <i class="bi bi-taxi-front-fill" style="font-size:1.1rem;color:${color.text};"></i>
+                       </div>`,
+                iconSize: [38, 38],
+                iconAnchor: [19, 19],
+                popupAnchor: [0, -22]
+            });
+
+            const marker = L.marker([lat, lng], { icon: iconoTaxi });
+
+            const nombreSindicato = rm.nombre_sindicato || rm.nombre || 'Radiomóvil';
+            const nombreParada = rm.nombre_parada || 'Parada Oficial';
+            const tipoParada = rm.tipo_parada || (esCentral ? 'CENTRAL' : 'PARADA');
+
+            const popupHtml = `
+                <div class="beniturs-map-popup p-1" style="min-width: 240px;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 34px; height: 34px; flex-shrink: 0; background-color:${color.bg}; color:${color.text};">
+                            <i class="bi bi-taxi-front-fill fs-6"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="badge extra-small rounded-pill px-2 py-0 fw-bold border" style="background-color:${color.bg}; color:${color.text}; border-color:${color.border}!important;">${tipoParada}</span>
+                            <h6 class="fw-bold mb-0 text-dark text-truncate" style="font-size: 0.90rem;">${nombreParada}</h6>
+                            <small class="extra-small fw-bold d-block text-truncate" style="color:${color.border};">${nombreSindicato}</small>
+                        </div>
+                    </div>
+                    <p class="extra-small text-muted mb-2 lh-sm">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>${rm.direccion || 'Trinidad, Beni'}
+                    </p>
+                    <div class="d-grid gap-1 pt-1 border-top">
+                        ${rm.whatsapp ? `
+                            <button type="button" 
+                                    class="btn btn-sm btn-success rounded-pill fw-bold extra-small py-1 btn-pedir-radio d-flex align-items-center justify-content-center gap-1 shadow-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalPedirRadiomovilIndex"
+                                    data-nombre="${nombreSindicato} (${nombreParada})"
+                                    data-wa="${rm.whatsapp}"
+                                    data-id="${idLug}">
+                                <i class="bi bi-whatsapp"></i> Pedir a esta Parada
+                            </button>
+                        ` : ''}
+                        <div class="d-flex gap-1 mt-1">
+                            ${rm.telefono ? `
+                                <a href="tel:${rm.telefono}" class="btn btn-xs btn-outline-dark rounded-pill flex-grow-1 extra-small py-1 text-center text-decoration-none">
+                                    <i class="bi bi-telephone-fill me-1"></i> Llamar
+                                </a>
+                            ` : ''}
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" rel="noopener" class="btn btn-xs btn-outline-secondary rounded-pill flex-grow-1 extra-small py-1 text-center text-decoration-none">
+                                <i class="bi bi-navigation-fill me-1"></i> Cómo llegar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            marker.bindPopup(popupHtml, { maxWidth: 280, minWidth: 230, className: 'beniturs-leaflet-popup' });
+            marker.idLugar = idLug;
+            marker.idParada = idPar;
+
+            // En móvil: al tocar un marcador, desplazar el carrusel horizontal a la tarjeta correspondiente
+            marker.on('click', () => {
+                const targetCard = document.getElementById(`card-radio-${idLug}`);
+                if (targetCard && window.innerWidth < 992) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+
+            grupoTransporte.addLayer(marker);
+            marcadoresTransporte.push(marker);
+        });
+
+        // Ajustar vista a las paradas existentes
+        if (grupoTransporte.getLayers().length > 0) {
+            mapaTransporte.fitBounds(grupoTransporte.getBounds(), { padding: [50, 50], maxZoom: 16 });
+        }
+
+        // Recentrar mapa al hacer clic en "Ver todo"
+        const btnRecentrar = document.getElementById('btnRecentrarMapaTransporte');
+        btnRecentrar?.addEventListener('click', () => {
+            if (grupoTransporte && grupoTransporte.getLayers().length > 0) {
+                mapaTransporte.fitBounds(grupoTransporte.getBounds(), { padding: [50, 50], maxZoom: 16 });
+            }
+        });
+
+        // Conectar botones "Ver en mapa" de las tarjetas (Central o Parada específica)
+        document.querySelectorAll('.btn-ver-parada-mapa').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const lat = parseFloat(btn.getAttribute('data-lat'));
+                const lng = parseFloat(btn.getAttribute('data-lng'));
+                const id = parseInt(btn.getAttribute('data-id') || '0', 10);
+                const idPar = parseInt(btn.getAttribute('data-parada-id') || '0', 10);
+
+                if (!isNaN(lat) && !isNaN(lng) && mapaTransporte) {
+                    mapaTransporte.flyTo([lat, lng], 16, { animate: true, duration: 0.8 });
+                    let targetMarker = marcadoresTransporte.find(m => m.idLugar === id && m.idParada === idPar);
+                    if (!targetMarker) {
+                        targetMarker = marcadoresTransporte.find(m => m.idLugar === id);
+                    }
+                    if (targetMarker) {
+                        setTimeout(() => targetMarker.openPopup(), 850);
+                    }
+                }
+            });
+        });
+    }
+
+    // Inicializar mapa de transporte cuando la sección esté visible o el DOM esté listo
+    if (document.getElementById('mapaTransporte')) {
+        // Observer para cargar o recalcular tamaño solo cuando el usuario se acerque a la sección
+        const secTransporte = document.getElementById('transporte');
+        if ('IntersectionObserver' in window && secTransporte) {
+            const observerTransporte = new IntersectionObserver((entries, obs) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        if (!mapaTransporte) {
+                            inicializarMapaTransporte();
+                        } else {
+                            mapaTransporte.invalidateSize();
+                        }
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '200px' });
+            observerTransporte.observe(secTransporte);
+        } else {
+            setTimeout(inicializarMapaTransporte, 600);
+        }
+    }
+
+    // =========================================================================
+    // 8. LIGHTBOX DE GALERÍA TURÍSTICA
+    // =========================================================================
+    const modalLightbox = document.getElementById('modalLightboxGaleria');
+    if (modalLightbox) {
+        modalLightbox.addEventListener('show.bs.modal', (e) => {
+            const trigger = e.relatedTarget;
+            if (!trigger) return;
+
+            const foto = trigger.getAttribute('data-foto') || '';
+            const titulo = trigger.getAttribute('data-titulo') || 'Lugar Turístico';
+            const categoria = trigger.getAttribute('data-categoria') || 'Turismo';
+            const credito = trigger.getAttribute('data-credito') || '';
+            const fuente = trigger.getAttribute('data-fuente') || '';
+            const url = trigger.getAttribute('data-url') || '#';
+
+            const imgEl = document.getElementById('lightboxImg');
+            const tituloEl = document.getElementById('lightboxTituloLugar');
+            const catBadgeEl = document.getElementById('lightboxCatBadge');
+            const btnFichaEl = document.getElementById('lightboxBtnFicha');
+            const creditoContainerEl = document.getElementById('lightboxCreditoContainer');
+            const creditoNombreEl = document.getElementById('lightboxCreditoNombre');
+            const fuenteLinkEl = document.getElementById('lightboxFuenteLink');
+
+            if (imgEl) imgEl.src = foto;
+            if (tituloEl) tituloEl.textContent = titulo;
+            if (catBadgeEl) catBadgeEl.textContent = categoria;
+
+            if (creditoContainerEl && creditoNombreEl) {
+                if (credito) {
+                    creditoNombreEl.textContent = credito;
+                    creditoContainerEl.classList.remove('d-none');
+                    if (fuenteLinkEl) {
+                        if (fuente) {
+                            fuenteLinkEl.href = fuente;
+                            fuenteLinkEl.classList.remove('d-none');
+                        } else {
+                            fuenteLinkEl.classList.add('d-none');
+                        }
+                    }
+                } else {
+                    creditoContainerEl.classList.add('d-none');
+                }
+            }
+
+            if (btnFichaEl) {
+                if (url && url !== '#') {
+                    btnFichaEl.href = url;
+                    btnFichaEl.classList.remove('d-none');
+                } else {
+                    btnFichaEl.classList.add('d-none');
+                }
+            }
+        });
+
+        modalLightbox.addEventListener('hidden.bs.modal', () => {
+            const imgEl = document.getElementById('lightboxImg');
+            if (imgEl) imgEl.src = '';
+        });
+    }
+
     document.addEventListener('contextmenu', (e) => {
         if (e.target.closest('img, video, .place-card, .hero-video, .gallery-item, .beniturs-popup-img')) {
             e.preventDefault();
@@ -1261,3 +1864,84 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { passive: false });
 });
+
+/**
+ * Función global para aplicar búsquedas directas desde las píldoras del Hero
+ */
+window.aplicarFiltroRapidoHero = function(termino) {
+    const inputHero = document.getElementById('inputBuscarHero');
+    if (inputHero) {
+        inputHero.value = termino;
+        inputHero.dispatchEvent(new Event('input', { bubbles: true }));
+        document.getElementById('explorar')?.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
+/**
+ * Interactividad del Mapa Departamental Regional del Beni
+ * Efecto Hover Revelador fotográfico y Clic con desplazamiento suave hacia la Galería
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const gruposRegiones = Array.from(document.querySelectorAll('.region-beni-grupo'));
+    if (!gruposRegiones.length) return;
+
+    const overlays = Array.from(document.querySelectorAll('.provincia-overlay'));
+    const overlayMap = new Map();
+    overlays.forEach(overlay => {
+        const id = overlay.dataset.overlay;
+        if (id) overlayMap.set(id, overlay);
+    });
+
+    gruposRegiones.forEach(grupo => {
+        const provId = grupo.dataset.provincia;
+        const overlay = overlayMap.get(provId);
+
+        // Al pasar el mouse sobre la provincia, activar su etiqueta y pin en la capa superior
+        grupo.addEventListener('mouseenter', () => {
+            if (overlay) overlay.classList.add('is-hover');
+        });
+
+        grupo.addEventListener('mouseleave', () => {
+            if (overlay) overlay.classList.remove('is-hover');
+        });
+
+        grupo.addEventListener('focus', () => {
+            if (overlay) overlay.classList.add('is-hover');
+        });
+
+        grupo.addEventListener('blur', () => {
+            if (overlay) overlay.classList.remove('is-hover');
+        });
+
+        // Al hacer clic sobre cualquier provincia
+        grupo.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Resaltar brevemente la provincia seleccionada
+            grupo.classList.add('is-active');
+            if (overlay) overlay.classList.add('is-active');
+
+            // Desplazar suavemente a la sección Galería de Fotos
+            const seccionGaleria = document.getElementById('galeria');
+            if (seccionGaleria) {
+                seccionGaleria.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Remover la clase is-active para que cuando el usuario vuelva a ver el mapa
+            // no quede congelado con la foto revelada ni la etiqueta pegada
+            setTimeout(() => {
+                gruposRegiones.forEach(g => g.classList.remove('is-active'));
+                overlays.forEach(o => o.classList.remove('is-active', 'is-hover'));
+            }, 600);
+        });
+
+        // Soporte de accesibilidad para teclado (Enter o Espacio)
+        grupo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                grupo.click();
+            }
+        });
+    });
+});
+

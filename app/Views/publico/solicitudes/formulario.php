@@ -20,6 +20,10 @@ $qrSrc = $qrValido ? (preg_match('~\Ahttps?://~i', $qr) ? $qr : $baseUrl . $qr) 
         <form id="formSolicitudComercial" action="<?= $escape($baseUrl) ?>/solicitudes/enviar" method="post" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token" value="<?= $escape($csrfToken) ?>">
             <input type="hidden" name="monto_declarado" value="<?= $escape($planes[0]['monto'] ?? '') ?>">
+            <div style="display:none !important; position:absolute; left:-9999px;" aria-hidden="true">
+                <label for="campo_antispam_fax">No llenar este campo</label>
+                <input type="text" id="campo_antispam_fax" name="campo_antispam_fax" tabindex="-1" autocomplete="off">
+            </div>
             <section data-wizard-step="0" class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
                 <h2 class="h4 mb-4" tabindex="-1">Datos del negocio y del propietario</h2>
                 <div class="row g-3">

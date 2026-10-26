@@ -11,54 +11,107 @@ document.addEventListener('DOMContentLoaded', () => {
     let mapa;
     let marcador;
 
+    let archivosFotos = [];
+
     const elegirPortada = (indice) => {
         inputPortada.value = String(indice);
-        previews.querySelectorAll('[data-foto-indice]').forEach((elemento) => {
+        previews.querySelectorAll('.image-preview-card').forEach((elemento) => {
             elemento.classList.toggle('is-cover', Number(elemento.dataset.fotoIndice) === indice);
         });
     };
 
-    inputFotos?.addEventListener('change', async () => {
+    const renderizarGaleria = () => {
         objectUrlsFotos.forEach((url) => URL.revokeObjectURL(url));
         objectUrlsFotos.clear();
+        previews.replaceChildren();
 
-        let archivos = Array.from(inputFotos.files || []).slice(0, 6);
-        if (!archivos.length) {
-            previews.replaceChildren();
+        if (!archivosFotos.length) {
             actualizarPreviewPortada('');
+            if (inputPortada) inputPortada.value = '0';
+            return;
+        }
+
+        archivosFotos.forEach((archivo, indice) => {
+            const tarjeta = document.createElement('div');
+            tarjeta.className = 'image-preview-card';
+            tarjeta.dataset.fotoIndice = String(indice);
+            tarjeta.setAttribute('role', 'button');
+            tarjeta.setAttribute('tabindex', '0');
+            tarjeta.setAttribute('aria-label', `Foto ${indice + 1}: ${archivo.name}. Clic para portada.`);
+
+            const imagen = document.createElement('img');
+            imagen.alt = `Previsualización de ${archivo.name}`;
+            const objectUrl = URL.createObjectURL(archivo);
+            objectUrlsFotos.add(objectUrl);
+            imagen.src = objectUrl;
+
+            // Badge de Portada
+            const etiqueta = document.createElement('span');
+            etiqueta.innerHTML = '<i class="bi bi-star-fill"></i> Portada';
+
+            // Botón flotante para eliminar foto
+            const btnEliminar = document.createElement('button');
+            btnEliminar.type = 'button';
+            btnEliminar.className = 'btn-remove-foto';
+            btnEliminar.title = 'Quitar esta fotografía';
+            btnEliminar.setAttribute('aria-label', `Quitar fotografía ${archivo.name}`);
+            btnEliminar.innerHTML = '<i class="bi bi-x-lg"></i>';
+            btnEliminar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                eliminarFoto(indice);
+            });
+
+            // Al hacer clic en la tarjeta, seleccionar como portada
+            tarjeta.addEventListener('click', () => {
+                elegirPortadaConPreview(indice);
+            });
+
+            tarjeta.append(imagen, etiqueta, btnEliminar);
+            previews.append(tarjeta);
+        });
+
+        // Asegurar que la portada actual sea válida
+        let portadaActual = parseInt(inputPortada.value, 10);
+        if (isNaN(portadaActual) || portadaActual < 0 || portadaActual >= archivosFotos.length) {
+            portadaActual = 0;
+        }
+        elegirPortadaConPreview(portadaActual);
+    };
+
+    const sincronizarInputFotos = () => {
+        if (typeof DataTransfer !== 'undefined') {
+            const dt = new DataTransfer();
+            archivosFotos.forEach(file => dt.items.add(file));
+            inputFotos.files = dt.files;
+        }
+    };
+
+    const eliminarFoto = (indiceAEliminar) => {
+        archivosFotos.splice(indiceAEliminar, 1);
+        sincronizarInputFotos();
+        renderizarGaleria();
+    };
+
+    inputFotos?.addEventListener('change', async () => {
+        let nuevosArchivos = Array.from(inputFotos.files || []).slice(0, 6);
+        if (!nuevosArchivos.length) {
             return;
         }
 
         // Si CompresorImagen está disponible, optimizar en el cliente antes de la subida
         if (window.CompresorImagen) {
             previews.innerHTML = '<div class="col-12 py-3 text-center text-muted small"><span class="spinner-border spinner-border-sm me-2 text-success"></span> Optimizando fotos en el navegador para subida rápida...</div>';
-            const resultados = await Promise.all(archivos.map(a => window.CompresorImagen.comprimir(a, { maxDimension: 1280, calidad: 0.82 })));
+            const resultados = await Promise.all(nuevosArchivos.map(a => window.CompresorImagen.comprimir(a, { maxDimension: 1280, calidad: 0.82 })));
             if (typeof DataTransfer !== 'undefined') {
                 const dt = new DataTransfer();
                 resultados.forEach(r => dt.items.add(r.file));
                 inputFotos.files = dt.files;
             }
-            archivos = Array.from(inputFotos.files || []);
+            nuevosArchivos = Array.from(inputFotos.files || []);
         }
 
-        previews.replaceChildren();
-        archivos.forEach((archivo, indice) => {
-            const tarjeta = document.createElement('button');
-            tarjeta.type = 'button';
-            tarjeta.className = 'image-preview-card';
-            tarjeta.dataset.fotoIndice = String(indice);
-            tarjeta.setAttribute('aria-label', `Elegir ${archivo.name} como portada`);
-            const imagen = document.createElement('img');
-            imagen.alt = `Previsualización de ${archivo.name}`;
-            const objectUrl = URL.createObjectURL(archivo);
-            objectUrlsFotos.add(objectUrl);
-            imagen.src = objectUrl;
-            const etiqueta = document.createElement('span');
-            etiqueta.innerHTML = '<i class="bi bi-star-fill"></i> Portada';
-            tarjeta.append(imagen, etiqueta);
-            previews.append(tarjeta);
-        });
-        elegirPortadaConPreview(0);
+        archivosFotos = nuevosArchivos;
+        renderizarGaleria();
     });
 
     const colocarMarcador = (latitud, longitud, actualizarCampo = true) => {
@@ -173,8 +226,16 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', () => {
             const catNombre = radio.dataset.nombreCat || 'General';
             if (previewCatBadge) previewCatBadge.textContent = catNombre;
+            if (typeof window.alternarTarifasPorCategoria === 'function') {
+                window.alternarTarifasPorCategoria(radio.value);
+            }
         });
     });
+
+    const catSeleccionadaInicial = document.querySelector('input[name="id_categoria"]:checked')?.value;
+    if (catSeleccionadaInicial && typeof window.alternarTarifasPorCategoria === 'function') {
+        window.alternarTarifasPorCategoria(catSeleccionadaInicial);
+    }
 
     // Actualizar foto en la preview al seleccionar portada
     const actualizarPreviewPortada = (imgSrc) => {
@@ -199,13 +260,176 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Reasignar el selector de portada interactivo
-    previews.addEventListener('click', (e) => {
-        const card = e.target.closest('.image-preview-card');
-        if (card && card.dataset.fotoIndice !== undefined) {
-            elegirPortadaConPreview(Number(card.dataset.fotoIndice));
+    // ==========================================
+    // Constructor Visual de Días y Horarios
+    // ==========================================
+    const inputHorario = document.getElementById('inputHorarioAtencion');
+    const previewHorario = document.getElementById('previewHorarioSintetizado');
+    const panelConstructor = document.getElementById('panelHorarioConstructor');
+    const btnModoManual = document.getElementById('btnAlternarModoHorarioManual');
+    const txtModoHorario = document.getElementById('txtModoHorario');
+    const switch24h = document.getElementById('switchHorario24h');
+    const checkboxesDias = document.querySelectorAll('.btn-dia-check');
+    const presetDiasBtns = document.querySelectorAll('[data-preset-dias]');
+    const horaApertura1 = document.getElementById('horaApertura1');
+    const horaCierre1 = document.getElementById('horaCierre1');
+    const filaTurno2 = document.getElementById('filaHorasTurno2');
+    const btnToggleTurno2 = document.getElementById('btnToggleTurno2');
+    const btnQuitarTurno2 = document.getElementById('btnQuitarTurno2');
+    const horaApertura2 = document.getElementById('horaApertura2');
+    const horaCierre2 = document.getElementById('horaCierre2');
+
+    let modoHorarioManual = false;
+    let turno2Activo = false;
+
+    const DIAS_ORDEN = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+    const formatearRangoDias = (diasSeleccionados) => {
+        if (!diasSeleccionados.length) return 'Cerrado temporalmente';
+        if (diasSeleccionados.length === 7) return 'Todos los días';
+
+        // Ordenar según el orden de la semana
+        const diasOrdenados = diasSeleccionados.slice().sort((a, b) => DIAS_ORDEN.indexOf(a) - DIAS_ORDEN.indexOf(b));
+
+        // Casos comunes
+        const str = diasOrdenados.join(',');
+        if (str === 'Lun,Mar,Mié,Jue,Vie') return 'Lun - Vie';
+        if (str === 'Lun,Mar,Mié,Jue,Vie,Sáb') return 'Lun - Sáb';
+        if (str === 'Sáb,Dom') return 'Sáb y Dom';
+
+        // Verificar si es un rango continuo
+        const indices = diasOrdenados.map(d => DIAS_ORDEN.indexOf(d));
+        let esContinuo = true;
+        for (let i = 1; i < indices.length; i++) {
+            if (indices[i] !== indices[i - 1] + 1) {
+                esContinuo = false;
+                break;
+            }
+        }
+
+        if (esContinuo && diasOrdenados.length >= 3) {
+            return `${diasOrdenados[0]} - ${diasOrdenados[diasOrdenados.length - 1]}`;
+        }
+
+        // Días salteados o no continuos
+        return diasOrdenados.join(', ');
+    };
+
+    const actualizarHorarioSintetizado = () => {
+        if (modoHorarioManual) return;
+
+        if (switch24h?.checked) {
+            const texto = 'Abierto las 24 horas';
+            if (inputHorario) inputHorario.value = texto;
+            if (previewHorario) previewHorario.textContent = texto;
+            return;
+        }
+
+        const diasSeleccionados = [];
+        checkboxesDias.forEach(cb => {
+            if (cb.checked) diasSeleccionados.push(cb.value);
+        });
+
+        const diasTexto = formatearRangoDias(diasSeleccionados);
+        if (diasSeleccionados.length === 0) {
+            const texto = 'Sin horario definido';
+            if (inputHorario) inputHorario.value = texto;
+            if (previewHorario) previewHorario.textContent = texto;
+            return;
+        }
+
+        const hIni1 = horaApertura1?.value || '08:00';
+        const hFin1 = horaCierre1?.value || '22:00';
+        let rangoHoras = `${hIni1} - ${hFin1}`;
+
+        if (turno2Activo) {
+            const hIni2 = horaApertura2?.value || '15:00';
+            const hFin2 = horaCierre2?.value || '22:00';
+            rangoHoras = `${hIni1} - ${hFin1}, ${hIni2} - ${hFin2}`;
+        }
+
+        const textoFinal = `${diasTexto}: ${rangoHoras}`;
+        if (inputHorario) inputHorario.value = textoFinal;
+        if (previewHorario) previewHorario.textContent = textoFinal;
+    };
+
+    // Listeners de checkboxes de días
+    checkboxesDias.forEach(cb => {
+        cb.addEventListener('change', actualizarHorarioSintetizado);
+    });
+
+    // Listeners de horas
+    horaApertura1?.addEventListener('change', actualizarHorarioSintetizado);
+    horaCierre1?.addEventListener('change', actualizarHorarioSintetizado);
+    horaApertura2?.addEventListener('change', actualizarHorarioSintetizado);
+    horaCierre2?.addEventListener('change', actualizarHorarioSintetizado);
+
+    // Atajos de presets
+    presetDiasBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const preset = btn.dataset.presetDias;
+            checkboxesDias.forEach(cb => {
+                if (preset === 'L-V') {
+                    cb.checked = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'].includes(cb.value);
+                } else if (preset === 'L-S') {
+                    cb.checked = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].includes(cb.value);
+                } else if (preset === 'S-D') {
+                    cb.checked = ['Sáb', 'Dom'].includes(cb.value);
+                } else if (preset === 'TODOS') {
+                    cb.checked = true;
+                }
+            });
+            actualizarHorarioSintetizado();
+        });
+    });
+
+    // Turno 2
+    btnToggleTurno2?.addEventListener('click', () => {
+        turno2Activo = true;
+        if (filaTurno2) filaTurno2.classList.remove('d-none');
+        if (btnToggleTurno2) btnToggleTurno2.classList.add('d-none');
+        actualizarHorarioSintetizado();
+    });
+
+    btnQuitarTurno2?.addEventListener('click', () => {
+        turno2Activo = false;
+        if (filaTurno2) filaTurno2.classList.add('d-none');
+        if (btnToggleTurno2) btnToggleTurno2.classList.remove('d-none');
+        actualizarHorarioSintetizado();
+    });
+
+    // Switch 24 horas
+    switch24h?.addEventListener('change', () => {
+        if (panelConstructor) {
+            panelConstructor.style.opacity = switch24h.checked ? '0.35' : '1';
+            panelConstructor.style.pointerEvents = switch24h.checked ? 'none' : 'auto';
+        }
+        actualizarHorarioSintetizado();
+    });
+
+    // Alternar modo manual
+    btnModoManual?.addEventListener('click', () => {
+        modoHorarioManual = !modoHorarioManual;
+        if (modoHorarioManual) {
+            if (panelConstructor) panelConstructor.classList.add('d-none');
+            if (inputHorario) inputHorario.classList.remove('d-none');
+            if (txtModoHorario) txtModoHorario.textContent = 'Usar constructor';
+        } else {
+            if (panelConstructor) panelConstructor.classList.remove('d-none');
+            if (inputHorario) inputHorario.classList.add('d-none');
+            if (txtModoHorario) txtModoHorario.textContent = 'Modo manual';
+            actualizarHorarioSintetizado();
         }
     });
+
+    inputHorario?.addEventListener('input', () => {
+        if (modoHorarioManual && previewHorario) {
+            previewHorario.textContent = inputHorario.value || 'Sin horario definido';
+        }
+    });
+
+    // Inicializar síntesis de horario
+    actualizarHorarioSintetizado();
 
     window.addEventListener('beforeunload', () => {
         objectUrlsFotos.forEach((url) => URL.revokeObjectURL(url));

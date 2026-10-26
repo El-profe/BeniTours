@@ -118,12 +118,12 @@
                                 </button>
                             </div>
 
-                            <!-- Sección A: Planes Rápidos Predefinidos -->
+                            <!-- Sección A1: Planes Rápidos Predefinidos para Comercios Generales -->
                             <div id="seccion-planes-estandar">
                                 <div class="row g-2">
                                     <!-- Plan 1 Mes -->
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer active" id="cardPlan1" onclick="elegirPlanEstandar(1, 250.00, 1, 0)">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer active" id="cardPlan1" onclick="elegirPlanEstandar(1, 250.00, 1, 0, 'MENSUAL')">
                                             <span class="badge bg-light text-muted extra-small mb-1">Básico</span>
                                             <h6 class="fw-bold text-dark mb-1">1 Mes</h6>
                                             <span class="text-success fw-bold fs-6">Bs 250</span>
@@ -132,7 +132,7 @@
                                     </div>
                                     <!-- Plan 3 Meses -->
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer" id="cardPlan3" onclick="elegirPlanEstandar(3, 712.50, 1, 37.50)">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer" id="cardPlan3" onclick="elegirPlanEstandar(3, 712.50, 5, 37.50, 'TRIMESTRAL')">
                                             <span class="badge bg-info-subtle text-info-emphasis extra-small mb-1">Trimestral</span>
                                             <h6 class="fw-bold text-dark mb-1">3 Meses</h6>
                                             <span class="text-success fw-bold fs-6">Bs 712.50</span>
@@ -141,7 +141,7 @@
                                     </div>
                                     <!-- Plan 6 Meses -->
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer" id="cardPlan6" onclick="elegirPlanEstandar(6, 1350.00, 1, 150.00)">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer" id="cardPlan6" onclick="elegirPlanEstandar(6, 1350.00, 6, 150.00, 'SEMESTRAL')">
                                             <span class="badge bg-primary-subtle text-primary extra-small mb-1">Semestral</span>
                                             <h6 class="fw-bold text-dark mb-1">6 Meses</h6>
                                             <span class="text-success fw-bold fs-6">Bs 1,350</span>
@@ -150,11 +150,36 @@
                                     </div>
                                     <!-- Plan 12 Meses (Anual) -->
                                     <div class="col-6 col-md-3">
-                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer position-relative" id="cardPlan12" onclick="elegirPlanEstandar(12, 2500.00, 2, 500.00)">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer position-relative" id="cardPlan12" onclick="elegirPlanEstandar(12, 2500.00, 2, 500.00, 'ANUAL')">
                                             <span class="badge bg-warning text-dark fw-bold extra-small mb-1">★ Más Popular</span>
                                             <h6 class="fw-bold text-dark mb-1">12 Meses</h6>
                                             <span class="text-success fw-bold fs-6">Bs 2,500</span>
                                             <small class="text-success fw-bold extra-small d-block mt-1"><i class="bi bi-gift-fill me-1"></i>Ahorra Bs 500 (2m gratis)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección A2: Planes Especiales para Sindicatos y Radiomóviles -->
+                            <div id="seccion-planes-transporte" style="display: none;">
+                                <div class="alert alert-info py-2 px-3 mb-2 rounded-3 small border-0 bg-info bg-opacity-10 text-dark">
+                                    <i class="bi bi-taxi-front-fill text-warning me-1"></i> Tarifa especial institucional para Sindicatos y Radiomóviles (Bs 100/mes).
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer" id="cardPlanTransportePago1" onclick="elegirPlanEstandar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL')">
+                                            <span class="badge bg-light text-muted extra-small mb-1">Mensual Gremial</span>
+                                            <h6 class="fw-bold text-dark mb-1">1 Mes</h6>
+                                            <span class="text-success fw-bold fs-5">Bs 100</span>
+                                            <small class="text-muted extra-small d-block mt-1">Tarifa institucional por sindicato</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="card card-plan h-100 p-3 text-center border-2 cursor-pointer border-warning" id="cardPlanTransportePago12" onclick="elegirPlanEstandar(12, 800.00, 8, 400.00, 'TRANSPORTE_ANUAL')">
+                                            <span class="badge bg-warning text-dark fw-bold extra-small mb-1">★ Anual Sindicato</span>
+                                            <h6 class="fw-bold text-dark mb-1">12 Meses (1 Año)</h6>
+                                            <span class="text-success fw-bold fs-5">Bs 800</span>
+                                            <small class="text-success fw-bold extra-small d-block mt-1"><i class="bi bi-gift-fill me-1"></i>Ahorra Bs 400 al año</small>
                                         </div>
                                     </div>
                                 </div>
@@ -462,13 +487,16 @@
     box-shadow: 0 4px 12px rgba(13, 148, 136, 0.12);
 }
 </style>
-
+ 
 <script>
-const TARIFA_BASE_MENSUAL = <?= (float)($tarifa['monto_mensual'] ?? 250.00) ?>;
+const TARIFA_BASE_REGULAR = <?= (float)($tarifa['monto_mensual'] ?? 250.00) ?>;
+const TARIFA_BASE_TRANSPORTE = 100.00;
+let TARIFA_BASE_MENSUAL = TARIFA_BASE_REGULAR;
 const BASE_URL_APP = <?= json_encode($baseUrl) ?>;
 const COMERCIOS_DATA = <?= json_encode($comercios, JSON_UNESCAPED_UNICODE) ?>;
 let modoActual = 'ESTANDAR'; // 'ESTANDAR' o 'PERSONALIZADO'
 let mesesSeleccionados = 1;
+let codigoPlanActual = 'MENSUAL';
 let reglaDescuentoManual = false;
 let comercioSeleccionadoObj = null;
 
@@ -666,6 +694,23 @@ function seleccionarComercioCard(c) {
     tarjetaFijado?.classList.remove('d-none');
     if (contenedorTarjetas) contenedorTarjetas.innerHTML = '';
 
+    // Detección de Transporte vs Comercio Estándar
+    const esTransporte = parseInt(c.id_categoria, 10) === 9;
+    const secEst = document.getElementById('seccion-planes-estandar');
+    const secTra = document.getElementById('seccion-planes-transporte');
+
+    if (esTransporte) {
+        TARIFA_BASE_MENSUAL = TARIFA_BASE_TRANSPORTE;
+        if (secEst) secEst.style.display = 'none';
+        if (secTra) secTra.style.display = 'block';
+        elegirPlanEstandar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL');
+    } else {
+        TARIFA_BASE_MENSUAL = TARIFA_BASE_REGULAR;
+        if (secTra) secTra.style.display = 'none';
+        if (secEst) secEst.style.display = 'block';
+        elegirPlanEstandar(1, 250.00, 1, 0, 'MENSUAL');
+    }
+
     // Mostrar banner de vigencia y proyectar
     mostrarBannerVigencia(c);
 }
@@ -693,6 +738,15 @@ function deseleccionarComercio() {
         inputBuscar.value = '';
         inputBuscar.focus();
     }
+
+    // Revertir a tarifas y planes regulares
+    TARIFA_BASE_MENSUAL = TARIFA_BASE_REGULAR;
+    const secEst = document.getElementById('seccion-planes-estandar');
+    const secTra = document.getElementById('seccion-planes-transporte');
+    if (secTra) secTra.style.display = 'none';
+    if (secEst) secEst.style.display = 'block';
+    elegirPlanEstandar(1, 250.00, 1, 0, 'MENSUAL');
+
     actualizarProyeccionVigencia();
 }
 
@@ -766,13 +820,21 @@ function seleccionarModoPlan(modo) {
     if (modo === 'ESTANDAR') {
         btnEst.classList.add('active');
         btnPer.classList.remove('active');
-        secEst.style.display = 'block';
-        secPer.style.display = 'none';
-        elegirPlanEstandar(1, TARIFA_BASE_MENSUAL, 1, 0);
+        const esTransporte = parseInt(comercioSeleccionadoObj?.id_categoria, 10) === 9;
+        if (esTransporte) {
+            secEst.style.display = 'none';
+            if (secTra) secTra.style.display = 'block';
+            elegirPlanEstandar(1, 100.00, 7, 0, 'TRANSPORTE_MENSUAL');
+        } else {
+            if (secTra) secTra.style.display = 'none';
+            secEst.style.display = 'block';
+            elegirPlanEstandar(1, 250.00, 1, 0, 'MENSUAL');
+        }
     } else {
         btnPer.classList.add('active');
         btnEst.classList.remove('active');
-        secEst.style.display = 'none';
+        if (secEst) secEst.style.display = 'none';
+        if (secTra) secTra.style.display = 'none';
         secPer.style.display = 'block';
         document.querySelectorAll('.card-plan').forEach(c => c.classList.remove('active'));
         
@@ -784,13 +846,20 @@ function seleccionarModoPlan(modo) {
 /**
  * Selecciona uno de los planes estándar rápidos
  */
-function elegirPlanEstandar(meses, monto, idTarifa, ahorro) {
+function elegirPlanEstandar(meses, monto, idTarifa, ahorro, codigoPlan = 'MENSUAL') {
     mesesSeleccionados = meses;
+    codigoPlanActual = codigoPlan;
     reglaDescuentoManual = false;
 
     // Resaltar tarjeta seleccionada
     document.querySelectorAll('.card-plan').forEach(c => c.classList.remove('active'));
-    document.getElementById('cardPlan' + meses)?.classList.add('active');
+    if (codigoPlan === 'TRANSPORTE_MENSUAL') {
+        document.getElementById('cardPlanTransportePago1')?.classList.add('active');
+    } else if (codigoPlan === 'TRANSPORTE_ANUAL') {
+        document.getElementById('cardPlanTransportePago12')?.classList.add('active');
+    } else {
+        document.getElementById('cardPlan' + meses)?.classList.add('active');
+    }
 
     // Asignar campos del formulario
     document.getElementById('meses_duracion').value = meses;
@@ -921,10 +990,10 @@ function actualizarDesgloseAhorro(meses, monto, ahorro) {
             </div>
             <div>
                 <div class="fw-bold text-dark fs-6">
-                    Tarifa regular estándar (Bs 250.00 / mes)
+                    Tarifa base regular (Bs ${TARIFA_BASE_MENSUAL.toFixed(2)} / mes)
                 </div>
                 <div class="extra-small text-muted">
-                    No se ha aplicado ningún descuento promocional en este plan.
+                    No se ha aplicado ningún descuento adicional en este plan.
                 </div>
             </div>
         `;

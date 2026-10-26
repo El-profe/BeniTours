@@ -263,10 +263,10 @@ $hayBusqueda = trim((string)$buscar) !== '';
                         <!-- Plan & Monto -->
                         <td>
                             <div class="fw-bold text-success small">
-                                Bs <?= number_format((float)($s['monto_declarado'] ?? ($s['plan_solicitado'] === 'ANUAL' ? 2500 : 250)), 2) ?>
+                                Bs <?= number_format((float)($s['monto_declarado'] ?? 0), 2) ?>
                             </div>
                             <small class="badge bg-light text-dark border extra-small">
-                                <?= $escape($s['tarifa_nombre'] ?? ($s['plan_solicitado'] === 'ANUAL' ? 'Plan Anual' : 'Plan Mensual')) ?>
+                                <?= $escape($s['tarifa_nombre'] ?? $s['plan_solicitado']) ?>
                             </small>
                             <div class="extra-small text-muted mt-1">
                                 <i class="bi bi-clock me-1"></i><?= date('d/m/Y H:i', strtotime($s['created_at'])) ?>

@@ -25,11 +25,24 @@ class AnaliticaVisitasService {
             ]);
         }
 
+        $hoy = date('Y-m-d');
+        if (($_COOKIE['beniturs_visita_dia'] ?? '') === $hoy) {
+            return;
+        }
+
         try {
             $stmt = Database::getConnection()->prepare(
                 'INSERT IGNORE INTO visitas_diarias (fecha, visitante_hash) VALUES (CURDATE(), :visitante_hash)'
             );
             $stmt->execute([':visitante_hash' => hash('sha256', $token)]);
+
+            setcookie('beniturs_visita_dia', $hoy, [
+                'expires'  => strtotime('tomorrow'),
+                'path'     => '/',
+                'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
         } catch (PDOException $e) {
             error_log('Analitica de visitas no disponible: ' . $e->getMessage());
         }

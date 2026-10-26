@@ -58,12 +58,14 @@ class Solicitud {
         $sql = "SELECT s.*, c.nombre AS categoria, c.icono AS categoria_icono,
                        m.nombre AS municipio, m.provincia AS municipio_provincia,
                        l.id_lugar AS id_lugar_creado, l.slug AS slug_lugar_creado,
-                       cn.id_cuenta AS id_cuenta_creada, cn.usuario AS usuario_asignado
+                       cn.id_cuenta AS id_cuenta_creada, cn.usuario AS usuario_asignado,
+                       t.nombre AS tarifa_nombre, t.meses_duracion AS tarifa_meses
                 FROM solicitudes s
                 INNER JOIN categorias c ON s.id_categoria = c.id_categoria
                 LEFT JOIN municipios m ON s.id_municipio = m.id_municipio
                 LEFT JOIN lugares l ON l.id_solicitud_origen = s.id_solicitud
-                LEFT JOIN cuentas_negocio cn ON cn.id_lugar = l.id_lugar";
+                LEFT JOIN cuentas_negocio cn ON cn.id_lugar = l.id_lugar
+                LEFT JOIN tarifas t ON t.id_tarifa = s.id_tarifa";
 
         $params = [];
         $where = [];
@@ -91,11 +93,13 @@ class Solicitud {
     public function buscarPorId(int $id): ?array {
         $sql = "SELECT s.*, c.nombre AS categoria, 
                        m.nombre AS municipio, m.provincia AS municipio_provincia,
-                       l.id_lugar AS id_lugar_creado
+                       l.id_lugar AS id_lugar_creado,
+                       t.nombre AS tarifa_nombre, t.meses_duracion AS tarifa_meses
                 FROM solicitudes s
                 INNER JOIN categorias c ON s.id_categoria = c.id_categoria
                 LEFT JOIN municipios m ON s.id_municipio = m.id_municipio
                 LEFT JOIN lugares l ON l.id_solicitud_origen = s.id_solicitud
+                LEFT JOIN tarifas t ON t.id_tarifa = s.id_tarifa
                 WHERE s.id_solicitud = :id LIMIT 1";
 
         $stmt = $this->db->prepare($sql);

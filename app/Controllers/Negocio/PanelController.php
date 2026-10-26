@@ -325,13 +325,16 @@ class PanelController extends Controller {
             exit();
         }
 
-        $idPromo     = (int)($_POST['id_promocion'] ?? 0);
-        $titulo      = trim($_POST['titulo'] ?? '');
-        $descripcion = trim($_POST['descripcion'] ?? '');
-        $descuento   = trim($_POST['descuento_texto'] ?? '');
-        $inicio      = trim($_POST['fecha_inicio'] ?? '');
-        $fin         = trim($_POST['fecha_fin'] ?? '');
-        $quitarImg   = !empty($_POST['quitar_imagen']);
+        $idPromo       = (int)($_POST['id_promocion'] ?? 0);
+        $titulo        = trim($_POST['titulo'] ?? '');
+        $descripcion   = trim($_POST['descripcion'] ?? '');
+        $descuento     = trim($_POST['descuento_texto'] ?? '');
+        $tiktokUrl     = trim($_POST['tiktok_url'] ?? '');
+        $facebookUrl   = trim($_POST['facebook_url'] ?? '');
+        $instagramUrl  = trim($_POST['instagram_url'] ?? '');
+        $inicio        = trim($_POST['fecha_inicio'] ?? '');
+        $fin           = trim($_POST['fecha_fin'] ?? '');
+        $quitarImg     = !empty($_POST['quitar_imagen']);
 
         if (empty($titulo) || empty($descripcion) || empty($inicio) || empty($fin)) {
             $_SESSION['negocio_error'] = 'Complete todos los campos requeridos (*).';
@@ -371,6 +374,9 @@ class PanelController extends Controller {
                 'titulo'          => $titulo,
                 'descripcion'     => $descripcion,
                 'descuento_texto' => $descuento,
+                'tiktok_url'      => $tiktokUrl !== '' ? $tiktokUrl : null,
+                'facebook_url'    => $facebookUrl !== '' ? $facebookUrl : null,
+                'instagram_url'   => $instagramUrl !== '' ? $instagramUrl : null,
                 'fecha_inicio'    => $inicio,
                 'fecha_fin'       => $fin
             ];
@@ -387,6 +393,9 @@ class PanelController extends Controller {
                 'titulo'          => $titulo,
                 'descripcion'     => $descripcion,
                 'descuento_texto' => $descuento,
+                'tiktok_url'      => $tiktokUrl !== '' ? $tiktokUrl : null,
+                'facebook_url'    => $facebookUrl !== '' ? $facebookUrl : null,
+                'instagram_url'   => $instagramUrl !== '' ? $instagramUrl : null,
                 'imagen_archivo'  => $imagenArchivo,
                 'fecha_inicio'    => $inicio,
                 'fecha_fin'       => $fin
@@ -459,6 +468,9 @@ class PanelController extends Controller {
             'email_contacto' => 120,
             'horario_atencion' => 150,
             'enlace_menu' => 255,
+            'facebook_url' => 255,
+            'instagram_url' => 255,
+            'tiktok_url' => 255,
         ];
         $datos = [];
         foreach ($campos as $campo => $longitudMaxima) {

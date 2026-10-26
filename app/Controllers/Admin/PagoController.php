@@ -101,14 +101,15 @@ class PagoController extends Controller {
         $db = Database::getConnection();
         
         // Listar establecimientos comerciales con su ultimo vencimiento registrado y su fotografía principal
-        $sqlComercios = "SELECT l.id_lugar, l.nombre, l.whatsapp_contacto, l.telefono_contacto, l.direccion, s.plan_solicitado,
+        $sqlComercios = "SELECT l.id_lugar, l.nombre, l.id_categoria, c.nombre as categoria_nombre, l.whatsapp_contacto, l.telefono_contacto, l.direccion, s.plan_solicitado,
                                 (SELECT f.nombre_archivo FROM fotografias f WHERE f.id_lugar = l.id_lugar AND f.es_principal = 1 LIMIT 1) AS imagen,
                                 (SELECT MAX(v.fecha_vencimiento) FROM vigencias v
                                  INNER JOIN pagos p ON p.id_pago = v.id_pago
                                  WHERE v.id_lugar = l.id_lugar AND p.estado = 'CONFIRMADO') AS ultimo_vencimiento
                          FROM lugares l
+                         LEFT JOIN categorias c ON c.id_categoria = l.id_categoria
                          LEFT JOIN solicitudes s ON s.id_solicitud = l.id_solicitud_origen
-                         WHERE l.tipo_lugar = 'COMERCIAL' 
+                         WHERE l.tipo_lugar = 'COMERCIAL' OR l.id_categoria = 9
                          ORDER BY l.nombre ASC";
         $comercios = $db->query($sqlComercios)->fetchAll(PDO::FETCH_ASSOC);
         
@@ -199,8 +200,9 @@ class PagoController extends Controller {
 
         try {
             $lugar = (new \App\Models\Lugar())->buscarPorId($idLugar);
-            if (!$lugar || $lugar['tipo_lugar'] !== 'COMERCIAL') {
-                throw new \RuntimeException('Seleccione un establecimiento comercial válido.');
+            $esComercialValido = $lugar && ($lugar['tipo_lugar'] === 'COMERCIAL' || (int)($lugar['id_categoria'] ?? 0) === 9);
+            if (!$esComercialValido) {
+                throw new \RuntimeException('Seleccione un establecimiento comercial o de transporte válido.');
             }
             $fecha = \DateTimeImmutable::createFromFormat('!Y-m-d', $fechaDeclarada);
             if (!$fecha || $fecha->format('Y-m-d') !== $fechaDeclarada) {
