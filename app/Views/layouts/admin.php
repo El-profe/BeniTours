@@ -7,12 +7,17 @@
     <link rel="icon" type="image/png" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo2.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo2.png') ?>">
 
     <!-- Preconexión y optimización de DNS para recursos externos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="preconnect" href="https://tile.openstreetmap.org">
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
+    <!-- Tipografía Google Fonts: Poppins (400, 500, 600, 700, 800) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 
     <!-- Bootstrap 5.3.3 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -66,15 +71,9 @@
                         <span>Nueva Ficha</span>
                     </a>
                 </li>
-                <li>
-                    <a href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria')) ? 'active' : '' ?>">
-                        <i class="bi bi-camera-fill"></i>
-                        <span>Galería de Fotos</span>
-                    </a>
-                </li>
             </ul>
 
-                        <div class="sidebar-label">Comercial & Finanzas</div>
+            <div class="sidebar-label">Comercial & Finanzas</div>
             <ul class="nav-admin mb-3">
                 <li>
                     <a href="<?= htmlspecialchars($baseUrl) ?>/admin/solicitudes" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'solicitudes')) ? 'active' : '' ?>">
@@ -96,12 +95,18 @@
                 </li>
             </ul>
 
-            <div class="sidebar-label">Ajustes & Catálogos</div>
+            <div class="sidebar-label">Ajustes del Sistema</div>
             <ul class="nav-admin mb-3">
                 <li>
                     <a href="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'catalogos')) ? 'active' : '' ?>">
                         <i class="bi bi-sliders2"></i>
                         <span>Parámetros & Planes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria" class="nav-admin-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria')) ? 'active' : '' ?>">
+                        <i class="bi bi-camera-fill"></i>
+                        <span>Galería de Fotos</span>
                     </a>
                 </li>
                 <li>
@@ -161,10 +166,6 @@
                     <i class="bi bi-geo-alt-fill"></i>
                     <span>Lugares</span>
                 </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria" class="admin-top-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria') ? 'active' : '' ?>">
-                    <i class="bi bi-camera-fill"></i>
-                    <span>Galería</span>
-                </a>
                 <a href="<?= htmlspecialchars($baseUrl) ?>/admin/lugares/crear" class="admin-top-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'crear') ? 'active' : '' ?>">
                     <i class="bi bi-plus-circle-fill"></i>
                     <span>Nueva Ficha</span>
@@ -181,14 +182,49 @@
                     <i class="bi bi-bar-chart-line-fill"></i>
                     <span>Reportes</span>
                 </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos" class="admin-top-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'catalogos')) ? 'active' : '' ?>">
-                    <i class="bi bi-sliders2"></i>
-                    <span>Parámetros</span>
-                </a>
-                <a href="<?= htmlspecialchars($baseUrl) ?>/admin/eventos" class="admin-top-link <?= (str_contains($_SERVER['REQUEST_URI'] ?? '', 'eventos')) ? 'active' : '' ?>">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>Eventos</span>
-                </a>
+
+                <!-- Dropdown Ajustes (Parámetros, Galería, Eventos) -->
+                <?php 
+                    $ajustesActivo = str_contains($_SERVER['REQUEST_URI'] ?? '', 'catalogos') || 
+                                     str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria') || 
+                                     str_contains($_SERVER['REQUEST_URI'] ?? '', 'eventos'); 
+                ?>
+                <div class="dropdown d-inline-block">
+                    <button class="admin-top-link dropdown-toggle border-0 bg-transparent <?= $ajustesActivo ? 'active' : '' ?>" 
+                            type="button" id="topDropAjustes" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear-fill"></i>
+                        <span>Ajustes</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark bg-teal-dark shadow-lg rounded-4 border-0 py-2 mt-2 dropdown-menu-admin-top" aria-labelledby="topDropAjustes">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'catalogos') ? 'active' : '' ?>" href="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos">
+                                <i class="bi bi-sliders2 text-warning fs-6"></i>
+                                <div>
+                                    <span class="d-block fw-semibold text-white">Parámetros</span>
+                                    <small class="text-white-50 extra-small d-block">Categorías, municipios y planes</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'galeria') ? 'active' : '' ?>" href="<?= htmlspecialchars($baseUrl) ?>/admin/galeria">
+                                <i class="bi bi-camera-fill text-info fs-6"></i>
+                                <div>
+                                    <span class="d-block fw-semibold text-white">Galería</span>
+                                    <small class="text-white-50 extra-small d-block">Fotografías y postales</small>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 <?= str_contains($_SERVER['REQUEST_URI'] ?? '', 'eventos') ? 'active' : '' ?>" href="<?= htmlspecialchars($baseUrl) ?>/admin/eventos">
+                                <i class="bi bi-calendar-event text-teal-highlight fs-6"></i>
+                                <div>
+                                    <span class="d-block fw-semibold text-white">Eventos</span>
+                                    <small class="text-white-50 extra-small d-block">Agenda cultural y festividades</small>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
 
             <!-- Bloque 3: Acciones a la Derecha (Catálogo Público + Menú de Usuario) -->

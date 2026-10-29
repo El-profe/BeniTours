@@ -197,28 +197,30 @@
 
         items.forEach((item, idx) => {
             const imgHtml = item.imagen
-                ? `<img src="${baseUrl}/imagen?f=${encodeURIComponent(item.imagen)}" alt="${item.nombre}" class="rounded-3 object-fit-cover flex-shrink-0" style="width: 54px; height: 54px;">`
-                : `<div class="rounded-3 bg-success-subtle text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 54px; height: 54px;"><i class="bi bi-geo-alt-fill fs-4"></i></div>`;
+                ? `<img src="${baseUrl}/imagen?f=${encodeURIComponent(item.imagen)}" alt="${item.nombre}" class="itinerario-card-thumb rounded-3 object-fit-cover flex-shrink-0">`
+                : `<div class="itinerario-card-thumb rounded-3 bg-success-subtle text-success d-flex align-items-center justify-content-center flex-shrink-0"><i class="bi bi-geo-alt-fill fs-4"></i></div>`;
 
             html += `
-                <div class="list-group-item bg-light rounded-4 border-0 p-3 d-flex align-items-center justify-content-between gap-3 shadow-sm">
-                    <div class="d-flex align-items-center gap-3 overflow-hidden">
-                        <span class="badge bg-success rounded-pill extra-small px-2 py-1">${idx + 1}</span>
+                <div class="card border rounded-4 p-3 bg-white shadow-2xs mb-2 itinerario-item-card position-relative">
+                    <div class="d-flex align-items-start gap-3">
+                        <span class="itinerario-num-badge flex-shrink-0">${idx + 1}</span>
                         ${imgHtml}
-                        <div class="text-truncate">
-                            <h6 class="mb-0 fw-bold text-dark text-truncate">${item.nombre}</h6>
-                            <small class="text-muted extra-small d-block text-truncate">
-                                <i class="bi bi-tag me-1"></i>${item.categoria} ${item.municipio ? `&bull; <i class="bi bi-geo-alt text-danger"></i> ${item.municipio}` : ''}
-                            </small>
+                        <div class="flex-grow-1 min-w-0">
+                            <h6 class="mb-1 fw-bold text-dark text-break lh-sm itinerario-item-title">${item.nombre}</h6>
+                            <div class="text-muted extra-small d-flex flex-wrap align-items-center gap-1">
+                                <span><i class="bi bi-tag text-teal me-1"></i>${item.categoria}</span>
+                                ${item.municipio ? `<span class="text-secondary opacity-50">&bull;</span><span><i class="bi bi-geo-alt text-danger me-1"></i>${item.municipio}</span>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-1 flex-shrink-0">
-                        <a href="${item.url}" class="btn btn-outline-success btn-sm rounded-pill px-3 extra-small fw-semibold" title="Ver ficha">
-                            Ver
+                    <!-- Acciones abajo de cada elemento -->
+                    <div class="d-flex align-items-center justify-content-end gap-2 pt-2 border-top border-light-subtle mt-2">
+                        <a href="${item.url}" class="btn btn-sm btn-outline-teal rounded-pill px-3 py-1 extra-small fw-semibold d-inline-flex align-items-center gap-1" title="Ver ficha del lugar">
+                            <i class="bi bi-eye"></i> <span>Ver lugar</span>
                         </a>
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center btn-eliminar-favorito" 
-                                data-id="${item.id}" title="Quitar de la lista" style="width: 32px; height: 32px;">
-                            <i class="bi bi-trash"></i>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 extra-small fw-semibold d-inline-flex align-items-center gap-1 btn-eliminar-favorito" 
+                                data-id="${item.id}" title="Quitar de mi ruta">
+                            <i class="bi bi-trash"></i> <span>Quitar</span>
                         </button>
                     </div>
                 </div>

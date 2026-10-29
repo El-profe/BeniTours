@@ -17,17 +17,84 @@ class EventoController extends Controller {
 
     public function index(): void {
         $eventos = $this->eventoModel->listarTodos();
+        $fraternidades = (new \App\Models\Fraternidad())->listarAdmin();
         $mensaje = $_SESSION['admin_flash'] ?? null;
         $error   = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
 
         $this->render('admin/eventos/index', [
-            'titulo'    => 'Agenda de Eventos del Beni',
-            'eventos'   => $eventos,
-            'mensaje'   => $mensaje,
-            'error'     => $error,
-            'csrfToken' => CsrfMiddleware::obtenerToken()
+            'titulo'         => 'Agenda de Eventos y Entrada Universitaria',
+            'eventos'        => $eventos,
+            'fraternidades'  => $fraternidades,
+            'mensaje'        => $mensaje,
+            'error'          => $error,
+            'csrfToken'      => CsrfMiddleware::obtenerToken()
         ], 'admin');
+    }
+
+    /**
+     * Gestión de Fraternidades para la Entrada Folklórica Universitaria
+     */
+    public function guardarFraternidad(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Token de seguridad inválido.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabFraternidadesAdmin");
+            exit();
+        }
+
+        $id = (int)($_POST['id_fraternidad'] ?? 0);
+        $orden = max(1, (int)($_POST['orden'] ?? 1));
+        $hora = trim($_POST['hora_ingreso'] ?? '14:00');
+        $nombre = trim($_POST['nombre_fraternidad'] ?? '');
+        $danza = trim($_POST['danza'] ?? '');
+        $universidad = trim($_POST['universidad'] ?? '');
+        $depto = trim($_POST['departamento'] ?? 'Beni');
+        $activo = isset($_POST['activo']) ? 1 : 0;
+
+        if (empty($nombre) || empty($danza) || empty($universidad)) {
+            $_SESSION['admin_error'] = 'Por favor ingresa el nombre de la fraternidad, danza y universidad.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabFraternidadesAdmin");
+            exit();
+        }
+
+        $fratModel = new \App\Models\Fraternidad();
+        $datos = [
+            'orden'              => $orden,
+            'hora_ingreso'       => $hora,
+            'nombre_fraternidad' => $nombre,
+            'danza'              => $danza,
+            'universidad'        => $universidad,
+            'departamento'       => $depto,
+            'activo'             => $activo
+        ];
+
+        if ($id > 0) {
+            $fratModel->actualizar($id, $datos);
+            $_SESSION['admin_flash'] = 'Fraternidad actualizada exitosamente.';
+        } else {
+            $fratModel->crear($datos);
+            $_SESSION['admin_flash'] = 'Fraternidad agregada al rol de la entrada.';
+        }
+
+        header("Location: {$this->config['base_url']}/admin/eventos#tabFraternidadesAdmin");
+        exit();
+    }
+
+    public function eliminarFraternidad(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Token de seguridad inválido.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabFraternidadesAdmin");
+            exit();
+        }
+
+        $id = (int)($_POST['id_fraternidad'] ?? 0);
+        if ($id > 0) {
+            (new \App\Models\Fraternidad())->eliminar($id);
+            $_SESSION['admin_flash'] = 'Fraternidad eliminada del rol.';
+        }
+
+        header("Location: {$this->config['base_url']}/admin/eventos#tabFraternidadesAdmin");
+        exit();
     }
 
     public function guardar(): void {

@@ -22,17 +22,35 @@ class CatalogoController extends Controller {
     }
 
     /**
-     * Muestra el panel unificado de gestión de Catálogos (Categorías, Municipios, Planes).
+     * Muestra el panel unificado de gestión de Catálogos (Categorías, Municipios, Planes, Portada & Video).
      */
     public function index(): void {
         $tabActivo = trim($_GET['tab'] ?? 'categorias');
-        if (!in_array($tabActivo, ['categorias', 'municipios', 'planes'], true)) {
+        if (!in_array($tabActivo, ['categorias', 'municipios', 'planes', 'portada-video'], true)) {
             $tabActivo = 'categorias';
         }
 
         $categorias = $this->categoriaModel->listarTodas();
         $municipios = $this->municipioModel->listarTodosConConteo();
         $planes     = $this->tarifaModel->listarTodas();
+
+        // Información del video y poster actual del Hero
+        $rutaVideo  = dirname(__DIR__, 3) . '/public/assets/video/video.mp4';
+        $rutaPoster = dirname(__DIR__, 3) . '/public/assets/img/hero-poster.webp';
+
+        $infoVideo = [
+            'existe'     => file_exists($rutaVideo),
+            'tamano_mb'  => file_exists($rutaVideo) ? round(filesize($rutaVideo) / (1024 * 1024), 2) : 0,
+            'modificado' => file_exists($rutaVideo) ? date('d/m/Y H:i', filemtime($rutaVideo)) : 'No cargado',
+            'url'        => $this->config['base_url'] . '/assets/video/video.mp4'
+        ];
+
+        $infoPoster = [
+            'existe'     => file_exists($rutaPoster),
+            'tamano_kb'  => file_exists($rutaPoster) ? round(filesize($rutaPoster) / 1024, 1) : 0,
+            'modificado' => file_exists($rutaPoster) ? date('d/m/Y H:i', filemtime($rutaPoster)) : 'No cargado',
+            'url'        => $this->config['base_url'] . '/assets/img/hero-poster.webp'
+        ];
 
         $mensaje = $_SESSION['admin_flash'] ?? null;
         $error   = $_SESSION['admin_error'] ?? null;
@@ -44,6 +62,8 @@ class CatalogoController extends Controller {
             'categorias'  => $categorias,
             'municipios'  => $municipios,
             'planes'      => $planes,
+            'infoVideo'   => $infoVideo,
+            'infoPoster'  => $infoPoster,
             'mensaje'     => $mensaje,
             'error'       => $error,
             'csrfToken'   => CsrfMiddleware::obtenerToken()
@@ -273,6 +293,130 @@ class CatalogoController extends Controller {
         $this->tarifaModel->cambiarEstado($id, $nuevoEstado);
         $txt = $nuevoEstado ? 'activado' : 'desactivado';
         $this->redirigirConExito("Plan comercial {$txt} correctamente.", 'planes');
+    }
+
+    // =========================================================================
+    // GESTIÓN DE VIDEO Y PORTADA DEL HERO
+    // =========================================================================
+
+    /**
+     * Procesa la carga y reemplazo del video promocional (video.mp4).
+     */
+    public function actualizarVideoHero(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $this->redirigirConError('Token CSRF inválido o sesión expirada.', 'portada-video');
+            return;
+        }
+
+        if (empty($_FILES['video_archivo']) || $_FILES['video_archivo']['error'] === UPLOAD_ERR_NO_FILE) {
+            $this->redirigirConError('Por favor selecciona un archivo de video MP4.', 'portada-video');
+            return;
+        }
+
+        $archivo = $_FILES['video_archivo'];
+
+        if ($archivo['error'] !== UPLOAD_ERR_OK) {
+            $this->redirigirConError('Error al subir el archivo de video (Código: ' . $archivo['error'] . ').', 'portada-video');
+            return;
+        }
+
+        // Validación de tamaño (Máx 50MB)
+        $maxBytes = 50 * 1024 * 1024;
+        if ($archivo['size'] > $maxBytes) {
+            $this->redirigirConError('El video excede el límite máximo permitido de 50 MB.', 'portada-video');
+            return;
+        }
+
+        // Validación de extensión y tipo MIME
+        $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $archivo['tmp_name']);
+        finfo_close($finfo);
+
+        $mimesPermitidos = ['video/mp4', 'video/quicktime', 'application/octet-stream'];
+        if ($ext !== 'mp4' && !in_array($mime, $mimesPermitidos, true)) {
+            $this->redirigirConError('Formato no admitido. El video debe ser un archivo MP4 válido.', 'portada-video');
+            return;
+        }
+
+        $dirDestino = dirname(__DIR__, 3) . '/public/assets/video';
+        if (!is_dir($dirDestino)) {
+            mkdir($dirDestino, 0755, true);
+        }
+
+        $rutaDestino = $dirDestino . '/video.mp4';
+
+        if (!move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
+            $this->redirigirConError('No se pudo guardar el archivo en el servidor. Verifica los permisos de carpeta.', 'portada-video');
+            return;
+        }
+
+        $this->redirigirConExito('¡Video promocional de portada actualizado exitosamente!', 'portada-video');
+    }
+
+    /**
+     * Procesa la carga y reemplazo de la imagen póster previa (hero-poster.webp/jpg/png).
+     */
+    public function actualizarPosterHero(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $this->redirigirConError('Token CSRF inválido o sesión expirada.', 'portada-video');
+            return;
+        }
+
+        if (empty($_FILES['poster_archivo']) || $_FILES['poster_archivo']['error'] === UPLOAD_ERR_NO_FILE) {
+            $this->redirigirConError('Por favor selecciona una imagen para el póster.', 'portada-video');
+            return;
+        }
+
+        $archivo = $_FILES['poster_archivo'];
+
+        if ($archivo['error'] !== UPLOAD_ERR_OK) {
+            $this->redirigirConError('Error al subir la imagen (Código: ' . $archivo['error'] . ').', 'portada-video');
+            return;
+        }
+
+        // Validación de tamaño (Máx 6MB)
+        $maxBytes = 6 * 1024 * 1024;
+        if ($archivo['size'] > $maxBytes) {
+            $this->redirigirConError('La imagen excede el límite de 6 MB.', 'portada-video');
+            return;
+        }
+
+        $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $archivo['tmp_name']);
+        finfo_close($finfo);
+
+        $mimesPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!in_array($mime, $mimesPermitidos, true)) {
+            $this->redirigirConError('Formato de imagen no válido. Debe ser WebP, JPG o PNG.', 'portada-video');
+            return;
+        }
+
+        $dirDestino = dirname(__DIR__, 3) . '/public/assets/img';
+        $rutaDestino = $dirDestino . '/hero-poster.webp';
+
+        // Convertir o mover a hero-poster.webp
+        if ($mime === 'image/webp') {
+            move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+        } else {
+            // Conversión rápida con GD si es JPG o PNG
+            $imagenGd = null;
+            if ($mime === 'image/jpeg') {
+                $imagenGd = @imagecreatefromjpeg($archivo['tmp_name']);
+            } elseif ($mime === 'image/png') {
+                $imagenGd = @imagecreatefrompng($archivo['tmp_name']);
+            }
+
+            if ($imagenGd && function_exists('imagewebp')) {
+                imagewebp($imagenGd, $rutaDestino, 85);
+                imagedestroy($imagenGd);
+            } else {
+                move_uploaded_file($archivo['tmp_name'], $rutaDestino);
+            }
+        }
+
+        $this->redirigirConExito('¡Imagen póster de portada actualizada con éxito!', 'portada-video');
     }
 
     // =========================================================================

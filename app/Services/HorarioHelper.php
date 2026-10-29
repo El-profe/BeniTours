@@ -96,4 +96,89 @@ class HorarioHelper {
             return null;
         }
     }
+
+    /**
+     * Clasifica los turnos gastronómicos (desayuno, almuerzo, merienda, cena)
+     * a partir del texto de horario o el tipo de establecimiento.
+     *
+     * @param string|null $horario
+     * @param string|null $nombre
+     * @return array Lista de turnos: ['desayuno', 'almuerzo', 'merienda', 'cena']
+     */
+    public static function clasificarTurnos(?string $horario, ?string $nombre = null): array {
+        $turnos = [];
+        $texto = mb_strtolower(trim(($horario ?? '') . ' ' . ($nombre ?? '')), 'UTF-8');
+
+        if (empty($texto)) {
+            return ['almuerzo', 'cena']; // Valor predeterminado para restaurantes sin horario
+        }
+
+        // Casos 24 horas o siempre abierto
+        if (str_contains($texto, '24 hora') || str_contains($texto, '24h') || str_contains($texto, 'continuo')) {
+            return ['desayuno', 'almuerzo', 'merienda', 'cena'];
+        }
+
+        // 1. Detección por palabras clave directas
+        if (str_contains($texto, 'desayun') || str_contains($texto, 'salteñ') || str_contains($texto, 'mañan')) {
+            $turnos[] = 'desayuno';
+        }
+        if (str_contains($texto, 'almuerz')) {
+            $turnos[] = 'almuerzo';
+        }
+        if (str_contains($texto, 'meriend') || str_contains($texto, 'caf') || str_contains($texto, 'masita') || str_contains($texto, 'pasteler')) {
+            $turnos[] = 'merienda';
+        }
+        if (str_contains($texto, 'cena') || str_contains($texto, 'noche') || str_contains($texto, 'pub') || str_contains($texto, 'bar')) {
+            $turnos[] = 'cena';
+        }
+
+        // 2. Detección por rangos de horas (Inicio y Fin)
+        preg_match_all('/(\d{1,2}):(\d{2})\s*(?:a|-)\s*(\d{1,2}):(\d{2})/i', $horario ?? '', $matches, PREG_SET_ORDER);
+        if (!empty($matches)) {
+            foreach ($matches as $m) {
+                $hIni = (int)$m[1];
+                $hFin = (int)$m[3];
+
+                // Turno cruza el día o noche (ej. 18:00 a 02:00)
+                if ($hFin < $hIni) {
+                    $turnos[] = 'cena';
+                }
+                // Desayuno: Abre entre las 06:00 y las 10:59
+                if ($hIni >= 6 && $hIni <= 10) {
+                    $turnos[] = 'desayuno';
+                }
+                // Almuerzo: Horario cubre entre 11:30 y 14:30
+                if (($hIni <= 13 && $hFin >= 12) || ($hIni >= 11 && $hIni <= 14)) {
+                    $turnos[] = 'almuerzo';
+                }
+                // Merienda / Café: Horario cubre entre 15:00 y 18:30
+                if (($hIni <= 17 && $hFin >= 16) || ($hIni >= 15 && $hIni <= 17)) {
+                    $turnos[] = 'merienda';
+                }
+                // Cena: Horario cubre a partir de las 18:30 o noche
+                if ($hFin >= 20 || $hIni >= 18 || $hFin < $hIni) {
+                    $turnos[] = 'cena';
+                }
+            }
+        }
+
+        // Si es una churrasquería o restaurante tradicional típico
+        if (str_contains($texto, 'churrasquer') || str_contains($texto, 'restauran') || str_contains($texto, 'pizz')) {
+            $turnos[] = 'almuerzo';
+            $turnos[] = 'cena';
+        }
+
+        // Si es cafetería
+        if (str_contains($texto, 'cafeter') || str_contains($texto, 'café')) {
+            $turnos[] = 'desayuno';
+            $turnos[] = 'merienda';
+        }
+
+        $turnos = array_unique($turnos);
+        if (empty($turnos)) {
+            $turnos = ['almuerzo', 'cena'];
+        }
+
+        return array_values($turnos);
+    }
 }

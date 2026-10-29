@@ -34,12 +34,17 @@
     <?php endif; ?>
 
     <!-- Preconexión y optimización de DNS para recursos externos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="preconnect" href="https://tile.openstreetmap.org">
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
+    <!-- Tipografía Google Fonts: Poppins (400, 500, 600, 700, 800) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 
     <!-- Bootstrap 5.3.3 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/css/bootstrap.min.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -49,13 +54,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- Leaflet 1.9.4 CSS (Local) -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/leaflet/leaflet.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/leaflet/leaflet.css') ?>">
+    <!-- AOS (Animate On Scroll) CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     <!-- Estilos propios -->
     <link rel="stylesheet" href="<?= htmlspecialchars($baseUrl) ?>/assets/css/app.css?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/app.css') ?>">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light<?= !empty($heroPantallaCompleta) ? ' page-home' : '' ?><?= !empty($bodyClass) ? ' ' . htmlspecialchars($bodyClass) : '' ?>">
 
     <!-- Navegación Superior -->
-    <nav class="navbar navbar-expand-xl navbar-dark navbar-trinidad sticky-top shadow-sm py-2">
+    <nav class="navbar navbar-expand-xl navbar-dark navbar-trinidad sticky-top shadow-sm py-2<?= !empty($heroPantallaCompleta) ? ' navbar-transparente' : ' navbar-scrolled' ?>" id="navbarPrincipal">
         <div class="container-fluid px-2 px-lg-3">
             <a class="navbar-brand d-flex align-items-center" href="<?= htmlspecialchars($baseUrl) ?>/">
                 <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/logo.png?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/img/logo.png') ?>"
@@ -74,15 +81,15 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 fw-medium">
+                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 fw-medium d-flex align-items-center gap-1 gap-xl-2">
                     <li class="nav-item">
                         <a class="nav-link active" href="<?= htmlspecialchars($baseUrl) ?>/#inicio" data-nav-link="inicio">
                             <i class="bi bi-house-door me-1"></i> Inicio
                         </a>
                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#guia-trinidad" data-nav-link="guia-trinidad">
-                            <i class="bi bi-info-circle me-1" aria-hidden="true"></i> Guía del Viajero
+                    <li class="nav-item ms-xl-1 me-xl-1">
+                        <a class="nav-link nav-link-festivo fw-bold px-3 py-1 my-1 my-xl-0 d-inline-flex align-items-center gap-1 shadow-sm text-nowrap" href="<?= htmlspecialchars($baseUrl) ?>/#eventos-18-noviembre" data-nav-link="eventos-18-noviembre">
+                            <i class="bi bi-calendar-event-fill text-warning me-1"></i> 18 de Noviembre
                         </a>
                     </li>
                     <li class="nav-item">
@@ -100,17 +107,74 @@
                             <i class="bi bi-tag-fill me-1" aria-hidden="true"></i> Promociones
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#transporte" data-nav-link="transporte">
-                            <i class="bi bi-taxi-front-fill me-1" aria-hidden="true"></i> Transporte
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-inline-flex align-items-center gap-1" href="#" id="navbarDropServicios" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-nav-link="servicios">
+                            <i class="bi bi-shield-plus text-teal-highlight"></i> Servicios
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-dark bg-teal-dark shadow-lg rounded-3 border-0 py-1" aria-labelledby="navbarDropServicios">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/?categoria=hospitales-salud#explorar" data-categoria-slug="hospitales-salud">
+                                    <i class="bi bi-hospital text-danger fs-6"></i>
+                                    <span class="fw-semibold">Salud y Hospitales</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/?categoria=policia-seguridad#explorar" data-categoria-slug="policia-seguridad">
+                                    <i class="bi bi-shield-check text-warning fs-6"></i>
+                                    <span class="fw-semibold">Seguridad y Policía</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/?categoria=bancos-cajeros#explorar" data-categoria-slug="bancos-cajeros">
+                                    <i class="bi bi-cash-coin text-success fs-6"></i>
+                                    <span class="fw-semibold">Banca y Cajeros ATM</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider border-secondary opacity-25 my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/#transporte">
+                                    <i class="bi bi-taxi-front-fill text-info fs-6"></i>
+                                    <span class="fw-semibold">Transporte y Radiomóviles</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= htmlspecialchars($baseUrl) ?>/#galeria" data-nav-link="galeria">
-                            <i class="bi bi-camera-fill me-1" aria-hidden="true"></i> Galería
+                    <!-- Dropdown Eventos y Cultura -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-inline-flex align-items-center gap-1" href="#" id="navbarDropEventos" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-nav-link="eventos">
+                            <i class="bi bi-calendar-event text-teal-highlight"></i> Eventos
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-dark bg-teal-dark shadow-lg rounded-3 border-0 py-1" aria-labelledby="navbarDropEventos">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/#eventos-18-noviembre">
+                                    <i class="bi bi-flag-fill text-warning fs-6"></i>
+                                    <div>
+                                        <span class="d-block fw-semibold">Eventos y Festividades</span>
+                                        <small class="text-white-50 extra-small d-block">Afiches y fiestas cívicas</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/#agenda-festividades">
+                                    <i class="bi bi-calendar3-range text-teal-highlight fs-6"></i>
+                                    <div>
+                                        <span class="d-block fw-semibold">Agenda</span>
+                                        <small class="text-white-50 extra-small d-block">Calendario interactivo 2026</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider border-secondary opacity-25 my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= htmlspecialchars($baseUrl) ?>/#galeria">
+                                    <i class="bi bi-camera-fill text-info fs-6"></i>
+                                    <div>
+                                        <span class="d-block fw-semibold">Galería</span>
+                                        <small class="text-white-50 extra-small d-block">Postales y fotografías</small>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    
                 </ul>
 
                 <div class="d-flex align-items-center gap-2">
@@ -253,6 +317,8 @@
         </div>
     <?php endif; ?>
 
+
+
     <!-- Bootstrap Bundle JS (Local) -->
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/vendor/bootstrap/js/bootstrap.bundle.min.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 
@@ -289,29 +355,33 @@
 
     <!-- Modal Mi Itinerario -->
     <div class="modal fade" id="modalItinerario" tabindex="-1" aria-labelledby="modalItinerarioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header border-bottom modal-header-teal text-white py-3">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
+            <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden modal-itinerario-custom">
+                <div class="modal-header border-0 modal-header-teal text-white py-3 px-3 px-sm-4">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-compass-fill fs-5"></i>
-                        <h5 class="modal-title fw-bold mb-0" id="modalItinerarioLabel">Mi Ruta Turística en el Beni</h5>
+                        <div class="modal-itinerario-icon-badge" title="Ruta Turística">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold mb-0 fs-6 fs-sm-5 text-white" id="modalItinerarioLabel">Mi Ruta Turística en el Beni</h5>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body p-3 p-md-4">
+                <div class="modal-body p-3 p-sm-4 bg-light">
                     <div id="itinerarioVacioMensaje" class="text-center py-4 text-muted">
-                        <i class="bi bi-heart text-secondary display-4 d-block mb-2 opacity-50"></i>
-                        <h6 class="fw-bold text-dark">Tu itinerario está vacío</h6>
-                        <p class="small mb-0">Explora el catálogo y presiona el corazón (<i class="bi bi-heart text-danger"></i>) en los atractivos, hoteles o restaurantes que deseas visitar para armar tu ruta del día.</p>
+                        <div class="rounded-circle bg-white shadow-xs p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 64px; height: 64px;">
+                            <i class="bi bi-heart text-danger fs-2"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mt-2 mb-1">Tu itinerario está vacío</h6>
+                        <p class="small mb-0 text-muted px-2">Explora el catálogo y presiona el corazón (<i class="bi bi-heart text-danger"></i>) en los atractivos, hoteles o restaurantes que deseas visitar para armar tu ruta del día.</p>
                     </div>
                     <div id="listaItinerarioContenido"></div>
                 </div>
-                <div class="modal-footer border-top bg-light d-flex justify-content-between p-3" id="itinerarioFooterAcciones">
-                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" id="btnVaciarItinerario">
-                        <i class="bi bi-trash me-1"></i> Vaciar
+                <div class="modal-footer border-top bg-white d-flex align-items-center justify-content-between p-3 gap-2 flex-wrap" id="itinerarioFooterAcciones">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-1" id="btnVaciarItinerario">
+                        <i class="bi bi-trash"></i> <span>Vaciar</span>
                     </button>
-                    <button type="button" class="btn btn-teal-action btn-sm rounded-pill px-3 fw-bold" id="btnCompartirItinerarioWa">
-                        <i class="bi bi-whatsapp me-1"></i> Compartir Ruta por WhatsApp
+                    <button type="button" class="btn btn-teal-action btn-sm rounded-pill px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 flex-grow-1 flex-sm-grow-0 justify-content-center" id="btnCompartirItinerarioWa">
+                        <i class="bi bi-whatsapp fs-6"></i> <span>Compartir Ruta por WhatsApp</span>
                     </button>
                 </div>
             </div>
@@ -367,5 +437,20 @@
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/publico/catalogo.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/publico/catalogo.js') ?>"></script>
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/publico/solicitudes.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/publico/solicitudes.js') ?>"></script>
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/publico/itinerario.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/publico/itinerario.js') ?>"></script>
+
+    <!-- AOS (Animate On Scroll) JS & Inicialización -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 700,
+                    once: true,
+                    offset: 100,
+                    easing: 'ease-out-cubic'
+                });
+            }
+        });
+    </script>
 </body>
 </html>

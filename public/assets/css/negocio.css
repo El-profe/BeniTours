@@ -1,4 +1,7 @@
 :root {
+    --business-font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bs-font-sans-serif: var(--business-font-family);
+    --bs-body-font-family: var(--business-font-family);
     --business-green: #0E4D5E;
     --business-green-light: #2A9D8F;
     --business-gold: #FF6F3C;
@@ -10,7 +13,16 @@ body.business-portal {
     margin: 0;
     background: #f7faf9;
     color: var(--business-ink);
-    font-family: system-ui, sans-serif;
+    font-family: var(--business-font-family);
+}
+
+body.business-portal button,
+body.business-portal input,
+body.business-portal select,
+body.business-portal textarea,
+body.business-portal .form-control,
+body.business-portal .form-select {
+    font-family: inherit;
 }
 
 /* Dropdowns del Portal de Negocios */

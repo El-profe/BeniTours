@@ -13,6 +13,9 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-teal rounded-pill px-3 py-2 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalFraternidadAdmin">
+                <i class="bi bi-people-fill me-1"></i> + Nueva Fraternidad
+            </button>
             <button type="button" class="btn btn-nuevo-evento rounded-pill px-4 py-2 fw-bold shadow-sm" id="btnNuevoEvento">
                 <i class="bi bi-plus-circle-fill me-1"></i> Nuevo Evento
             </button>
@@ -41,7 +44,7 @@
     <?php endif; ?>
 
     <!-- Tabla de Eventos -->
-    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-5">
         <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
             <span class="fw-bold text-dark">
                 <i class="bi bi-stars text-warning me-1"></i> Cartelera de Eventos (<?= count($eventos) ?>)
@@ -154,6 +157,117 @@
                                             <input type="hidden" name="id_evento" value="<?= (int)$ev['id_evento'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 p-2 px-2" title="Eliminar evento">
                                                 <i class="bi bi-trash fs-6"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================
+     SECCIÓN 2: GESTIÓN DE LA ENTRADA UNIVERSITARIA
+     ========================================== -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 mt-5 overflow-hidden" id="tabFraternidadesAdmin">
+    <div class="card-header bg-white py-3 px-4 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold">Trinidad 2026</span>
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-people-fill text-warning me-2"></i>Rol de Fraternidades - Entrada Universitaria
+                </h5>
+            </div>
+            <p class="text-muted extra-small mb-0 mt-1">
+                Administra el orden de ingreso, agrupaciones folklóricas, danzas representativas y universidades participantes.
+            </p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-warning rounded-pill px-3 py-2 fw-bold text-dark shadow-sm d-flex align-items-center gap-2" id="btnNuevaFraternidad">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Nueva Fraternidad</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase extra-small fw-bold text-secondary">
+                    <tr>
+                        <th class="text-center" style="width: 70px;"># Orden</th>
+                        <th style="width: 100px;">Hora Aprox.</th>
+                        <th>Fraternidad</th>
+                        <th>Danza</th>
+                        <th>Universidad / Institución</th>
+                        <th>Origen</th>
+                        <th class="text-center" style="width: 100px;">Estado</th>
+                        <th class="text-end" style="width: 120px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    <?php if (empty($fraternidades)): ?>
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 text-secondary opacity-50 d-block mb-2"></i>
+                                No hay fraternidades registradas aún. Haz clic en <strong>"Nueva Fraternidad"</strong> para añadir la primera delegación.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($fraternidades as $frat): ?>
+                            <tr>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border rounded-circle p-2 fw-bold" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                        <?= (int)$frat['orden'] ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border px-2 py-1 extra-small fw-semibold">
+                                        <i class="bi bi-clock text-teal me-1"></i><?= htmlspecialchars($frat['hora_ingreso'] ?: '--:--') ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark"><?= htmlspecialchars($frat['nombre_fraternidad']) ?></div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-teal-subtle text-teal rounded-pill px-3 py-1 extra-small fw-bold">
+                                        <?= htmlspecialchars($frat['danza']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small text-secondary"><?= htmlspecialchars($frat['universidad']) ?></div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-secondary border px-2 py-1 extra-small">
+                                        <i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($frat['departamento']) ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ((int)$frat['activo'] === 1): ?>
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 extra-small fw-bold">Activo</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2 py-1 extra-small fw-bold">Inactivo</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        <!-- Botón Editar -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 btn-editar-fraternidad p-1 px-2"
+                                                data-frat='<?= json_encode($frat, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>'
+                                                title="Editar fraternidad">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <!-- Eliminar -->
+                                        <form action="<?= htmlspecialchars($baseUrl) ?>/admin/eventos/fraternidad/eliminar" method="POST" class="d-inline m-0" onsubmit="return confirm('¿Seguro que deseas eliminar esta fraternidad?');">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                                            <input type="hidden" name="id_fraternidad" value="<?= (int)$frat['id_fraternidad'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 p-1 px-2" title="Eliminar fraternidad">
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -316,6 +430,83 @@
     </div>
 </div>
 
+<!-- Modal Crear / Editar Fraternidad -->
+<div class="modal fade" id="modalFraternidadForm" tabindex="-1" aria-labelledby="modalFratTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="<?= htmlspecialchars($baseUrl) ?>/admin/eventos/fraternidad/guardar" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                <input type="hidden" name="id_fraternidad" id="formFratId" value="0">
+
+                <div class="modal-header bg-warning text-dark border-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold" id="modalFratTitulo">
+                        <i class="bi bi-person-plus-fill me-2"></i>Nueva Fraternidad
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="formFratOrden" class="form-label fw-bold text-dark small"># Orden <span class="text-danger">*</span></label>
+                            <input type="number" name="orden" id="formFratOrden" class="form-control rounded-3" value="1" min="1" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label for="formFratHora" class="form-label fw-bold text-dark small">Hora Estimada de Ingreso</label>
+                            <input type="text" name="hora_ingreso" id="formFratHora" class="form-control rounded-3" placeholder="Ej. 14:30 o 15:00">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="formFratNombre" class="form-label fw-bold text-dark small">Nombre de la Fraternidad <span class="text-danger">*</span></label>
+                            <input type="text" name="nombre_fraternidad" id="formFratNombre" class="form-control rounded-3" placeholder="Ej. Fraternidad Folklórica Macheteros UAB" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="formFratDanza" class="form-label fw-bold text-dark small">Danza Folklórica <span class="text-danger">*</span></label>
+                            <input type="text" name="danza" id="formFratDanza" class="form-control rounded-3" placeholder="Ej. Macheteros, Morenada, Caporales..." required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="formFratDepto" class="form-label fw-bold text-dark small">Origen / Departamento</label>
+                            <select name="departamento" id="formFratDepto" class="form-select rounded-3">
+                                <option value="Beni">Beni (Anfitrión)</option>
+                                <option value="La Paz">La Paz</option>
+                                <option value="Santa Cruz">Santa Cruz</option>
+                                <option value="Cochabamba">Cochabamba</option>
+                                <option value="Oruro">Oruro</option>
+                                <option value="Potosí">Potosí</option>
+                                <option value="Chuquisaca">Chuquisaca</option>
+                                <option value="Tarija">Tarija</option>
+                                <option value="Pando">Pando</option>
+                                <option value="Nacional">Nacional / Invitado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="formFratUniv" class="form-label fw-bold text-dark small">Universidad / Facultad o Carrera</label>
+                            <input type="text" name="universidad" id="formFratUniv" class="form-control rounded-3" placeholder="Ej. Universidad Autónoma del Beni José Ballivián">
+                        </div>
+
+                        <div class="col-12 pt-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="activo" id="formFratActivo" value="1" checked>
+                                <label class="form-check-label fw-bold text-dark small" for="formFratActivo">Fraternidad visible en el catálogo público</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">
+                        <i class="bi bi-save me-1"></i> Guardar Fraternidad
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('modalEventoForm');
@@ -336,6 +527,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const imgPreview = document.getElementById('imgPreview');
     const previewPlaceholder = document.getElementById('previewPlaceholder');
     const modalTitulo = document.getElementById('modalEventoTitulo');
+
+    // Elementos modal Fraternidad
+    const modalFratEl = document.getElementById('modalFraternidadForm');
+    const modalFratInstance = modalFratEl ? new bootstrap.Modal(modalFratEl) : null;
+    const btnNuevaFrat = document.getElementById('btnNuevaFraternidad');
+    const formFratId = document.getElementById('formFratId');
+    const formFratOrden = document.getElementById('formFratOrden');
+    const formFratHora = document.getElementById('formFratHora');
+    const formFratNombre = document.getElementById('formFratNombre');
+    const formFratDanza = document.getElementById('formFratDanza');
+    const formFratUniv = document.getElementById('formFratUniv');
+    const formFratDepto = document.getElementById('formFratDepto');
+    const formFratActivo = document.getElementById('formFratActivo');
+    const modalFratTitulo = document.getElementById('modalFratTitulo');
+
+    // Abrir Modal Nueva Fraternidad
+    btnNuevaFrat?.addEventListener('click', () => {
+        formFratId.value = '0';
+        formFratOrden.value = '<?= count($fraternidades ?? []) + 1 ?>';
+        formFratHora.value = '';
+        formFratNombre.value = '';
+        formFratDanza.value = '';
+        formFratUniv.value = 'Universidad Autónoma del Beni José Ballivián';
+        formFratDepto.value = 'Beni';
+        formFratActivo.checked = true;
+        modalFratTitulo.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Nueva Fraternidad';
+        modalFratInstance?.show();
+    });
+
+    // Abrir Modal Editar Fraternidad
+    document.querySelectorAll('.btn-editar-fraternidad').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dataStr = btn.getAttribute('data-frat');
+            if (!dataStr) return;
+            try {
+                const frat = JSON.parse(dataStr);
+                formFratId.value = frat.id_fraternidad;
+                formFratOrden.value = frat.orden || 1;
+                formFratHora.value = frat.hora_ingreso || '';
+                formFratNombre.value = frat.nombre_fraternidad || '';
+                formFratDanza.value = frat.danza || '';
+                formFratUniv.value = frat.universidad || '';
+                formFratDepto.value = frat.departamento || 'Beni';
+                formFratActivo.checked = parseInt(frat.activo) === 1;
+
+                modalFratTitulo.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Fraternidad';
+                modalFratInstance?.show();
+            } catch (e) {
+                console.error('Error parseando datos de fraternidad', e);
+            }
+        });
+    });
 
     function mostrarPreview(url) {
         if (url) {

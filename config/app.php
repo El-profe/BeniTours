@@ -14,15 +14,25 @@ if ($isLocal) {
     $localPath = rtrim($scriptDirectory, '/.');
     $envBaseUrl = 'http://' . $host . ($localPath !== '' ? $localPath : '/benitours/public');
 } else {
-    // 2. Entorno remoto (InfinityFree, VPS, etc.)
-    $envBaseUrl = env('BENITURS_BASE_URL');
-    // Si no está configurada o se subió por error una URL de localhost, auto-detectar host remoto
-    if (empty($envBaseUrl) || str_contains($envBaseUrl, 'localhost') || str_contains($envBaseUrl, '127.0.0.1')) {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
-            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-            ? 'https://' : 'http://';
-        $envBaseUrl = rtrim($protocol . $host, '/');
+    // 2. Entorno remoto (cPanel, VPS, Cloudflare, etc.)
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (isset($_SERVER['HTTP_CF_VISITOR']) && str_contains($_SERVER['HTTP_CF_VISITOR'], 'https'))
+        ? 'https://' : 'http://';
+
+    $rawBaseUrl = (string)env('BENITURS_BASE_URL', '');
+    if ($rawBaseUrl !== '' && !str_contains($rawBaseUrl, 'localhost') && !str_contains($rawBaseUrl, '127.0.0.1')) {
+        // Si el usuario escribió http:// en .env pero el sitio carga por https://, forzar https://
+        if ($protocol === 'https://' && str_starts_with($rawBaseUrl, 'http://')) {
+            $rawBaseUrl = 'https://' . substr($rawBaseUrl, 7);
+        }
+        $envBaseUrl = $rawBaseUrl;
+    } else {
+        // Auto-detectar carpeta desde SCRIPT_NAME o REQUEST_URI
+        $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        $folder = trim(str_replace('/public', '', $scriptDir), '/');
+        $envBaseUrl = $protocol . $host . ($folder !== '' ? '/' . $folder : '');
     }
 }
 

@@ -27,6 +27,9 @@ ServerSignature Off
     AddOutputFilterByType DEFLATE image/svg+xml
     AddOutputFilterByType DEFLATE font/woff2
     AddOutputFilterByType DEFLATE font/woff
+
+    # Evitar comprimir archivos multimedia ya comprimidos (permite streaming de video con HTTP 206 Byte Ranges)
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|mp4|webm|ogv|mp3)$ no-gzip dont-vary
 </IfModule>
 
 # Políticas de expiración y almacenamiento en memoria del navegador

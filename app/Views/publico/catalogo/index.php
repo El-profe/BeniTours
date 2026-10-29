@@ -11,24 +11,24 @@
         <div class="col-xl-9 col-lg-10">
             
             <!-- Badge: Visión departamental con sede en la capital -->
-            <div class="d-inline-flex align-items-center gap-2 mb-3">
+            <div class="d-inline-flex align-items-center gap-2 mb-3" data-aos="fade-down" data-aos-duration="600">
                 <span class="badge hero-badge-glass fw-bold px-3 py-2 rounded-pill text-uppercase shadow-sm">
                     <i class="bi bi-compass-fill text-warning me-1"></i> Portal Turístico del Beni · Trinidad
                 </span>
             </div>
 
             <!-- Título Principal con Relieve y Contraste Óptimo -->
-            <h1 class="display-4 fw-extrabold mb-3 text-white hero-title-cinematic">
+            <h1 class="display-4 fw-extrabold mb-3 text-white hero-title-cinematic" data-aos="fade-down" data-aos-delay="100">
                 Descubre los mejores destinos del <span class="text-teal-gradient">Beni</span>
             </h1>
 
             <!-- Descripción clara y legible -->
-            <p class="lead hero-lead-cinematic hero-lead-bounded mb-4 mx-auto">
+            <p class="lead hero-lead-cinematic hero-lead-bounded mb-4 mx-auto" data-aos="fade-up" data-aos-delay="150">
                 Explora atractivos naturales, gastronomía amazónica, hospedaje y comercios locales en Trinidad y las principales rutas del departamento.
             </p>
 
             <!-- Barra de Búsqueda Principal Premium Glassmorphism -->
-            <div class="search-box-hero-premium hero-search-box-bounded mx-auto p-2 rounded-pill mb-3">
+            <div class="search-box-hero-premium hero-search-box-bounded mx-auto p-2 rounded-pill mb-3" data-aos="fade-up" data-aos-delay="200">
                 <div class="d-flex align-items-center">
                     <span class="ps-3 text-teal-dark"><i class="bi bi-search fs-5"></i></span>
                     <input type="text" id="inputBuscarHero" class="form-control border-0 shadow-none px-3 py-2 bg-transparent hero-input-text" 
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Micro-filtros Rápidos Interactivas (Píldoras) -->
-            <div class="hero-quick-pills d-flex flex-wrap justify-content-center gap-2 mb-4">
+            <div class="hero-quick-pills d-flex flex-wrap justify-content-center gap-2 mb-4" data-aos="fade-up" data-aos-delay="250">
                 <button type="button" class="btn hero-pill-btn" onclick="aplicarFiltroRapidoHero('Laguna Suárez')">
                     <i class="fa-solid fa-water text-info me-1"></i> Laguna Suárez
                 </button>
@@ -82,26 +82,16 @@
 </div>
 </section>
 
-<!-- DIVISOR ORGÁNICO: OLA AMAZÓNICA Y BRÚJULA FLOTANTE -->
-<div class="section-divider-wrapper position-relative">
-    <!-- Ola Fluida SVG -->
-    <div class="wave-divider">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 90" preserveAspectRatio="none">
-            <path fill="#f7faf9" fill-opacity="1" d="M0,32L48,42.7C96,53,192,75,288,74.7C384,75,480,53,576,42.7C672,32,768,32,864,42.7C960,53,1056,75,1152,69.3C1248,64,1344,32,1392,16L1440,0L1440,90L1392,90C1344,90,1248,90,1152,90C1056,90,960,90,864,90C768,90,672,90,576,90C480,90,384,90,288,90C192,90,96,90,48,90L0,90Z"></path>
-        </svg>
-    </div>
-</div>
-
 <!-- Catálogo y Filtros de Categorías Multicolor -->
 <section class="container py-4" id="explorar">
     <!-- Encabezado Centrado -->
-    <div class="text-center mb-3">
+    <div class="text-center mb-3" data-aos="fade-down">
         <h2 class="fw-bold text-dark mb-1">Explorar el Beni y sus Destinos</h2>
         <p class="text-muted small mb-0">Selecciona tu municipio, rubro favorito o explora el mapa interactivo</p>
     </div>
 
     <!-- Filtro de Municipios del Beni -->
-    <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+    <div class="d-flex justify-content-center align-items-center gap-2 mb-3" data-aos="fade-up" data-aos-delay="100">
         <div class="municipio-filter align-items-center rounded-pill px-3 py-1">
             <span class="municipio-filter-icon"><i class="bi bi-geo-alt-fill"></i></span>
             <span class="municipio-filter-label small fw-semibold me-2 d-none d-sm-inline">Municipio:</span>
@@ -120,27 +110,30 @@
     </div>
 
     <!-- Píldoras de Categoría + Botón GPS Cerca de Mí -->
-    <div class="category-filter-container d-flex flex-wrap justify-content-center align-items-center gap-2 gap-md-3 mb-4 py-2">
+    <div class="category-filter-container d-flex flex-wrap justify-content-center align-items-center gap-2 gap-md-3 mb-4 py-2" data-aos="fade-up" data-aos-delay="150">
         <!-- 1. Botón Todos -->
-        <button type="button" class="chip-filter-icon cat-color-all<?= $categoriaSeleccionada === null ? ' active' : '' ?>" data-categoria="" title="Todos los lugares" aria-label="Todos los lugares">
+        <button type="button" class="chip-filter-icon cat-color-all<?= $categoriaSeleccionada === null ? ' active' : '' ?>" data-categoria="" data-tooltip="Todos los lugares" aria-label="Todos los lugares">
             <i class="bi bi-grid-fill"></i>
         </button>
 
         <!-- 2. BOTÓN GPS: Cerca de Mí (Radio de 1 km) -->
-        <button type="button" id="btnCercaDeMi" class="chip-filter-icon cat-color-geo" title="Lugares a menos de 1 km de mi ubicación" aria-label="Lugares a menos de 1 km">
+        <button type="button" id="btnCercaDeMi" class="chip-filter-icon cat-color-geo" data-tooltip="Cerca de Mí (1 km)" aria-label="Lugares a menos de 1 km">
             <i class="bi bi-geo-alt-fill"></i>
         </button>
 
         <!-- 3. Categorías Dinámicas de la BD -->
         <?php
         $categoriaColorMap = [
-            'gastronomia'                  => 'cat-color-gastro', // Naranja Ámbar
-            'hoteles-alojamientos'         => 'cat-color-hotel',  // Azul Cielo
-            'vida-nocturna'                => 'cat-color-night',  // Violeta Neón
-            'atractivos-turisticos'        => 'cat-color-nature', // Verde Esmeralda
-            'balnearios-recreacion'        => 'cat-color-water',  // Turquesa / Cian
-            'museos-y-patrimonio-cultural' => 'cat-color-gold',   // Dorado / Ámbar
-            'comercio-artesanias'          => 'cat-color-shop',   // Rosa Coral
+            'gastronomia'                  => 'cat-color-gastro',  // Naranja Ámbar
+            'hoteles-alojamientos'         => 'cat-color-hotel',   // Azul Cielo
+            'vida-nocturna'                => 'cat-color-night',   // Violeta Neón
+            'atractivos-turisticos'        => 'cat-color-nature',  // Verde Esmeralda
+            'balnearios-recreacion'        => 'cat-color-water',   // Turquesa / Cian
+            'museos-y-patrimonio-cultural' => 'cat-color-gold',    // Dorado / Ámbar
+            'comercio-artesanias'          => 'cat-color-shop',    // Rosa Coral
+            'hospitales-salud'             => 'cat-color-health',  // Rojo Carmesí / Emergencias
+            'policia-seguridad'            => 'cat-color-police',  // Azul Cobalto / Seguridad
+            'bancos-cajeros'               => 'cat-color-atm',     // Verde Esmeralda / Dinero
         ];
         foreach ($categorias as $c):
             $catSlug = $c['slug'] ?? '';
@@ -153,12 +146,16 @@
                 elseif (str_contains($nom, 'hotel') || str_contains($nom, 'alojam')) $currentClass = 'cat-color-hotel';
                 elseif (str_contains($nom, 'balneari') || str_contains($nom, 'agua')) $currentClass = 'cat-color-water';
                 elseif (str_contains($nom, 'comercio') || str_contains($nom, 'tienda')) $currentClass = 'cat-color-shop';
+                elseif (str_contains($nom, 'salud') || str_contains($nom, 'hospital') || str_contains($nom, 'medic')) $currentClass = 'cat-color-health';
+                elseif (str_contains($nom, 'polic') || str_contains($nom, 'seguridad')) $currentClass = 'cat-color-police';
+                elseif (str_contains($nom, 'banco') || str_contains($nom, 'cajero') || str_contains($nom, 'atm')) $currentClass = 'cat-color-atm';
             }
         ?>
             <?php $iconoChip = str_starts_with($c['icono'] ?? '', 'fa-') ? htmlspecialchars($c['icono']) : 'bi ' . htmlspecialchars($c['icono'] ?? 'bi-tag'); ?>
             <button type="button" class="chip-filter-icon <?= $currentClass ?><?= $categoriaSeleccionada === (int)$c['id_categoria'] ? ' active' : '' ?>"
                     data-categoria="<?= $c['id_categoria'] ?>"
-                    title="<?= htmlspecialchars($c['nombre']) ?>"
+                    data-slug="<?= htmlspecialchars($catSlug) ?>"
+                    data-tooltip="<?= htmlspecialchars($c['nombre']) ?>"
                     aria-label="<?= htmlspecialchars($c['nombre']) ?>">
                 <i class="<?= $iconoChip ?>"></i>
             </button>
@@ -172,7 +169,7 @@
     </div>
 
     <!-- Barra de Herramientas: Contador y Selector de Modo de Vista -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 px-1">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 px-1">
         <div class="d-flex align-items-center gap-2">
             <span id="contadorResultados" class="badge bg-teal-subtle text-teal border border-teal-subtle px-3 py-2 rounded-pill fw-semibold small">
                 <?= count($lugares) ?> lugares encontrados
@@ -189,8 +186,30 @@
         </div>
     </div>
 
+    <!-- Filtro Específico por Horario para Gastronomía y Alimentación -->
+    <div id="filtroHorariosGastronomia" class="d-flex align-items-center gap-1 gap-sm-2 mb-4 border">
+        <span class="small fw-bold text-dark px-2 d-none d-lg-inline d-flex align-items-center gap-1">
+            <i class="bi bi-clock-history text-teal fs-6"></i> Horarios:
+        </span>
+        <button type="button" class="btn btn-sm btn-filtro-momento active" data-momento="todos">
+            Todos
+        </button>
+        <button type="button" class="btn btn-sm btn-filtro-momento" data-momento="desayuno">
+            <i class="bi bi-cup-hot text-warning"></i> Desayunos
+        </button>
+        <button type="button" class="btn btn-sm btn-filtro-momento" data-momento="almuerzo">
+            <i class="bi bi-egg-fried text-danger"></i> Almuerzos
+        </button>
+        <button type="button" class="btn btn-sm btn-filtro-momento" data-momento="merienda">
+            <i class="bi bi-cup-straw text-primary"></i> Café / Masitas
+        </button>
+        <button type="button" class="btn btn-sm btn-filtro-momento" data-momento="cena">
+            <i class="bi bi-moon-stars text-info"></i> Cenas
+        </button>
+    </div>
+
     <!-- Contenedor del Mapa Interactivo de Trinidad -->
-    <div id="mapaCatalogoWrapper" class="d-none mb-4">
+    <div id="mapaCatalogoWrapper" class="d-none mb-4" data-aos="zoom-in" data-aos-duration="600">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-relative map-catalog-card">
             <!-- Selector de Rutas Turísticas Inteligentes (Algoritmo de Popularidad y Proximidad) -->
             <div class="bg-light border-bottom p-3">
@@ -313,18 +332,36 @@
                         $l['aviso_temporal_motivo'] ?? null,
                         $l['aviso_temporal_reapertura'] ?? null
                     );
+                    $turnosComidaStr = !empty($l['turnos_comida']) 
+                        ? (string)$l['turnos_comida'] 
+                        : (((int)($l['id_categoria'] ?? 0) === 1) ? implode(',', \App\Services\HorarioHelper::clasificarTurnos($l['horario_atencion'] ?? null, $l['nombre'] ?? null)) : '');
                     $urlFicha = $baseUrl . '/catalogo/detalle?slug=' . urlencode($l['slug']);
+                    $delayAos = ($indiceLugar % 3) * 100;
                 ?>
                 <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col<?= ($indiceLugar >= 6) ? ' d-none tarjeta-oculta-fila' : '' ?>"
+                     data-aos="fade-up"
+                     data-aos-delay="<?= $delayAos ?>"
                      data-id="<?= (int)$l['id_lugar'] ?>"
                      data-nombre="<?= htmlspecialchars(mb_strtolower($l['nombre'], 'UTF-8')) ?>"
                      data-categoria="<?= (int)$l['id_categoria'] ?>"
                      data-municipio="<?= (int)($l['id_municipio'] ?? 1) ?>"
-                     data-coordenadas="<?= htmlspecialchars($l['coordenadas_gps'] ?? '') ?>">
+                     data-coordenadas="<?= htmlspecialchars($l['coordenadas_gps'] ?? '') ?>"
+                     data-turnos="<?= htmlspecialchars($turnosComidaStr) ?>"
+                     data-horario-texto="<?= htmlspecialchars(mb_strtolower($l['horario_atencion'] ?? '', 'UTF-8')) ?>">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative place-card place-card-editorial">
                         
                         <!-- Contenedor de Imagen Inmersiva -->
                         <div class="place-card-media-wrapper position-relative">
+                            <?php 
+                                $idLugarItem = (int)$l['id_lugar'];
+                                $fotosGaleriaLugar = $fotosPorLugar[$idLugarItem] ?? [];
+                                if (empty($fotosGaleriaLugar) && !empty($l['imagen'])) {
+                                    $fotosGaleriaLugar = [$l['imagen']];
+                                }
+                                $tieneVariasFotos = count($fotosGaleriaLugar) > 0;
+                            ?>
+
+                            <!-- Foto principal normal -->
                             <?php if (!empty($l['imagen'])): ?>
                                 <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($l['imagen']) ?>"
                                      alt="<?= htmlspecialchars($l['nombre']) ?>"
@@ -337,6 +374,27 @@
                                         <i class="<?= $iconoClass ?> fs-2 text-teal"></i>
                                     </div>
                                     <span class="small text-white-50"><?= htmlspecialchars($l['categoria'] ?? 'Lugar de Interés') ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Cuadrícula interactiva de 4 fotos visible al hacer Hover (Estilo GetYourGuide / Referencia) -->
+                            <?php if ($tieneVariasFotos): ?>
+                                <div class="place-card-hover-grid">
+                                    <?php 
+                                        $fotosMostrar = array_slice($fotosGaleriaLugar, 0, 4);
+                                        // Completar hasta 4 fotos en la cuadrícula
+                                        while (count($fotosMostrar) < 4 && count($fotosGaleriaLugar) > 0) {
+                                            $fotosMostrar[] = $fotosGaleriaLugar[count($fotosMostrar) % count($fotosGaleriaLugar)];
+                                        }
+                                    ?>
+                                    <?php foreach ($fotosMostrar as $idxF => $nomFoto): ?>
+                                        <div class="place-card-hover-tile overflow-hidden position-relative">
+                                            <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($nomFoto) ?>"
+                                                 alt="<?= htmlspecialchars($l['nombre']) ?> foto <?= $idxF + 1 ?>"
+                                                 class="w-100 h-100 object-fit-cover place-card-hover-img"
+                                                 loading="lazy">
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
 
@@ -380,7 +438,7 @@
                             <!-- Barra de Acciones Revelables en Hover (❤️ Favorito, ℹ️ Info/Horario, Redes, ➔ Botón Flecha) -->
                             <div class="place-card-hover-actions d-flex align-items-center justify-content-between pt-2">
                                 <div class="d-flex align-items-center gap-2 position-relative z-index-6">
-                                    <!-- Botón de Favorito / Guardar en itinerario -->
+                                     <!-- Botón de Favorito / Guardar en itinerario -->
                                     <button type="button" 
                                             class="btn btn-white bg-white rounded-circle shadow-xs place-btn-icon" 
                                             data-btn-favorito
@@ -396,32 +454,50 @@
                                         <i class="bi bi-heart text-danger fs-6"></i>
                                     </button>
 
-                                    <!-- Estado de Horario / Info -->
-                                    <?php if ($estadoHorario): ?>
-                                        <span class="badge <?= $estadoHorario['badge'] ?> rounded-pill extra-small shadow-2xs" title="<?= htmlspecialchars($l['horario_atencion'] ?? '') ?>">
-                                            <i class="bi bi-info-circle me-1"></i> <?= htmlspecialchars($estadoHorario['texto']) ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge bg-light text-secondary border rounded-pill extra-small" title="Información disponible">
-                                            <i class="bi bi-info-circle text-teal"></i> Info
-                                        </span>
-                                    <?php endif; ?>
+                                    <!-- Botón Compartir Ficha / Ubicación -->
+                                    <button type="button" 
+                                            class="btn btn-white bg-white rounded-circle shadow-xs place-btn-icon place-btn-share" 
+                                            data-btn-compartir
+                                            data-nombre="<?= htmlspecialchars($l['nombre']) ?>"
+                                            data-direccion="<?= htmlspecialchars($l['direccion'] ?? '') ?>"
+                                            data-coordenadas="<?= htmlspecialchars($l['coordenadas_gps'] ?? '') ?>"
+                                            data-url="<?= htmlspecialchars($urlFicha) ?>"
+                                            title="Compartir lugar"
+                                            aria-label="Compartir lugar">
+                                        <i class="bi bi-share-fill text-teal fs-6"></i>
+                                    </button>
+
+                                    <!-- Estado de Horario y Horario Detallado debajo -->
+                                    <div class="d-flex flex-column align-items-start gap-1">
+                                        <?php if ($estadoHorario): ?>
+                                            <span class="badge <?= $estadoHorario['badge'] ?> rounded-pill extra-small shadow-2xs">
+                                                <i class="bi bi-clock-fill me-1"></i> <?= htmlspecialchars($estadoHorario['texto']) ?>
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($l['horario_atencion'])): ?>
+                                            <?php
+                                                $horarioTextoCorto = $l['horario_atencion'];
+                                                // Si es muy largo, acortarlo limpiamente para la tarjeta
+                                                if (mb_strlen($horarioTextoCorto, 'UTF-8') > 38) {
+                                                    $horarioTextoCorto = mb_substr($horarioTextoCorto, 0, 36, 'UTF-8') . '...';
+                                                }
+                                            ?>
+                                            <span class="place-card-horario-subtext extra-small text-muted d-flex align-items-center" title="<?= htmlspecialchars($l['horario_atencion']) ?>">
+                                                <i class="bi bi-calendar-week text-teal me-1 font-2xs"></i>
+                                                <span class="text-truncate max-w-180"><?= htmlspecialchars($horarioTextoCorto) ?></span>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
 
                                     <!-- Redes Sociales Compactas si tiene -->
-                                    <?php if (!empty($l['tiktok_url']) || !empty($l['facebook_url']) || !empty($l['instagram_url'])): ?>
+                                    <?php if (!empty($l['tiktok_url']) || !empty($l['instagram_url'])): ?>
                                         <div class="d-flex align-items-center gap-1 ms-1">
                                             <?php if (!empty($l['tiktok_url'])): ?>
                                                 <a href="<?= htmlspecialchars($l['tiktok_url']) ?>" target="_blank" rel="noopener noreferrer" 
                                                    class="btn-social-icon btn-social-icon-sm btn-social-icon--tiktok" 
                                                    title="Ver en TikTok" onclick="event.stopPropagation();">
                                                     <i class="bi bi-tiktok"></i>
-                                                </a>
-                                            <?php endif; ?>
-                                            <?php if (!empty($l['facebook_url'])): ?>
-                                                <a href="<?= htmlspecialchars($l['facebook_url']) ?>" target="_blank" rel="noopener noreferrer" 
-                                                   class="btn-social-icon btn-social-icon-sm btn-social-icon--facebook" 
-                                                   title="Ver en Facebook" onclick="event.stopPropagation();">
-                                                    <i class="bi bi-facebook"></i>
                                                 </a>
                                             <?php endif; ?>
                                             <?php if (!empty($l['instagram_url'])): ?>
@@ -472,17 +548,670 @@
     </script>
 </section>
 
+<!-- ==========================================================================
+     SECCIÓN DESTACADA: 18 DE NOVIEMBRE / CRONOGRAMA DE FESTIVIDADES
+     ========================================================================== -->
+<!-- ==========================================================================
+     SECCIÓN FESTIVIDADES Y AGENDA DE EVENTOS (ESTILO TURISMO SUIZO)
+     ========================================================================== -->
+<section class="seccion-festividades-18nov py-5 position-relative overflow-hidden" id="eventos-18-noviembre">
+    <div class="container py-3 position-relative z-index-2">
+        <!-- Encabezado Editorial Minimalista con Título y Enlace a la derecha -->
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 pb-2 border-bottom border-white border-opacity-10 gap-3" data-aos="fade-down">
+            <div>
+                <span class="badge hero-badge-glass fw-bold px-3 py-1 rounded-pill text-uppercase extra-small mb-2 shadow-sm">
+                    <i class="bi bi-calendar-event text-warning me-1"></i> Fiestas Cívicas y Tradición
+                </span>
+                <h2 class="display-6 fw-extrabold text-white mb-0 text-shadow-hero">
+                    Eventos y Festividades
+                </h2>
+            </div>
+            <div>
+                <a href="#entrada-universitaria" class="btn-ver-todos-eventos text-decoration-none d-inline-flex align-items-center gap-2 fw-semibold">
+                    <span>Ver recorrido y fraternidades</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Grilla de Eventos Panorámicos Estilo Suiza -->
+        <div class="row g-4 justify-content-center">
+            <?php if (!empty($eventosDestacados)): ?>
+                <?php foreach ($eventosDestacados as $idxEv => $ev): ?>
+                    <?php 
+                        $imgArchivo = $ev['imagen_archivo'] ?? '';
+                        if (!empty($imgArchivo) && file_exists(dirname(__DIR__, 4) . '/public/assets/img/' . $imgArchivo)) {
+                            $imgUrl = "{$baseUrl}/assets/img/" . htmlspecialchars($imgArchivo);
+                        } elseif (!empty($imgArchivo) && file_exists(dirname(__DIR__, 4) . '/public/assets/img/eventos/' . $imgArchivo)) {
+                            $imgUrl = "{$baseUrl}/assets/img/eventos/" . htmlspecialchars($imgArchivo);
+                        } elseif (!empty($imgArchivo)) {
+                            $imgUrl = "{$baseUrl}/assets/img/" . htmlspecialchars($imgArchivo);
+                        } else {
+                            $imgUrl = "{$baseUrl}/assets/img/hero-poster.webp";
+                        }
+
+                        $timeRef = !empty($ev['fecha_fin']) ? strtotime($ev['fecha_fin']) : (!empty($ev['fecha_inicio']) ? strtotime($ev['fecha_inicio']) : time());
+                        $prefijoBadge = !empty($ev['fecha_fin']) ? 'hasta' : 'de';
+                        $dia = date('d', $timeRef);
+                        $mesesEsp = ['Jan'=>'ene','Feb'=>'feb','Mar'=>'mar','Apr'=>'abr','May'=>'may','Jun'=>'jun','Jul'=>'jul','Aug'=>'ago','Sep'=>'sep','Oct'=>'oct','Nov'=>'nov','Dec'=>'dic'];
+                        $mesTxt = $mesesEsp[date('M', $timeRef)] ?? 'nov.';
+                        $delayEv = ($idxEv % 3) * 100;
+                    ?>
+                    <?php
+                        $esEventoUAB = stripos($ev['titulo'], 'UAB') !== false || stripos($ev['titulo'], 'Aniversario') !== false;
+                    ?>
+                    <div class="col-sm-6 col-lg-4 col-xl-4" data-aos="fade-up" data-aos-delay="<?= $delayEv ?>">
+                        <div class="card-evento-swiss group" 
+                             data-action="<?= $esEventoUAB ? 'ver-agenda-uab' : 'ver-afiche-evento' ?>"
+                             data-evento-img="<?= htmlspecialchars($imgUrl) ?>"
+                             data-evento-titulo="<?= htmlspecialchars($ev['titulo']) ?>"
+                             data-evento-lugar="<?= htmlspecialchars($ev['subtitulo_lugar'] ?: 'Trinidad · Beni') ?>"
+                             data-evento-fechas="<?= htmlspecialchars($ev['detalle_fechas']) ?>"
+                             data-evento-enlace="<?= htmlspecialchars($ev['enlace_externo'] ?? '') ?>"
+                             data-evento-es-entrada="<?= stripos($ev['titulo'], 'Entrada') !== false ? '1' : '0' ?>"
+                             data-evento-es-uab="<?= $esEventoUAB ? '1' : '0' ?>"
+                             title="<?= $esEventoUAB ? 'Clic para ver cronograma de actividades y afiche oficial' : 'Clic para ver afiche completo' ?>">
+                            <div class="evento-swiss-media position-relative rounded-4 overflow-hidden mb-3">
+                                <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($ev['titulo']) ?>" class="w-100 h-100 object-fit-cover evento-swiss-img" loading="lazy" onerror="this.onerror=null; this.src='<?= $baseUrl ?>/assets/img/hero-poster.webp';">
+                                <div class="evento-swiss-overlay"></div>
+                                
+                                <!-- Badge Flotante de Fecha (Estilo Suiza) -->
+                                <div class="evento-date-badge shadow-lg">
+                                    <span class="evento-date-prefix"><?= $prefijoBadge ?></span>
+                                    <span class="evento-date-day"><?= $dia ?></span>
+                                    <span class="evento-date-month"><?= $mesTxt ?>.</span>
+                                </div>
+
+                                <?php if ($esEventoUAB): ?>
+                                    <span class="badge bg-warning text-dark position-absolute bottom-0 end-0 m-3 px-3 py-1 rounded-pill extra-small fw-bold shadow">
+                                        <i class="bi bi-calendar-check-fill me-1"></i> Ver Cronograma
+                                    </span>
+                                <?php endif; ?>
+
+                                <!-- Icono indicador de ampliación/ver afiche completo -->
+                                <div class="evento-zoom-hint position-absolute bottom-0 end-0 m-3 d-flex align-items-center justify-content-center rounded-circle bg-dark bg-opacity-75 text-white shadow" title="Ver afiche completo">
+                                    <i class="bi bi-arrows-fullscreen font-xs"></i>
+                                </div>
+                            </div>
+                            <div class="evento-swiss-body">
+                                <h5 class="fw-bold text-white mb-1 evento-swiss-title"><?= htmlspecialchars($ev['titulo']) ?></h5>
+                                <div class="extra-small text-white-50 d-flex align-items-center gap-1">
+                                    <i class="bi bi-geo-alt-fill text-warning me-1"></i>
+                                    <span><?= htmlspecialchars($ev['subtitulo_lugar'] ?: 'Trinidad · Beni') ?></span>
+                                    <span class="mx-1">•</span>
+                                    <span><?= htmlspecialchars($ev['detalle_fechas']) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- Evento 1: Entrada Folklórica Universitaria -->
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card-evento-swiss group"
+                         data-action="ver-afiche-evento"
+                         data-evento-img="<?= htmlspecialchars($baseUrl) ?>/assets/img/EntradaFolklorica2026.jpeg"
+                         data-evento-titulo="XIII Entrada Folklórica Universitaria Nacional"
+                         data-evento-lugar="Trinidad, 13 al 16 de noviembre"
+                         data-evento-fechas="13 al 16 de noviembre de 2026"
+                         data-evento-enlace=""
+                         data-evento-es-entrada="1"
+                         title="Clic para ver afiche completo">
+                        <div class="evento-swiss-media position-relative rounded-4 overflow-hidden mb-3">
+                            <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/EntradaFolklorica2026.jpeg" alt="Entrada Folklórica Universitaria" class="w-100 h-100 object-fit-cover evento-swiss-img" loading="lazy">
+                            <div class="evento-swiss-overlay"></div>
+                            
+                            <!-- Badge Flotante de Fecha -->
+                            <div class="evento-date-badge shadow-lg">
+                                <span class="evento-date-prefix">hasta</span>
+                                <span class="evento-date-day">16</span>
+                                <span class="evento-date-month">nov.</span>
+                            </div>
+
+                            <span class="badge bg-success bg-opacity-90 position-absolute bottom-0 end-0 m-3 px-3 py-1 rounded-pill extra-small fw-bold">
+                                <i class="bi bi-compass-fill me-1"></i> Ver Recorrido
+                            </span>
+                        </div>
+                        <div class="evento-swiss-body">
+                            <h5 class="fw-bold text-white mb-1 evento-swiss-title">XIII Entrada Folklórica Universitaria Nacional</h5>
+                            <div class="extra-small text-white-50 d-flex align-items-center gap-1">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                <span>Trinidad, 13 al 16 de noviembre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evento 2: FexpoBeni 2026 -->
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card-evento-swiss group"
+                         data-action="ver-afiche-evento"
+                         data-evento-img="<?= htmlspecialchars($baseUrl) ?>/assets/img/FexpoBeni2026.jpeg"
+                         data-evento-titulo="FexpoBeni 2026 · Feria Departamental"
+                         data-evento-lugar="Campo Ferial FexpoBeni"
+                         data-evento-fechas="14 al 18 de noviembre"
+                         data-evento-enlace="https://maps.google.com/?q=FexpoBeni+Trinidad+Beni"
+                         data-evento-es-entrada="0"
+                         title="Clic para ver afiche completo">
+                        <div class="evento-swiss-media position-relative rounded-4 overflow-hidden mb-3">
+                            <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/FexpoBeni2026.jpeg" alt="FexpoBeni 2026" class="w-100 h-100 object-fit-cover evento-swiss-img" loading="lazy">
+                            <div class="evento-swiss-overlay"></div>
+                            
+                            <!-- Badge Flotante de Fecha -->
+                            <div class="evento-date-badge shadow-lg">
+                                <span class="evento-date-prefix">hasta</span>
+                                <span class="evento-date-day">18</span>
+                                <span class="evento-date-month">nov.</span>
+                            </div>
+
+                            <span class="badge bg-warning text-dark bg-opacity-90 position-absolute bottom-0 end-0 m-3 px-3 py-1 rounded-pill extra-small fw-bold">
+                                <i class="bi bi-shop-window me-1"></i> Feria Multisectorial
+                            </span>
+                        </div>
+                        <div class="evento-swiss-body">
+                            <h5 class="fw-bold text-white mb-1 evento-swiss-title">FexpoBeni 2026 · Feria Departamental</h5>
+                            <div class="extra-small text-white-50 d-flex align-items-center gap-1">
+                                <i class="bi bi-geo-alt-fill text-warning me-1"></i>
+                                <span>Campo Ferial FexpoBeni, 14 al 18 de noviembre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evento 3: Serenata y Desfile Cívico-Militar -->
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card-evento-swiss group"
+                         data-action="ver-afiche-evento"
+                         data-evento-img="<?= htmlspecialchars($baseUrl) ?>/assets/img/hero-poster.webp"
+                         data-evento-titulo="Serenata al Beni y Solemne Desfile Cívico"
+                         data-evento-lugar="Plaza Principal Mariscal Ballivián"
+                         data-evento-fechas="17 y 18 de noviembre"
+                         data-evento-enlace="https://maps.google.com/?q=Plaza+Principal+Trinidad+Beni"
+                         data-evento-es-entrada="0"
+                         title="Clic para ver afiche completo">
+                        <div class="evento-swiss-media position-relative rounded-4 overflow-hidden mb-3">
+                            <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/hero-poster.webp" alt="Serenata y Desfile Cívico-Militar" class="w-100 h-100 object-fit-cover evento-swiss-img" loading="lazy">
+                            <div class="evento-swiss-overlay"></div>
+                            
+                            <!-- Badge Flotante de Fecha -->
+                            <div class="evento-date-badge shadow-lg">
+                                <span class="evento-date-prefix">De</span>
+                                <span class="evento-date-day">18</span>
+                                <span class="evento-date-month">nov.</span>
+                            </div>
+
+                            <span class="badge bg-teal bg-opacity-90 text-white position-absolute bottom-0 end-0 m-3 px-3 py-1 rounded-pill extra-small fw-bold">
+                                <i class="bi bi-flag-fill me-1"></i> Acto Cívico
+                            </span>
+                        </div>
+                        <div class="evento-swiss-body">
+                            <h5 class="fw-bold text-white mb-1 evento-swiss-title">Serenata al Beni y Solemne Desfile Cívico</h5>
+                            <div class="extra-small text-white-50 d-flex align-items-center gap-1">
+                                <i class="bi bi-geo-alt-fill text-info me-1"></i>
+                                <span>Plaza Principal Mariscal Ballivián, 17 y 18 de noviembre</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     NUEVA SECCIÓN: AGENDA Y CALENDARIO INTERACTIVO DE FESTIVIDADES (NOVIEMBRE 2026)
+     ========================================================================== -->
+<section class="seccion-agenda-calendario py-5 bg-white border-bottom position-relative" id="agenda-festividades">
+    <div class="container py-2">
+        <!-- Encabezado de la Agenda -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3" data-aos="fade-down">
+            <div>
+                <span class="badge bg-teal-subtle text-teal-dark fw-bold px-3 py-1 rounded-pill text-uppercase extra-small mb-1">
+                    <i class="bi bi-calendar3-range text-teal me-1"></i> Cronograma Oficial 2026
+                </span>
+                <h2 class="display-6 fw-extrabold text-dark mb-0">Agenda</h2>
+            </div>
+            
+            <!-- Barra de Filtros por Categoría (Estilo Primavera Tours / BeniTours) -->
+            <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0 w-100 w-md-auto overflow-hidden">
+                <span class="small fw-bold text-muted d-none d-sm-inline-flex align-items-center flex-shrink-0">
+                    <i class="bi bi-funnel me-1"></i> Filtrar:
+                </span>
+                <div class="agenda-chips-scroll flex-grow-1">
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip active flex-shrink-0" data-cat="todos">
+                            Todos (<?= count($agendaUAB ?? []) ?>)
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip chip-folklore flex-shrink-0" data-cat="folklore">
+                            Folklore
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip chip-fexpobeni flex-shrink-0" data-cat="fexpobeni">
+                            FexpoBeni
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip chip-remates flex-shrink-0" data-cat="remates">
+                            Remates
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip chip-ferias flex-shrink-0" data-cat="ferias">
+                            Ferias
+                        </button>
+                        <button type="button" class="btn btn-sm rounded-1 px-3 py-1 fw-bold agenda-filter-chip chip-civicos flex-shrink-0" data-cat="civicos">
+                            Cívicos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disposición en 2 Columnas: VISTA MENSUAL (Izquierda) y PRÓXIMOS EVENTOS (Derecha) -->
+        <div class="row g-4 align-items-start">
+            
+            <!-- COLUMNA IZQUIERDA: VISTA MENSUAL -->
+            <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+                <div class="agenda-box-wrapper p-3 p-md-4 rounded-4 bg-light border shadow-2xs">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="extra-small font-monospace fw-bold text-uppercase text-secondary letter-spacing-1">
+                            VISTA MENSUAL
+                        </span>
+                        <span class="badge bg-teal text-white rounded-pill extra-small px-2 py-1">
+                            UAB 58° Aniversario
+                        </span>
+                    </div>
+
+                    <!-- Calendario Grid -->
+                    <div class="agenda-calendar-container bg-white p-3 rounded-3 border">
+                        <!-- Cabecera de Mes con flechas de navegación -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                            <button type="button" class="btn btn-sm btn-light rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" id="btnCalPrevMes" title="Mes anterior">
+                                <i class="bi bi-chevron-left font-xs"></i>
+                            </button>
+                            <h6 class="fw-extrabold mb-0 text-dark font-monospace" id="labelCalMes">
+                                NOVIEMBRE 2026
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-light rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" id="btnCalNextMes" title="Mes siguiente">
+                                <i class="bi bi-chevron-right font-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Días de la semana -->
+                        <div class="agenda-weekdays-row text-center mb-2">
+                            <span>LU</span>
+                            <span>MA</span>
+                            <span>MI</span>
+                            <span>JU</span>
+                            <span>VI</span>
+                            <span>SÁ</span>
+                            <span>DO</span>
+                        </div>
+
+                        <!-- Grilla de los 30 días de Noviembre 2026 -->
+                        <div class="agenda-calendar-days-grid" id="agendaCalendarDaysGrid">
+                            <!-- Los días y puntos de eventos se renderizan dinámicamente vía JS -->
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between mt-3 px-1 flex-wrap gap-2">
+                        <small class="text-muted extra-small">
+                            <i class="bi bi-circle-fill text-warning me-1"></i> Toca un día con indicador para ver sus actividades
+                        </small>
+                        <button type="button" class="btn btn-link text-teal p-0 extra-small fw-bold text-decoration-none" id="btnVerTodosLosDias">
+                            Ver todos los eventos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: PRÓXIMOS EVENTOS / DETALLE DEL DÍA -->
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="150">
+                <div class="agenda-box-wrapper p-3 p-md-4 rounded-4 bg-light border shadow-2xs">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="extra-small font-monospace fw-bold text-uppercase text-secondary letter-spacing-1">
+                            PRÓXIMOS EVENTOS
+                        </span>
+                        <span class="badge bg-white text-dark border rounded-pill extra-small px-2 py-1" id="badgeTotalEventosDia">
+                            0 actividades
+                        </span>
+                    </div>
+
+                    <!-- Tarjeta Principal del Día Seleccionado -->
+                    <div class="agenda-detail-card bg-white p-3 p-md-4 rounded-3 border">
+                        <!-- Cabecera de Fecha con Día Gigante y Flechas -->
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="agenda-big-day fw-extrabold text-dark" id="agendaDetalleDiaNumero">--</span>
+                                <div>
+                                    <span class="d-block fw-bold text-dark font-monospace text-uppercase" id="agendaDetalleMesAno">NOVIEMBRE 2026</span>
+                                    <span class="extra-small text-muted" id="agendaDetalleDiaSemana">Día seleccionado</span>
+                                </div>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary" id="btnDiaAnterior" title="Día anterior con eventos">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="btnDiaSiguiente" title="Siguiente día con eventos">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor de Actividades del Día Seleccionado -->
+                        <div class="agenda-events-list d-flex flex-column gap-3" id="agendaEventsList">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Datos estructurados de la agenda en JSON para el calendario interactivo -->
+    <script id="datosAgendaUABJSON" type="application/json">
+        <?= json_encode($agendaUAB ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>
+    </script>
+</section>
+
+<!-- Modal Lightbox Visor de Afiche Completo del Evento -->
+<div class="modal fade" id="modalVisorAficheEvento" tabindex="-1" aria-labelledby="modalVisorEventoTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-content-visor-afiche rounded-4 border-0 shadow-2xl overflow-hidden">
+            <div class="modal-header border-0 py-3 px-3 px-md-4 d-flex justify-content-between align-items-start align-items-md-center">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 pe-2">
+                    <h5 class="modal-title fw-bold text-white mb-0 font-sm-responsive order-1 order-md-2" id="modalVisorEventoTitulo">Evento</h5>
+                    <span class="badge bg-teal-subtle text-teal-dark rounded-pill px-3 py-1 fw-bold extra-small order-2 order-md-1">
+                        <i class="bi bi-ticket-perforated-fill me-1"></i> Afiche Oficial
+                    </span>
+                </div>
+                <button type="button" class="btn-close btn-close-white flex-shrink-0" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-2 p-md-3 text-center bg-black bg-opacity-75 position-relative">
+                <div class="visor-afiche-img-wrap d-flex justify-content-center align-items-center overflow-hidden">
+                    <img id="modalVisorEventoImg" src="" alt="Afiche del evento" class="img-fluid rounded-3 shadow-lg visor-afiche-img" style="max-height: 72vh; object-fit: contain;">
+                </div>
+                <div class="visor-afiche-caption mt-2 px-2 px-md-3 text-start d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-2">
+                    <div>
+                        <div class="text-white-50 extra-small d-flex align-items-center gap-2" id="modalVisorEventoMeta">
+                            <span id="modalVisorEventoLugar"><i class="bi bi-geo-alt-fill text-warning me-1"></i> Trinidad</span>
+                            <span>•</span>
+                            <span id="modalVisorEventoFechas"><i class="bi bi-calendar-event text-info me-1"></i> Noviembre</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-end gap-2 flex-wrap">
+                        <a id="modalVisorBtnEnlace" href="#" target="_blank" class="btn btn-outline-warning btn-sm rounded-pill fw-semibold d-none">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Más Información
+                        </a>
+                        <button type="button" id="modalVisorBtnRecorrido" class="btn btn-success btn-sm rounded-pill fw-semibold d-none" data-bs-dismiss="modal">
+                            <i class="bi bi-compass-fill me-1"></i> Ver Recorrido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Programa Oficial UAB (Visor de Afiches / Páginas Oficiales) -->
+<div class="modal fade" id="modalAgendaUAB" tabindex="-1" aria-labelledby="modalAgendaUABTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow-2xl overflow-hidden modal-uab-benitours">
+            <!-- Cabecera Oficial BeniTours -->
+            <div class="modal-header border-0 py-3 px-3 px-md-4 position-relative d-flex align-items-start justify-content-between" style="background: linear-gradient(135deg, #09252a 0%, #0f3b43 55%, #0d9488 100%);">
+                <div class="d-flex align-items-center gap-2 gap-md-3 z-index-2 flex-grow-1 min-w-0 pe-2">
+                    <div class="bg-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center flex-shrink-0 uab-header-avatar">
+                        <i class="bi bi-mortarboard-fill text-teal"></i>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center gap-1 gap-md-2 mb-1 flex-wrap">
+                            <span class="badge rounded-pill px-2 px-md-3 py-1 fw-bold extra-small text-white shadow-xs" style="background-color: #ea580c;">
+                                <i class="bi bi-star-fill text-warning me-1"></i> 58 Años UAB
+                            </span>
+                            <span class="badge rounded-pill px-2 px-md-3 py-1 extra-small fw-bold uab-badge-mes">
+                                <i class="bi bi-calendar3 me-1"></i> Noviembre 2026
+                            </span>
+                        </div>
+                        <h5 class="modal-title fw-bold text-white mb-0 uab-modal-title text-truncate-2" id="modalAgendaUABTitulo">
+                            Universidad Autónoma del Beni "José Ballivián"
+                        </h5>
+                        <small class="text-white-50 extra-small d-block mt-0 mt-md-1 uab-modal-sub">Documento Oficial de Festividades y Efeméride Departamental</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white shadow-none flex-shrink-0 mt-1 ms-1 z-index-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body p-3 p-md-4" style="background-color: #f7faf9;">
+                <!-- Barra de Navegación del Documento y Botón a la Nueva Sección -->
+                <div class="card border-0 rounded-4 shadow-sm bg-white p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center flex-column flex-sm-row flex-wrap gap-2 mb-2 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-sm-auto">
+                            <span class="small fw-bold text-dark">
+                                <i class="bi bi-file-earmark-check-fill text-teal me-1"></i> Páginas:
+                            </span>
+                            <div class="btn-group btn-group-sm flex-grow-1 flex-sm-grow-0" role="group" id="btnGroupPaginasUAB">
+                                <button type="button" class="btn btn-teal-action fw-bold active" data-pagina="1">Pág. 1 (03-13 Nov)</button>
+                                <button type="button" class="btn btn-outline-teal fw-bold" data-pagina="2">Pág. 2 (14-18 Nov)</button>
+                                <button type="button" class="btn btn-outline-teal fw-bold" data-pagina="3">Pág. 3 (19-29 Nov)</button>
+                            </div>
+                        </div>
+                        <a id="btnAbrirPaginaActual" href="<?= htmlspecialchars($baseUrl) ?>/assets/img/programa_uab_pag1.png" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-teal rounded-pill px-3 extra-small fw-semibold w-100 w-sm-auto text-center">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en alta resolución
+                        </a>
+                    </div>
+
+                    <!-- Contenedor del Documento Oficial -->
+                    <div class="rounded-3 overflow-hidden d-flex justify-content-center align-items-center p-2 bg-dark shadow-inner" style="min-height: 440px;">
+                        <img id="imgPaginaUABActiva" 
+                             src="<?= htmlspecialchars($baseUrl) ?>/assets/img/programa_uab_pag1.png" 
+                             alt="Programa Oficial Celebración LIX Aniversario UAB José Ballivián" 
+                             class="img-fluid rounded-2 shadow" 
+                             style="max-height: 70vh; object-fit: contain;">
+                    </div>
+                </div>
+
+                <!-- Banner Llamativo para Ir a la Sección de Agenda / Calendario -->
+                <div class="p-3 rounded-4 border bg-white shadow-xs d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3 text-center text-sm-start">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle p-2 bg-teal-subtle text-teal-dark d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="bi bi-calendar4-week fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">¿Prefieres ver el cronograma día por día?</h6>
+                            <small class="text-muted extra-small">Explora nuestro nuevo Calendario y Agenda interactiva con filtros y mapa</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-teal-action rounded-pill px-3 py-2 small fw-bold text-nowrap w-100 w-sm-auto" id="btnIrACronogramaSeccion">
+                        <i class="bi bi-arrow-down-circle-fill me-1"></i> Ver Agenda Completa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer del Modal -->
+            <div class="modal-footer border-0 bg-white py-2 py-md-3 px-3 px-md-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="extra-small text-muted d-none d-sm-inline">
+                    <i class="bi bi-mortarboard-fill me-1 text-teal"></i> UAB "José Ballivián" &bull; Guía Oficial BeniTours 2026
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4 py-2 small fw-semibold w-100 w-sm-auto" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Recorrido y Fraternidades Entrada Universitaria -->
+<div class="modal fade" id="modalEntradaUniversitaria" tabindex="-1" aria-labelledby="modalEntradaUniTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header bg-teal-dark text-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold extra-small">
+                        <i class="bi bi-calendar-event me-1"></i> XIII Versión Nacional
+                    </span>
+                    <h5 class="modal-title fw-bold text-white mb-0" id="modalEntradaUniTitulo">
+                        Entrada Folklórica Universitaria Nacional · Trinidad 2026
+                    </h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- Tabs: Recorrido vs Fraternidades -->
+            <div class="bg-light border-bottom px-4 pt-3">
+                <ul class="nav nav-pills gap-2" id="pillsEntrada" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill fw-bold px-4 py-2 small" id="tabRecorrido-btn" data-bs-toggle="pill" data-bs-target="#tabRecorrido" type="button" role="tab" aria-selected="true">
+                            <i class="bi bi-map-fill me-1"></i> Recorrido Oficial
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill fw-bold px-4 py-2 small" id="tabFraternidades-btn" data-bs-toggle="pill" data-bs-target="#tabFraternidades" type="button" role="tab" aria-selected="false">
+                            <i class="bi bi-people-fill me-1"></i> Rol de Fraternidades y Danzas 
+                            <span class="badge bg-success rounded-pill ms-1"><?= count($fraternidadesEntrada ?? []) ?></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="modal-body p-3 p-md-4">
+                <div class="tab-content" id="pillsEntradaContent">
+                    
+                    <!-- Pestaña 1: Recorrido Oficial -->
+                    <div class="tab-pane fade show active" id="tabRecorrido" role="tabpanel">
+                        <div class="row g-4 align-items-start">
+                            <div class="col-lg-6 text-center">
+                                <div class="card border rounded-4 shadow-xs overflow-hidden bg-dark position-relative">
+                                    <img src="<?= htmlspecialchars($baseUrl) ?>/assets/img/recorrido_entrada_mapa.png" 
+                                         alt="Mapa Oficial Recorrido Entrada Universitaria Trinidad" 
+                                         class="img-fluid w-100 object-fit-contain" 
+                                         style="max-height: 520px; cursor: pointer;"
+                                         onclick="window.open(this.src, '_blank')">
+                                    <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75 text-white extra-small">
+                                        <i class="bi bi-zoom-in me-1"></i> Clic sobre el mapa para abrir en tamaño completo
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-signpost-split-fill text-teal me-2"></i> Puntos Clave del Trayecto</h6>
+                                
+                                <div class="timeline-recorrido d-flex flex-column gap-3 mb-4">
+                                    <div class="d-flex gap-3 align-items-start">
+                                        <div class="badge rounded-circle p-2 bg-danger text-white"><i class="bi bi-play-fill fs-5"></i></div>
+                                        <div>
+                                            <span class="badge bg-danger mb-1">PUNTO DE PARTIDA</span>
+                                            <h6 class="fw-bold mb-0 text-dark">Av. Cambódromo (Zona Estadio Gran Mamoré)</h6>
+                                            <p class="small text-muted mb-0">Concentración de fraternidades, bandas de música y carrozas estudiantiles.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-3 align-items-start">
+                                        <div class="badge rounded-circle p-2 bg-warning text-dark"><i class="bi bi-arrow-down-up fs-5"></i></div>
+                                        <div>
+                                            <span class="badge bg-warning text-dark mb-1">TRAYECTO PRINCIPAL</span>
+                                            <h6 class="fw-bold mb-0 text-dark">Av. Cambódromo ➡️ Monumento Cipriano Barace</h6>
+                                            <p class="small text-muted mb-0">Giro hacia el sur, continuando por Calle Félix Pinto y Calle Sucre.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-3 align-items-start">
+                                        <div class="badge rounded-circle p-2 bg-success text-white"><i class="bi bi-flag-fill fs-5"></i></div>
+                                        <div>
+                                            <span class="badge bg-success mb-1">PALCO OFICIAL Y FIN</span>
+                                            <h6 class="fw-bold mb-0 text-dark">Plaza Central Mariscal José Ballivián</h6>
+                                            <p class="small text-muted mb-0">Presentación coreográfica estelar y desconcentración.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <h6 class="small fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-primary me-1"></i> Recomendaciones para Asistentes:</h6>
+                                    <ul class="extra-small text-muted mb-0 ps-3">
+                                        <li>Llevar protección solar, gorra e hidratación permanente.</li>
+                                        <li>Respetar las vallas de seguridad y los pasos peatonales autorizados.</li>
+                                        <li>Puestos de auxilio médico y ambulancias ubicados en Cipriano Barace y Plaza Central.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña 2: Rol de Fraternidades -->
+                    <div class="tab-pane fade" id="tabFraternidades" role="tabpanel">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0">Rol Oficial de Entrada</h6>
+                                <small class="text-muted">Orden de presentación de fraternidades de toda Bolivia</small>
+                            </div>
+                            <div class="w-100 w-md-auto" style="max-width: 300px;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" id="buscadorFraternidades" class="form-control border-start-0" placeholder="Buscar danza, universidad...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive rounded-3 border">
+                            <table class="table table-hover align-middle mb-0" id="tablaFraternidades">
+                                <thead class="table-light">
+                                    <tr class="extra-small text-uppercase text-muted fw-bold">
+                                        <th style="width: 70px;" class="text-center"># Orden</th>
+                                        <th style="width: 100px;">Hora</th>
+                                        <th>Fraternidad / Conjunto</th>
+                                        <th>Danza Folklórica</th>
+                                        <th>Universidad / Origen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($fraternidadesEntrada)): ?>
+                                        <?php foreach ($fraternidadesEntrada as $frat): ?>
+                                            <tr class="fila-fraternidad">
+                                                <td class="text-center">
+                                                    <span class="badge bg-teal-subtle text-teal fw-bold rounded-pill px-2 py-1">
+                                                        <?= (int)$frat['orden'] ?>
+                                                    </span>
+                                                </td>
+                                                <td class="fw-semibold text-dark small">
+                                                    <i class="bi bi-clock me-1 text-muted"></i><?= htmlspecialchars($frat['hora_ingreso']) ?>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-dark"><?= htmlspecialchars($frat['nombre_fraternidad']) ?></div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border rounded-pill px-3 py-1 small">
+                                                        <?= htmlspecialchars($frat['danza']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="small text-dark fw-semibold"><?= htmlspecialchars($frat['universidad']) ?></div>
+                                                    <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($frat['departamento']) ?></small>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4 text-muted">
+                                                No hay fraternidades registradas aún. Próximamente se publicará el rol oficial.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="modal-footer bg-light border-0 py-2 px-4 justify-content-between">
+                <span class="extra-small text-muted"><i class="bi bi-shield-check text-success me-1"></i> Respaldado por el Comité Organizador UAB - FUL - CUB</span>
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Sección Carrusel de Promociones y Ofertas Imperdibles -->
 <section class="seccion-promociones py-5 border-bottom position-relative" id="promociones">
-
-    <!-- Video de Fondo en Promociones -->
-    <video class="promo-bg-video" autoplay muted loop playsinline preload="metadata" poster="<?= htmlspecialchars($baseUrl) ?>/assets/img/hero-poster.webp" aria-hidden="true">
-        <source src="<?= htmlspecialchars($baseUrl) ?>/assets/video/video.mp4" type="video/mp4">
-    </video>
     <div class="promo-bg-overlay" aria-hidden="true"></div>
 
-    <div class="container py-2">
-        <div class="text-center mb-4">
+    <div class="container py-2 position-relative z-index-2">
+        <div class="text-center mb-4" data-aos="fade-down">
             <div>
                 <span class="badge text-white px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2 shadow-sm hero-badge-glass">
                     <i class="bi bi-fire me-1 text-teal-highlight"></i> Ahorra en tu viaje
@@ -493,7 +1222,7 @@
         </div>
 
         <?php if (!empty($promocionesVigentes)): ?>
-            <div id="carruselPromociones" class="promo-carousel" role="region" aria-roledescription="carrusel" aria-label="Promociones activas" data-promo-carousel>
+            <div id="carruselPromociones" class="promo-carousel" role="region" aria-roledescription="carrusel" aria-label="Promociones activas" data-promo-carousel data-aos="fade-up" data-aos-delay="150">
                 <?php if (count($promocionesVigentes) > 1): ?>
                     <div class="promo-carousel-controls" aria-label="Controles del carrusel">
                         <button class="btn btn-outline-dark rounded-circle shadow-sm promo-carousel-control promo-carousel-control-prev" type="button" data-promo-direction="prev" aria-label="Promoción anterior">
@@ -590,7 +1319,7 @@
                                             <?php endif; ?>
 
                                             <!-- Cuerpo de la tarjeta -->
-                                            <div class="card-body p-3 p-sm-4 d-flex flex-column">
+                                            <div class="card-body p-3 d-flex flex-column">
                                                 <?php if ($fotoPromo): ?>
                                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                                         <h6 class="fw-bold text-dark mb-0 text-truncate" title="<?= htmlspecialchars($pr['lugar_nombre']) ?>">
@@ -600,15 +1329,12 @@
                                                     </div>
                                                 <?php endif; ?>
 
-                                                <h5 class="fw-bold text-teal mb-2 text-truncate" title="<?= htmlspecialchars($pr['titulo']) ?>">
+                                                <h5 class="fw-bold text-teal mb-1 text-truncate" title="<?= htmlspecialchars($pr['titulo']) ?>">
                                                     <?= htmlspecialchars($pr['titulo']) ?>
                                                 </h5>
-                                                <p class="text-secondary small flex-grow-1 mb-3 line-clamp-3">
-                                                    <?= htmlspecialchars($pr['descripcion']) ?>
-                                                </p>
 
                                                 <?php if ($fechaFinFmt): ?>
-                                                    <div class="extra-small text-muted mb-3 d-flex align-items-center gap-1">
+                                                    <div class="extra-small text-muted mb-2 d-flex align-items-center gap-1">
                                                         <i class="bi bi-clock-history text-danger"></i>
                                                         <span>Válido hasta el <strong><?= $fechaFinFmt ?></strong></span>
                                                     </div>
@@ -687,7 +1413,7 @@
 <section class="bg-white py-5 border-bottom" id="guia-trinidad">
     <div class="container py-3 position-relative guia-trinidad-container">
         <!-- Encabezado con Animales Amazónicos: Perezoso y Tucán -->
-        <div class="row align-items-center mb-5 position-relative">
+        <div class="row align-items-center mb-5 position-relative" data-aos="fade-down">
             <!-- Perezoso Colgado de la Rama (Izquierda) -->
             <div class="col-lg-2 col-md-3 d-none d-md-flex justify-content-center justify-content-lg-start mb-3 mb-lg-0">
                 <div class="perezoso-flotante-box position-relative" title="Perezoso Beniano (Bradypus) - Calma y naturaleza de la selva beniana">
@@ -851,7 +1577,7 @@
         </div>
 
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-transport">
                     <div class="icon-circle mx-auto mb-3">
                         <i class="bi bi-car-front-fill fs-2"></i>
@@ -863,7 +1589,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-food">
                     <div class="icon-circle mx-auto mb-3">
                         <i class="bi bi-cup-hot-fill fs-2"></i>
@@ -875,7 +1601,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="card h-100 border-0 bg-light rounded-4 p-4 text-center guide-card guide-card-sunset">
                     <div class="icon-circle mx-auto mb-3">
                         <i class="bi bi-water fs-2"></i>
@@ -892,15 +1618,10 @@
 
 <!-- Sección Radiomóviles y Transporte Turístico en Trinidad -->
 <section class="seccion-transporte-radiomovil py-5 border-bottom position-relative overflow-hidden" id="transporte">
-
-    <!-- Video de Fondo en Transporte -->
-    <video class="transporte-bg-video" autoplay muted loop playsinline preload="metadata" poster="<?= htmlspecialchars($baseUrl) ?>/assets/img/hero-poster.webp" aria-hidden="true">
-        <source src="<?= htmlspecialchars($baseUrl) ?>/assets/video/video.mp4" type="video/mp4">
-    </video>
     <div class="transporte-bg-overlay" aria-hidden="true"></div>
 
     <div class="container py-2 position-relative z-index-2">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" data-aos="fade-down">
             <span class="badge text-white px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2 shadow-sm hero-badge-glass">
                 <i class="bi bi-taxi-front-fill me-1 text-teal-highlight"></i> Movilidad Segura en Trinidad
             </span>
@@ -911,7 +1632,7 @@
         </div>
 
         <?php if (!empty($radiomoviles)): ?>
-            <div class="row g-4 align-items-stretch">
+            <div class="row g-4 align-items-stretch" data-aos="fade-up" data-aos-delay="150">
                 <?php
                     // Precomputar puntos de mapa para tener el conteo exacto y los puntos por sindicato
                     $puntosMapa = [];
@@ -1404,7 +2125,7 @@
 <?php if (!empty($galeriaFotos)): ?>
 <section class="seccion-galeria-turismo py-5 bg-light border-bottom position-relative" id="galeria">
     <div class="container py-2">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" data-aos="fade-down">
             <span class="badge hero-badge-teal px-3 py-2 rounded-pill fw-bold text-uppercase small mb-2 shadow-xs">
                 <i class="bi bi-camera-fill me-1"></i> Postales de Trinidad y el Beni
             </span>
@@ -1422,8 +2143,11 @@
                     $fichaUrl = !empty($gf['lugar_slug']) ? "{$baseUrl}/catalogo/detalle?slug=" . urlencode($gf['lugar_slug']) : '';
                     $isFeatured = !empty($gf['es_destacada']);
                     $categoriaTxt = !empty($gf['subtitulo']) ? $gf['subtitulo'] : (!empty($gf['categoria_nombre']) ? $gf['categoria_nombre'] : 'Postal del Beni');
+                    $delayBento = ($idx % 4) * 80;
                 ?>
                 <div class="bento-gallery-item <?= $isFeatured ? 'bento-item-featured' : '' ?>"
+                     data-aos="fade-up"
+                     data-aos-delay="<?= $delayBento ?>"
                      data-bs-toggle="modal"
                      data-bs-target="#modalLightboxGaleria"
                      data-foto="<?= htmlspecialchars($fotoUrl) ?>"
@@ -1490,431 +2214,179 @@
 <?php endif; ?>
 
 <!-- ==========================================================================
-     MAPA REGIONAL INTERACTIVO DEL BENI (UN DEPARTAMENTO, CUATRO MARAVILLAS)
+     SECCIÓN INTERACTIVA: XIII ENTRADA FOLKLÓRICA UNIVERSITARIA NACIONAL (TRINIDAD 2026)
+     Recorrido en Mapa Interactivo en Vivo + Rol de Fraternidades y Bailarines
      ========================================================================== -->
-<section class="seccion-mapa-regional-beni py-5 position-relative text-white overflow-hidden" id="regiones-beni">
+<section class="seccion-entrada-universitaria-mapa py-5 position-relative overflow-hidden text-white" id="entrada-universitaria">
+    <div class="entrada-bg-overlay" aria-hidden="true"></div>
+
     <div class="container py-4 position-relative z-index-2">
-        <div class="row align-items-center gy-5">
-            <!-- Columna Izquierda: Información Editorial y Llamado a la Acción -->
-            <div class="col-lg-5 text-center text-lg-start">
-                <span class="badge hero-badge-glass fw-bold px-3 py-2 rounded-pill text-uppercase mb-3 shadow-sm">
-                    <i class="bi bi-geo-alt-fill text-warning me-1"></i> Mapa Departamental
-                </span>
-                <h2 class="display-5 fw-extrabold mb-3 text-white titulo-mapa-regional">
-                    Descubre el Beni, <br class="d-none d-lg-block">
-                    <span class="text-teal-gradient">Tierra de Encanto</span>
-                </h2>
-                <p class="lead text-white-50 mb-4 fs-6 max-w-480">
-                    Explora la riqueza natural, cultural e histórica de nuestro departamento a través de sus provincias. Conoce sus atractivos turísticos, tradiciones, ríos y reservas naturales en un solo lugar.
-                </p>
-                <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start mb-4">
-                    <button type="button" class="btn btn-outline-light rounded-pill px-4 py-2 fw-semibold btn-sm d-inline-flex align-items-center gap-2 btn-explorar-mapa" onclick="document.getElementById('galeria').scrollIntoView({ behavior: 'smooth' });">
-                        <span>Ver Galería Turística</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-                <!-- Mini Leyenda Rápida -->
-                <div class="p-3 rounded-4 bg-dark bg-opacity-40 border border-white border-opacity-10 max-w-440">
-                    <div class="extra-small text-white-50 text-uppercase fw-bold mb-2">
-                        <i class="bi bi-hand-index-thumb me-1 text-warning"></i> Pasa el mouse o presiona sobre cada provincia para explorar:
+        <!-- Encabezado de la Sección -->
+        <div class="text-center mb-4 mb-md-5" data-aos="fade-down">
+            <div class="d-inline-flex align-items-center gap-2 badge hero-badge-glass fw-bold px-3 py-2 rounded-pill text-uppercase mb-2 mb-md-3 shadow-sm text-wrap text-start text-sm-center" style="max-width: 95%;">
+                <span class="punto-vivo-pulse flex-shrink-0"></span>
+                <i class="bi bi-flag-fill text-warning flex-shrink-0"></i>
+                <span class="text-white">Fiesta Mayor Universitaria · Trinidad 2026</span>
+            </div>
+            <h2 class="display-6 display-md-5 fw-extrabold mb-0 text-white entrada-titulo-principal">
+                XIII Entrada Folklórica <br class="d-none d-md-block">
+                <span class="text-teal-gradient">Universitaria Nacional</span>
+            </h2>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            <!-- Columna Izquierda: Mapa Interactivo con el Recorrido Trazado -->
+            <div class="col-lg-7">
+                <div class="card border-0 rounded-4 shadow-lg overflow-hidden h-100 bg-dark bg-opacity-75 border border-white border-opacity-10 d-flex flex-column">
+                    <!-- Barra de herramientas del Mapa -->
+                    <div class="card-header bg-dark bg-opacity-50 border-bottom border-white border-opacity-10 py-2 py-sm-3 px-3 px-sm-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-teal text-white rounded-pill px-3 py-1 fw-bold extra-small">
+                                <i class="bi bi-geo-alt-fill me-1"></i> Recorrido Oficial
+                            </span>
+                            <span class="text-white-50 extra-small d-none d-sm-inline">
+                                Distancia aprox.: <strong class="text-white">~3.2 km</strong>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-xs btn-outline-light rounded-pill px-2 py-1 extra-small" id="btnCentrarRecorrido" title="Reenfocar todo el circuito">
+                                <i class="bi bi-arrows-fullscreen me-1"></i> Reenfocar
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-warning rounded-pill px-2 py-1 extra-small" id="btnCambiarCapaEntrada" title="Alternar entre mapa satelital y mapa de calles">
+                                <i class="bi bi-layers-fill me-1"></i> <span id="textoCapaEntrada">Satélite</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="d-flex flex-wrap gap-2 extra-small text-white-50">
-                        <span><i class="bi bi-check2-circle text-success me-1"></i> 8 Provincias</span>
-                        <span class="mx-1">•</span>
-                        <span><i class="bi bi-camera-fill text-warning me-1"></i> Fotografías reales</span>
-                        <span class="mx-1">•</span>
-                        <span><i class="bi bi-compass-fill text-info me-1"></i> Destinos turísticos</span>
+
+                    <!-- Contenedor del Mapa Leaflet -->
+                    <div class="position-relative flex-grow-1" style="min-height: 380px;">
+                        <div id="mapaEntradaRecorrido" class="w-100 h-100" style="min-height: 380px; z-index: 1;"></div>
+
+                        <!-- Leyenda Flotante sobre el Mapa -->
+                        <div class="position-absolute bottom-0 start-0 m-3 p-3 rounded-4 text-white extra-small d-none d-sm-block leyenda-mapa-entrada" style="z-index: 1000; min-width: 240px;">
+                            <div class="fw-bold text-teal mb-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-compass-fill text-warning"></i> Trayecto del Recorrido:
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-success rounded-circle p-1" style="width: 14px; height: 14px;"> </span>
+                                    <span><strong>Partida:</strong> Av. Cambódromo (Estadio)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-warning text-dark rounded-circle p-1" style="width: 14px; height: 14px;"> </span>
+                                    <span><strong>Hito:</strong> Calle Antonio Vaca Díez</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-circle p-1" style="width: 14px; height: 14px;"> </span>
+                                    <span><strong>Llegada:</strong> Plaza Mcal. Ballivián</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie del mapa con recomendación turística -->
+                    <div class="card-footer bg-dark bg-opacity-40 border-top border-white border-opacity-10 py-2 px-4 d-flex justify-content-between align-items-center text-white-50 extra-small">
+                        <span><i class="bi bi-camera-fill text-warning me-1"></i> Palco oficial frente a la Catedral de Trinidad</span>
+                        <a href="https://maps.google.com/?q=-14.835349,-64.903657" target="_blank" rel="noopener noreferrer" class="text-teal text-decoration-none fw-semibold">
+                            Abrir en Google Maps <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Columna Derecha: Mapa SVG Interactivo con Revelación Fotográfica -->
-            <div class="col-lg-7 text-center">
-                <div class="mapa-beni-wrapper mx-auto position-relative">
-                    <!-- Mapa Geográfico Oficial y Estilizado del Departamento del Beni -->
-                    <svg viewBox="0 0 520 520" class="mapa-beni-svg w-100 h-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <defs>
-                            <!-- Patrones fotográficos dinámicos administrables para cada una de las 8 provincias del Beni -->
-                            <?php
-                                $obtenerUrlFotoMapa = function($codigo, $fallbackImg) use ($fotosMapa, $baseUrl) {
-                                    $foto = $fotosMapa[$codigo]['imagen'] ?? null;
-                                    if (!empty($foto)) {
-                                        if (str_starts_with($foto, 'hero-')) {
-                                            return "{$baseUrl}/assets/img/{$foto}";
-                                        }
-                                        return "{$baseUrl}/imagen?f=" . urlencode($foto);
-                                    }
-                                    return $fallbackImg;
-                                };
+            <!-- Columna Derecha: Lista y Buscador de Fraternidades y Bailarines -->
+            <div class="col-lg-5">
+                <div class="card border-0 rounded-4 shadow-lg h-100 bg-white text-dark overflow-hidden d-flex flex-column panel-fraternidades-entrada">
+                    <!-- Cabecera del Panel de Fraternidades -->
+                    <div class="p-3 p-sm-4 bg-light border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold extra-small">
+                                <i class="bi bi-people-fill me-1"></i> Rol de Ingreso
+                            </span>
+                            <span class="extra-small text-muted fw-semibold" id="contadorFraternidadesTxt">
+                                <?= count($fraternidadesEntrada ?? []) ?> agrupaciones
+                            </span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1 fs-5 fs-sm-4">Fraternidades y Danzas</h4>
+                        <p class="text-muted extra-small mb-3">
+                            Encuentra a tu universidad, agrupación o danza preferida en tiempo real:
+                        </p>
 
-                                $imgVacaDiez = $obtenerUrlFotoMapa('vacadiez', "{$baseUrl}/imagen?f=lugar_083829094a198208_1792908099.jpg");
-                                $imgBallivian = $obtenerUrlFotoMapa('ballivian', "{$baseUrl}/assets/img/hero-poster.webp");
-                                $imgYacuma = $obtenerUrlFotoMapa('yacuma', "{$baseUrl}/imagen?f=lugar_93f0c8ef051a2dda_1790312766.png");
-                                $imgMamore = $obtenerUrlFotoMapa('mamore', "{$baseUrl}/imagen?f=lugar_2cf4c818d0c03cd8_1790319478.jpg");
-                                $imgItenez = $obtenerUrlFotoMapa('itenez', "{$baseUrl}/imagen?f=lugar_2cf4c818d0c03cd8_1790319478.jpg");
-                                $imgCercado = $obtenerUrlFotoMapa('cercado', "{$baseUrl}/imagen?f=lugar_9998d4fdbb4f31c5_1791967750.jpg");
-                                $imgMoxos = $obtenerUrlFotoMapa('moxos', "{$baseUrl}/imagen?f=lugar_8570b95699c5b12b_1790310877.png");
-                                $imgMarban = $obtenerUrlFotoMapa('marban', "{$baseUrl}/imagen?f=lugar_8570b95699c5b12b_1790310877.png");
-                            ?>
-                            <!-- 1. Vaca Díez (Riberalta / Guayaramerín) -->
-                            <pattern id="patronVacaDiez" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgVacaDiez) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 2. Gral. José Ballivián (Rurrenabaque / Pampas / Pilón Lajas) -->
-                            <pattern id="patronBallivian" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgBallivian) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 3. Yacuma (Santa Rosa de Yacuma / Bufeos) -->
-                            <pattern id="patronYacuma" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgYacuma) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 4. Mamoré (San Joaquín / San Ramón / Puerto Siles) -->
-                            <pattern id="patronMamore" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgMamore) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 5. Iténez (Magdalena / Baures / Río Iténez / Versalles) -->
-                            <pattern id="patronItenez" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgItenez) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 6. Cercado (Trinidad Capital / Laguna Suárez / Loma Suárez) -->
-                            <pattern id="patronCercado" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgCercado) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 7. Moxos (San Ignacio de Moxos / Laguna Isireri) -->
-                            <pattern id="patronMoxos" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgMoxos) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
-                            <!-- 8. Marbán (Loreto / San Andrés / Santuario de Loreto) -->
-                            <pattern id="patronMarban" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <image href="<?= htmlspecialchars($imgMarban) ?>" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-                            </pattern>
+                        <!-- Buscador en tiempo real -->
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-teal">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="buscadorFraternidadesSeccion" class="form-control border-start-0 rounded-end-pill py-2 text-dark shadow-none" placeholder="Buscar por danza, universidad, origen...">
+                        </div>
+                    </div>
 
-                            <!-- Sombra suave para el mapa completo -->
-                            <filter id="sombraMapaBeni" x="-10%" y="-10%" width="120%" height="120%">
-                                <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#021417" flood-opacity="0.55" />
-                            </filter>
-                        </defs>
+                    <!-- Lista Scrolleable de Fraternidades -->
+                    <div class="p-2 p-sm-3 overflow-y-auto flex-grow-1" id="listaContenedorFraternidades" style="max-height: 480px;">
+                        <?php if (!empty($fraternidadesEntrada)): ?>
+                            <div class="d-flex flex-column gap-3" id="itemsFraternidadesList">
+                                <?php foreach ($fraternidadesEntrada as $frat): ?>
+                                    <div class="card border rounded-4 p-3 bg-white shadow-xs item-fraternidad-card transition-all position-relative overflow-hidden" 
+                                         data-search="<?= strtolower(htmlspecialchars($frat['nombre_fraternidad'] . ' ' . $frat['danza'] . ' ' . $frat['universidad'] . ' ' . $frat['departamento'])) ?>">
+                                        <!-- Barra de acento lateral según departamento -->
+                                        <div class="frat-card-accent-bar <?= strtolower($frat['departamento']) === 'beni' ? 'accent-beni' : 'accent-nacional' ?>"></div>
 
-                        <!-- MAPA GEOGRÁFICO DEPARTAMENTO DEL BENI (8 PROVINCIAS ENCAJADAS) -->
-                        <g filter="url(#sombraMapaBeni)">
-                            
-                            <!-- CAPA 1: CUERPO Y FORMAS DE LAS 8 PROVINCIAS -->
-                            <g class="capa-cuerpos-provincias">
-                                <!-- 1. Antonio Vaca Díez -->
-                                <g class="region-beni-grupo" data-provincia="vacadiez" data-region="norte" tabindex="0" role="button" aria-label="Provincia Vaca Díez: Riberalta y Guayaramerín">
-                                    <path class="region-path region-vacadiez" 
-                                          d="M 189 12 L 195 12 L 197 14 L 198 29 L 202 34 L 202 43 L 208 52 L 208 61 L 200 76 L 200 80 L 204 86 L 204 99 L 210 101 L 213 116 L 220 116 L 222 118 L 225 138 L 219 140 L 161 140 L 155 142 L 131 143 L 111 143 L 102 141 L 84 141 L 75 143 L 75 139 L 70 132 L 72 129 L 77 128 L 79 120 L 84 120 L 89 117 L 92 103 L 95 98 L 102 93 L 108 94 L 111 91 L 122 91 L 122 89 L 126 88 L 127 81 L 132 77 L 134 71 L 138 69 L 138 66 L 142 62 L 144 56 L 143 48 L 146 45 L 154 45 L 154 47 L 157 47 L 157 40 L 166 39 L 170 36 L 170 33 L 165 30 L 166 24 L 179 23 L 189 12 Z" 
-                                          fill="#c1bba4" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
+                                        <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="frat-orden-bubble shadow-sm">
+                                                    <?= (int)$frat['orden'] ?>
+                                                </span>
+                                                <div>
+                                                    <h6 class="fw-bold text-dark mb-0 frat-title-text"><?= htmlspecialchars($frat['nombre_fraternidad']) ?></h6>
+                                                    <?php if (!empty($frat['universidad'])): ?>
+                                                        <div class="extra-small text-muted text-truncate mt-1" style="max-width: 260px;" title="<?= htmlspecialchars($frat['universidad']) ?>">
+                                                            <i class="bi bi-mortarboard-fill text-teal me-1"></i><?= htmlspecialchars($frat['universidad']) ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                            <span class="badge frat-hora-badge shadow-xs whitespace-nowrap">
+                                                <i class="bi bi-clock me-1 text-teal"></i><?= htmlspecialchars($frat['hora_ingreso'] ?: '--:--') ?>
+                                            </span>
+                                        </div>
 
-                                <!-- 2. Gral. José Ballivián -->
-                                <g class="region-beni-grupo" data-provincia="ballivian" data-region="pampas" tabindex="0" role="button" aria-label="Provincia Gral. Ballivián: Rurrenabaque y San Borja">
-                                    <path class="region-path region-ballivian" 
-                                          d="M 84 141 L 125 143 L 122 151 L 125 168 L 118 179 L 113 183 L 104 206 L 104 284 L 106 285 L 106 302 L 104 303 L 102 314 L 102 345 L 104 347 L 104 367 L 102 368 L 102 428 L 87 442 L 78 444 L 72 432 L 68 430 L 66 423 L 61 418 L 59 407 L 50 395 L 47 387 L 33 381 L 31 376 L 33 362 L 29 356 L 21 351 L 21 348 L 26 341 L 24 336 L 20 333 L 20 329 L 26 325 L 25 320 L 23 319 L 23 313 L 25 311 L 23 292 L 26 289 L 29 289 L 27 280 L 32 276 L 32 272 L 38 266 L 36 251 L 43 245 L 45 238 L 52 234 L 56 225 L 61 223 L 66 211 L 70 207 L 71 193 L 69 188 L 72 182 L 70 181 L 69 174 L 74 170 L 73 152 L 76 148 L 75 143 L 84 141 Z" 
-                                          fill="#f2e415" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2 pt-2 border-top border-light">
+                                            <span class="badge frat-danza-pill">
+                                                <i class="bi bi-music-note-beamed me-1"></i><?= htmlspecialchars($frat['danza']) ?>
+                                            </span>
+                                            <span class="badge frat-depto-pill">
+                                                <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($frat['departamento']) ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-calendar2-range display-4 text-secondary opacity-50 d-block mb-2"></i>
+                                <span class="small">El rol oficial de fraternidades se publicará en los próximos días.</span>
+                            </div>
+                        <?php endif; ?>
 
-                                <!-- 3. Yacuma -->
-                                <g class="region-beni-grupo" data-provincia="yacuma" data-region="pampas" tabindex="0" role="button" aria-label="Provincia Yacuma: Santa Rosa del Yacuma">
-                                    <path class="region-path region-yacuma" 
-                                          d="M 202 139 L 219 140 L 221 145 L 220 151 L 214 154 L 216 163 L 214 174 L 219 184 L 223 187 L 222 196 L 226 200 L 226 212 L 224 213 L 225 220 L 222 229 L 213 230 L 214 238 L 210 246 L 210 257 L 206 265 L 205 279 L 216 292 L 218 299 L 223 305 L 223 311 L 215 314 L 210 313 L 197 316 L 186 347 L 178 355 L 170 359 L 171 366 L 169 372 L 171 373 L 171 376 L 167 380 L 166 389 L 158 396 L 158 399 L 154 404 L 142 404 L 141 406 L 134 407 L 119 420 L 107 427 L 102 427 L 102 368 L 104 367 L 102 314 L 104 303 L 106 302 L 106 285 L 104 284 L 104 206 L 113 183 L 118 179 L 125 168 L 122 151 L 125 143 L 131 142 L 202 139 Z" 
-                                          fill="#ef66e6" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
+                        <!-- Mensaje de no resultados de búsqueda -->
+                        <div id="noResultadosFrat" class="text-center py-4 text-muted d-none">
+                            <i class="bi bi-search fs-3 text-secondary opacity-50 d-block mb-2"></i>
+                            <span class="small">No se encontraron fraternidades que coincidan con la búsqueda.</span>
+                        </div>
+                    </div>
 
-                                <!-- 4. Mamoré -->
-                                <g class="region-beni-grupo" data-provincia="mamore" data-region="misiones" tabindex="0" role="button" aria-label="Provincia Mamoré: San Joaquín">
-                                    <path class="region-path region-mamore" 
-                                          d="M 224 138 L 232 139 L 241 144 L 242 149 L 247 149 L 252 155 L 264 158 L 266 162 L 268 162 L 269 171 L 280 179 L 277 186 L 285 209 L 283 211 L 283 219 L 286 223 L 286 230 L 280 239 L 279 248 L 276 251 L 275 312 L 267 312 L 239 303 L 221 303 L 216 292 L 205 279 L 206 265 L 210 257 L 210 246 L 214 238 L 213 230 L 221 230 L 225 220 L 224 213 L 226 212 L 226 200 L 222 196 L 223 187 L 219 184 L 214 174 L 214 169 L 216 168 L 214 154 L 221 149 L 219 139 L 224 138 Z" 
-                                          fill="#f2efbc" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
-
-                                <!-- 5. Iténez -->
-                                <g class="region-beni-grupo" data-provincia="itenez" data-region="misiones" tabindex="0" role="button" aria-label="Provincia Iténez: Magdalena, Baures y Versalles">
-                                    <path class="region-path region-itenez" 
-                                          d="M 323 173 L 339 177 L 344 184 L 348 185 L 354 191 L 363 193 L 368 191 L 376 192 L 382 203 L 389 207 L 393 207 L 403 221 L 413 220 L 419 225 L 427 226 L 430 229 L 440 228 L 442 230 L 451 230 L 455 234 L 455 239 L 461 248 L 469 250 L 475 257 L 475 262 L 480 262 L 482 264 L 483 262 L 490 262 L 493 259 L 497 259 L 499 266 L 492 271 L 481 273 L 474 278 L 470 278 L 459 285 L 446 288 L 422 299 L 387 310 L 386 312 L 366 317 L 362 321 L 358 321 L 356 324 L 349 326 L 339 327 L 333 323 L 275 312 L 276 251 L 279 248 L 280 239 L 286 230 L 286 223 L 283 219 L 283 211 L 285 209 L 277 183 L 279 180 L 285 180 L 286 178 L 292 178 L 294 181 L 310 180 L 323 173 Z" 
-                                          fill="#e194bc" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
-
-                                <!-- 6. Cercado -->
-                                <g class="region-beni-grupo" data-provincia="cercado" data-region="cercado" tabindex="0" role="button" aria-label="Provincia Cercado: Ciudad de Trinidad">
-                                    <path class="region-path region-cercado" 
-                                          d="M 224 302 L 239 303 L 267 312 L 277 312 L 280 314 L 295 315 L 306 319 L 333 323 L 339 326 L 340 330 L 319 352 L 317 352 L 314 359 L 302 361 L 294 366 L 282 368 L 278 371 L 258 374 L 238 383 L 231 383 L 229 382 L 229 374 L 225 362 L 230 352 L 233 335 L 231 333 L 231 326 L 227 322 L 227 313 L 222 310 L 222 303 L 224 302 Z" 
-                                          fill="#57e261" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
-
-                                <!-- 7. Moxos -->
-                                <g class="region-beni-grupo" data-provincia="moxos" data-region="misiones" tabindex="0" role="button" aria-label="Provincia Moxos: San Ignacio de Moxos">
-                                    <path class="region-path region-moxos" 
-                                          d="M 222 311 L 226 311 L 227 313 L 227 322 L 231 326 L 233 340 L 228 358 L 225 362 L 229 374 L 229 383 L 225 393 L 215 402 L 212 410 L 213 416 L 216 417 L 219 422 L 220 432 L 217 441 L 210 448 L 206 448 L 208 454 L 206 459 L 208 493 L 203 499 L 195 502 L 156 503 L 153 500 L 137 499 L 136 496 L 120 483 L 115 472 L 107 464 L 82 455 L 79 450 L 79 445 L 87 442 L 95 436 L 102 427 L 107 427 L 119 420 L 132 408 L 141 406 L 142 404 L 154 404 L 157 401 L 158 396 L 166 389 L 167 380 L 171 376 L 171 373 L 169 372 L 171 366 L 170 359 L 178 355 L 186 347 L 197 316 L 220 313 L 222 311 Z" 
-                                          fill="#56e4dd" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
-
-                                <!-- 8. Marbán -->
-                                <g class="region-beni-grupo" data-provincia="marban" data-region="cercado" tabindex="0" role="button" aria-label="Provincia Marbán: Loreto y San Andrés">
-                                    <path class="region-path region-marban" 
-                                          d="M 308 359 L 314 359 L 314 370 L 312 372 L 314 378 L 313 391 L 320 400 L 322 411 L 333 427 L 342 434 L 349 436 L 350 440 L 353 442 L 356 454 L 353 456 L 344 456 L 343 454 L 298 449 L 285 451 L 280 450 L 279 448 L 237 447 L 230 450 L 225 456 L 225 467 L 222 471 L 223 481 L 221 488 L 212 493 L 208 493 L 208 473 L 206 471 L 206 459 L 208 454 L 206 448 L 210 448 L 217 441 L 220 432 L 219 422 L 216 417 L 213 416 L 212 410 L 215 402 L 225 393 L 228 383 L 238 383 L 252 376 L 278 371 L 308 359 Z" 
-                                          fill="#9eeea4" 
-                                          stroke="#1e293b" 
-                                          stroke-width="2" />
-                                </g>
-                            </g>
-
-                            <!-- CAPA 2 (OVERLAY SUPERIOR ABSOLUTO): PINES Y ETIQUETAS FLOTANTES -->
-                            <!-- Renderizado siempre después de todas las provincias para que jamás queden cubiertas -->
-                            <g class="capa-overlays-provincias pointer-events-none">
-                                <!-- 1. Vaca Díez -->
-                                <g class="provincia-overlay" data-overlay="vacadiez">
-                                    <g class="region-pin-btn" transform="translate(163, 95)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(85, 120)">
-                                        <rect x="0" y="0" width="155" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="77" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Vaca Díez (Riberalta) ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 2. Gral. Ballivián -->
-                                <g class="provincia-overlay" data-overlay="ballivian">
-                                    <g class="region-pin-btn" transform="translate(76, 295)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(10, 325)">
-                                        <rect x="0" y="0" width="155" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="77" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Gral. Ballivián (Pampas) ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 3. Yacuma -->
-                                <g class="provincia-overlay" data-overlay="yacuma">
-                                    <g class="region-pin-btn" transform="translate(154, 255)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(85, 285)">
-                                        <rect x="0" y="0" width="145" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="72" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Yacuma & Santa Rosa ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 4. Mamoré -->
-                                <g class="provincia-overlay" data-overlay="mamore">
-                                    <g class="region-pin-btn" transform="translate(246, 225)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(180, 255)">
-                                        <rect x="0" y="0" width="135" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="67" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Provincia Mamoré ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 5. Iténez -->
-                                <g class="provincia-overlay" data-overlay="itenez">
-                                    <g class="region-pin-btn" transform="translate(365, 252)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(295, 280)">
-                                        <rect x="0" y="0" width="145" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="72" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Iténez & Magdalena ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 6. Cercado -->
-                                <g class="provincia-overlay" data-overlay="cercado">
-                                    <g class="region-pin-btn" transform="translate(267, 342)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(200, 372)">
-                                        <rect x="0" y="0" width="145" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="72" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Cercado (Trinidad) ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 7. Moxos -->
-                                <g class="provincia-overlay" data-overlay="moxos">
-                                    <g class="region-pin-btn" transform="translate(165, 435)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(95, 465)">
-                                        <rect x="0" y="0" width="145" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="72" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Moxos (San Ignacio) ➔</text>
-                                    </g>
-                                </g>
-
-                                <!-- 8. Marbán -->
-                                <g class="provincia-overlay" data-overlay="marban">
-                                    <g class="region-pin-btn" transform="translate(275, 420)">
-                                        <circle cx="0" cy="0" r="12" fill="#ffffff" class="pin-bg" />
-                                        <text x="0" y="4" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3b43" class="pin-icon">+</text>
-                                    </g>
-                                    <g class="region-tag-label" transform="translate(205, 450)">
-                                        <rect x="0" y="0" width="140" height="26" rx="13" fill="#ffffff" fill-opacity="0.95" class="tag-rect" />
-                                        <text x="70" y="17" text-anchor="middle" font-size="10" font-weight="bold" fill="#0f172a">Marbán (Loreto) ➔</text>
-                                    </g>
-                                </g>
-                            </g>
-                        </g>
-                    </svg>
+                    <!-- Pie del Panel -->
+                    <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                        <span class="extra-small text-muted">
+                            <i class="bi bi-shield-check text-success me-1"></i> Comité Organizador UAB · FUL
+                        </span>
+                        <a href="#eventos-18-noviembre" class="extra-small text-teal text-decoration-none fw-bold">
+                            <i class="bi bi-arrow-up-circle me-1"></i> Ver Agenda Completa
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Tigre Amazónico / Jaguar Beniano (Panthera onca) Vigilante en la Esquina -->
-    <div class="tigre-mapa-box d-none d-md-block" title="Tigre Amazónico / Jaguar (Panthera onca) - El rey de la fauna y las reservas del Beni">
-        <svg viewBox="0 0 180 140" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <!-- Pelaje dorado/ámbar del Jaguar -->
-                <linearGradient id="gradPielTigre" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#f59e0b" />
-                    <stop offset="60%" stop-color="#d97706" />
-                    <stop offset="100%" stop-color="#b45309" />
-                </linearGradient>
-                <!-- Hocico y mentón blanco crema -->
-                <linearGradient id="gradHocicoTigre" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#ffffff" />
-                    <stop offset="100%" stop-color="#fef3c7" />
-                </linearGradient>
-                <!-- Ojos ámbar / esmeralda brillante -->
-                <linearGradient id="gradOjoTigre" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#fef08a" />
-                    <stop offset="60%" stop-color="#a3e635" />
-                    <stop offset="100%" stop-color="#65a30d" />
-                </linearGradient>
-            </defs>
-
-            <!-- Hojas de selva de fondo en la esquina -->
-            <g opacity="0.75">
-                <path d="M 120 140 C 135 105 160 85 180 80 C 180 115 160 135 120 140 Z" fill="#047857" />
-                <path d="M 100 140 C 120 115 140 100 165 98 C 160 125 135 138 100 140 Z" fill="#10b981" opacity="0.6" />
-            </g>
-
-            <!-- Cola curvada y animada con anillos oscuros -->
-            <g class="tigre-cola-animada">
-                <path d="M 32 96 C 18 90 8 75 14 58 C 18 48 28 46 32 52 C 34 56 30 64 24 68 C 19 72 22 84 34 90 Z" fill="url(#gradPielTigre)" stroke="#78350f" stroke-width="0.8" />
-                <!-- Manchas de la cola -->
-                <circle cx="16" cy="62" r="3" fill="#1e1b18" />
-                <circle cx="21" cy="74" r="3.2" fill="#1e1b18" />
-                <circle cx="26" cy="85" r="3.5" fill="#1e1b18" />
-                <!-- Punta oscura -->
-                <path d="M 28 48 C 32 50 33 54 30 56 C 26 58 20 54 22 50 Z" fill="#1e1b18" />
-            </g>
-
-            <!-- Cuerpo del Jaguar en reposo felino -->
-            <g class="tigre-cuerpo">
-                <path d="M 30 96 C 30 76 48 65 72 65 C 102 65 120 74 135 90 C 142 98 145 112 144 125 C 138 128 50 130 30 125 C 24 116 28 104 30 96 Z" fill="url(#gradPielTigre)" />
-                <!-- Rosetas / Manchas características del Jaguar en el lomo -->
-                <g fill="#1e1b18">
-                    <!-- Roseta 1 -->
-                    <circle cx="52" cy="78" r="4.5" fill="none" stroke="#1e1b18" stroke-width="2.2" />
-                    <circle cx="52" cy="78" r="1.5" />
-                    <!-- Roseta 2 -->
-                    <circle cx="74" cy="75" r="5" fill="none" stroke="#1e1b18" stroke-width="2.5" />
-                    <circle cx="74" cy="75" r="1.8" />
-                    <!-- Roseta 3 -->
-                    <circle cx="95" cy="80" r="4.8" fill="none" stroke="#1e1b18" stroke-width="2.3" />
-                    <circle cx="95" cy="80" r="1.6" />
-                    <!-- Roseta 4 -->
-                    <circle cx="62" cy="94" r="5.2" fill="none" stroke="#1e1b18" stroke-width="2.4" />
-                    <circle cx="62" cy="94" r="1.8" />
-                    <!-- Roseta 5 -->
-                    <circle cx="86" cy="96" r="4.6" fill="none" stroke="#1e1b18" stroke-width="2.2" />
-                    <circle cx="86" cy="96" r="1.6" />
-                </g>
-                <!-- Pata delantera visible descansando -->
-                <path d="M 112 102 C 118 102 124 108 125 118 C 125 126 120 128 110 128 C 102 128 98 124 99 116 C 100 106 106 102 112 102 Z" fill="url(#gradPielTigre)" />
-                <path d="M 125 116 C 132 116 138 120 138 128 C 135 130 115 130 112 128 C 112 124 118 116 125 116 Z" fill="#fef3c7" />
-                <!-- Líneas de garras retráctiles -->
-                <path d="M 122 123 L 122 128" stroke="#78350f" stroke-width="1.2" stroke-linecap="round" />
-                <path d="M 128 123 L 128 128" stroke="#78350f" stroke-width="1.2" stroke-linecap="round" />
-                <path d="M 134 123 L 134 128" stroke="#78350f" stroke-width="1.2" stroke-linecap="round" />
-            </g>
-
-            <!-- Cabeza majestuosa del Tigre Amazónico / Jaguar (Con animación sutil de mirada) -->
-            <g class="tigre-cabeza-animada">
-                <!-- Oreja Izquierda -->
-                <path d="M 104 42 C 100 30 110 24 116 30 C 120 34 118 42 114 45 Z" fill="url(#gradPielTigre)" />
-                <path d="M 106 40 C 104 33 110 28 113 32 C 115 35 114 40 111 42 Z" fill="#1e1b18" />
-                <circle cx="110" cy="35" r="1.5" fill="#ffffff" opacity="0.9" />
-
-                <!-- Oreja Derecha -->
-                <path d="M 148 44 C 154 32 164 28 168 34 C 170 39 166 47 160 48 Z" fill="url(#gradPielTigre)" />
-                <path d="M 152 42 C 156 34 162 32 164 36 C 165 40 162 45 158 46 Z" fill="#1e1b18" />
-                <circle cx="160" cy="38" r="1.5" fill="#ffffff" opacity="0.9" />
-
-                <!-- Cráneo y Mandíbula poderosa del felino -->
-                <path d="M 108 52 C 104 68 112 90 134 94 C 156 94 168 76 166 54 C 164 42 148 38 135 38 C 122 38 110 44 108 52 Z" fill="url(#gradPielTigre)" />
-
-                <!-- Marcas faciales y rosetas en la frente -->
-                <path d="M 130 43 C 132 40 138 40 140 43" stroke="#1e1b18" stroke-width="2.2" stroke-linecap="round" />
-                <path d="M 126 48 C 129 46 133 46 135 48" stroke="#1e1b18" stroke-width="2" stroke-linecap="round" />
-                <path d="M 137 48 C 139 46 143 46 146 48" stroke="#1e1b18" stroke-width="2" stroke-linecap="round" />
-                <circle cx="121" cy="52" r="2.2" fill="#1e1b18" />
-                <circle cx="151" cy="53" r="2.2" fill="#1e1b18" />
-
-                <!-- Ojos hipnóticos verdes-dorados de jaguar con parpadeo perfecto en su propio eje -->
-                <!-- Ojo Izquierdo -->
-                <g class="tigre-ojo-izq">
-                    <ellipse cx="125" cy="58" rx="5.5" ry="4" fill="url(#gradOjoTigre)" stroke="#1e1b18" stroke-width="1.8" />
-                    <ellipse cx="125" cy="58" rx="2" ry="3.5" fill="#0f172a" />
-                    <circle cx="126" cy="56.5" r="0.9" fill="#ffffff" />
-                    <path d="M 119 55 C 123 54 128 54 131 56" stroke="#1e1b18" stroke-width="1.6" stroke-linecap="round" />
-                </g>
-
-                <!-- Ojo Derecho -->
-                <g class="tigre-ojo-der">
-                    <ellipse cx="147" cy="59" rx="5.5" ry="4" fill="url(#gradOjoTigre)" stroke="#1e1b18" stroke-width="1.8" />
-                    <ellipse cx="147" cy="59" rx="2" ry="3.5" fill="#0f172a" />
-                    <circle cx="148" cy="57.5" r="0.9" fill="#ffffff" />
-                    <path d="M 141 56 C 145 54 150 54 153 56" stroke="#1e1b18" stroke-width="1.6" stroke-linecap="round" />
-                </g>
-
-                <!-- Hocico blanco y mofletes de fiera -->
-                <path d="M 128 66 C 122 72 120 84 135 84 C 150 84 150 72 144 66 C 140 62 132 62 128 66 Z" fill="url(#gradHocicoTigre)" />
-                <!-- Nariz rosada oscura felina -->
-                <path d="M 132 68 C 134 66 138 66 140 68 C 141 71 138 74 136 74 C 134 74 131 71 132 68 Z" fill="#be185d" />
-                <!-- División del labio -->
-                <path d="M 136 74 L 136 79" stroke="#1e1b18" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M 131 78 C 133 80 139 80 141 78" stroke="#1e1b18" stroke-width="1.4" stroke-linecap="round" />
-                
-                <!-- Puntos de bigotes -->
-                <circle cx="128" cy="74" r="1" fill="#1e1b18" />
-                <circle cx="126" cy="77" r="1" fill="#1e1b18" />
-                <circle cx="130" cy="77" r="1" fill="#1e1b18" />
-                <circle cx="144" cy="74" r="1" fill="#1e1b18" />
-                <circle cx="142" cy="77" r="1" fill="#1e1b18" />
-                <circle cx="146" cy="77" r="1" fill="#1e1b18" />
-
-                <!-- Bigotes blancos finos y elegantes -->
-                <path d="M 124 75 C 114 74 104 77 96 82" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.85" />
-                <path d="M 125 78 C 116 80 107 85 100 92" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.85" />
-                <path d="M 148 76 C 158 75 168 78 176 83" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.85" />
-                <path d="M 147 79 C 156 82 165 87 172 94" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity="0.85" />
-            </g>
-
-            <!-- Hojas de selva decorativas en primer plano -->
-            <path d="M 140 140 C 150 120 170 115 180 118 C 178 135 160 140 140 140 Z" fill="#10b981" />
-            <path d="M 155 140 C 162 128 175 125 180 128" stroke="#34d399" stroke-width="1" stroke-linecap="round" />
-        </svg>
     </div>
 </section>
 

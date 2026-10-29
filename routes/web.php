@@ -94,12 +94,16 @@ $router->post('/admin/catalogos/municipios/guardar', [\App\Controllers\Admin\Cat
 $router->post('/admin/catalogos/municipios/estado', [\App\Controllers\Admin\CatalogoController::class, 'cambiarEstadoMunicipio']);
 $router->post('/admin/catalogos/planes/guardar', [\App\Controllers\Admin\CatalogoController::class, 'guardarPlan']);
 $router->post('/admin/catalogos/planes/estado', [\App\Controllers\Admin\CatalogoController::class, 'cambiarEstadoPlan']);
+$router->post('/admin/catalogos/video/guardar', [\App\Controllers\Admin\CatalogoController::class, 'actualizarVideoHero']);
+$router->post('/admin/catalogos/poster/guardar', [\App\Controllers\Admin\CatalogoController::class, 'actualizarPosterHero']);
 
 // Agenda de Eventos y Festividades
 $router->get('/admin/eventos', [\App\Controllers\Admin\EventoController::class, 'index']);
 $router->post('/admin/eventos/guardar', [\App\Controllers\Admin\EventoController::class, 'guardar']);
 $router->post('/admin/eventos/estado', [\App\Controllers\Admin\EventoController::class, 'cambiarEstado']);
 $router->post('/admin/eventos/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminar']);
+$router->post('/admin/eventos/fraternidad/guardar', [\App\Controllers\Admin\EventoController::class, 'guardarFraternidad']);
+$router->post('/admin/eventos/fraternidad/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminarFraternidad']);
 
 
 // Portal de las cuentas aprovisionadas.

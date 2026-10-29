@@ -11,9 +11,13 @@ try {
     if ($raw === false || strlen($raw) > 65536) throw new InvalidArgumentException('Petición inválida.');
     $update = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
     if (!is_array($update)) throw new InvalidArgumentException('Petición inválida.');
-    $callback = App\Services\TelegramService::validarWebhook($update, $_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '');
+
+    $secretoEnviado = $_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '';
+    $callback = App\Services\TelegramService::validarWebhook($update, $secretoEnviado);
 } catch (Throwable $e) {
-    http_response_code(403); exit('{"ok":false}');
+    error_log('Telegram Webhook Auth/JSON Error: ' . $e->getMessage());
+    http_response_code(403);
+    exit('{"ok":false}');
 }
 if (!$callback) exit('{"ok":true}');
 

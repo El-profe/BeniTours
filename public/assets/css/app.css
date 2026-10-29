@@ -1,5 +1,8 @@
 /* Paleta Institucional Inspirada en el Beni - Río Mamoré & Teal Amazónico */
 :root {
+    --trini-font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bs-font-sans-serif: var(--trini-font-family);
+    --bs-body-font-family: var(--trini-font-family);
     --trini-green: #0f3b43;
     --trini-green-light: #0d9488;
     --trini-green-dark: #09252a;
@@ -11,15 +14,27 @@
 
 body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--trini-font-family);
     color: #132a2f;
     background-color: var(--trini-bg-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, select, textarea, .form-control, .form-select {
+    font-family: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, 
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6, 
+.btn, .navbar-brand, .nav-link {
+    font-family: var(--trini-font-family);
 }
 
 /* Navbar Flotante Moderno con esquinas semi curvas, alargado y separación lateral */
 .navbar-trinidad {
     background-color: var(--trini-green);
-    transition: all 0.3s ease;
+    transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, padding 0.3s ease;
 }
 
 body > .navbar-trinidad,
@@ -32,13 +47,27 @@ body > .navbar-trinidad,
     max-width: 1580px;
     margin-inline: auto;
     z-index: 1030;
-    background: rgba(15, 59, 67, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(45, 212, 191, 0.25);
     border-radius: 24px;
-    box-shadow: 0 10px 35px rgba(9, 37, 42, 0.38) !important;
     padding: 0.55rem 1.6rem !important;
+}
+
+/* Estado 1: Transparente (al inicio / sobre el Hero) */
+.page-home > .navbar-trinidad.navbar-transparente {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: none !important;
+}
+
+/* Estado 2: Scrolled / Estado Sólido Glassmorphism (al desplazarse hacia abajo) */
+body > .navbar-trinidad:not(.navbar-transparente),
+.page-home > .navbar-trinidad.navbar-scrolled {
+    background: rgba(15, 59, 67, 0.94) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(45, 212, 191, 0.25) !important;
+    box-shadow: 0 10px 35px rgba(9, 37, 42, 0.38) !important;
 }
 
 /* Compensar el espacio superior en páginas que no son la portada principal */
@@ -57,6 +86,18 @@ body:not(.page-home) {
     }
     body:not(.page-home) {
         padding-top: 68px;
+    }
+}
+
+/* Soporte Móvil: Si el menú hamburguesa se abre estando arriba, darle fondo legible */
+@media (max-width: 1199.98px) {
+    .navbar-trinidad.navbar-transparente.menu-abierto,
+    .navbar-trinidad.navbar-transparente.is-open {
+        background: rgba(15, 59, 67, 0.98) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-color: rgba(45, 212, 191, 0.3) !important;
+        box-shadow: 0 12px 35px rgba(9, 37, 42, 0.45) !important;
     }
 }
 
@@ -234,6 +275,33 @@ body:not(.page-home) {
     box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.35);
 }
 
+/* Estilos específicos para Dropdown Oscuro / Barra de Navegación BeniTours */
+.dropdown-menu-dark.bg-teal-dark {
+    background-color: #09252a !important;
+    border: 1px solid rgba(45, 212, 191, 0.25) !important;
+}
+
+.dropdown-menu-dark .dropdown-item {
+    color: #e2e8f0 !important;
+}
+
+.dropdown-menu-dark .dropdown-item:hover,
+.dropdown-menu-dark .dropdown-item:focus {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.35) 0%, rgba(15, 59, 67, 0.6) 100%) !important;
+    color: #ffffff !important;
+}
+
+.dropdown-menu-dark .dropdown-item:hover .text-white-50,
+.dropdown-menu-dark .dropdown-item:focus .text-white-50 {
+    color: #ccfbf1 !important; /* Texto secundario más nítido y legible en hover */
+}
+
+.dropdown-menu-dark .dropdown-item:active,
+.dropdown-menu-dark .dropdown-item.active {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+}
+
 /* Hero */
 .hero-trinidad {
     width: 100%;
@@ -302,10 +370,13 @@ body:not(.page-home) {
 }
 
 .text-teal-gradient {
-    background: linear-gradient(135deg, #2dd4bf 20%, #5eead4 60%, #facc15 100%);
+    color: #34d399 !important;
+    background: linear-gradient(135deg, #a7f3d0 0%, #34d399 50%, #fbbf24 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(13, 148, 136, 0.5));
+    text-shadow: 0 0 20px rgba(52, 211, 153, 0.6);
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.85));
+    font-weight: 800;
 }
 
 .hero-lead-cinematic {
@@ -631,6 +702,13 @@ body:not(.page-home) {
 .place-card-hover-actions {
     border-top: 1px solid rgba(13, 148, 136, 0.1);
     transition: all 0.25s ease;
+}
+
+.place-card-horario-subtext {
+    font-size: 0.72rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #475569 !important;
 }
 
 /* Botón Circular de Favorito */
@@ -1402,6 +1480,7 @@ body:not(.page-home) {
     justify-content: center;
     font-size: 1.35rem;
     cursor: pointer;
+    position: relative;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                 box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                 background-color 0.25s ease,
@@ -1409,6 +1488,146 @@ body:not(.page-home) {
                 color 0.2s ease;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Tooltip elegante flotante con flecha que sale del icono */
+.chip-filter-icon[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 11px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: rgba(9, 37, 42, 0.95);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s ease;
+    z-index: 1050;
+}
+
+/* Flechita / triángulo que conecta hacia el icono */
+.chip-filter-icon[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: rgba(9, 37, 42, 0.95) transparent transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s ease;
+    z-index: 1050;
+}
+
+.chip-filter-icon:hover[data-tooltip]::before,
+.chip-filter-icon:hover[data-tooltip]::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Colores personalizados del Tooltip según la Categoría (Fondo temático y flecha) */
+/* 1. Todos: Teal */
+.chip-filter-icon.cat-color-all[data-tooltip]::before {
+    background: #0f3b43;
+    border-color: #2dd4bf;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-all[data-tooltip]::after {
+    border-top-color: #0f3b43;
+}
+
+/* 2. Cerca de mí (Rojo) */
+.chip-filter-icon.cat-color-geo[data-tooltip]::before {
+    background: #dc2626;
+    border-color: #f87171;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-geo[data-tooltip]::after {
+    border-top-color: #dc2626;
+}
+
+/* 3. Naturaleza (Verde Esmeralda) */
+.chip-filter-icon.cat-color-nature[data-tooltip]::before {
+    background: #059669;
+    border-color: #34d399;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-nature[data-tooltip]::after {
+    border-top-color: #059669;
+}
+
+/* 4. Gastronomía (Naranja Ámbar) */
+.chip-filter-icon.cat-color-gastro[data-tooltip]::before {
+    background: #ea580c;
+    border-color: #fb923c;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-gastro[data-tooltip]::after {
+    border-top-color: #ea580c;
+}
+
+/* 5. Hoteles (Azul Cielo) */
+.chip-filter-icon.cat-color-hotel[data-tooltip]::before {
+    background: #0284c7;
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-hotel[data-tooltip]::after {
+    border-top-color: #0284c7;
+}
+
+/* 6. Vida Nocturna (Violeta Neón) */
+.chip-filter-icon.cat-color-night[data-tooltip]::before {
+    background: #7c3aed;
+    border-color: #a78bfa;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-night[data-tooltip]::after {
+    border-top-color: #7c3aed;
+}
+
+/* 7. Balnearios (Cian / Turquesa) */
+.chip-filter-icon.cat-color-water[data-tooltip]::before {
+    background: #0891b2;
+    border-color: #22d3ee;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-water[data-tooltip]::after {
+    border-top-color: #0891b2;
+}
+
+/* 8. Museos y Patrimonio (Amarillo Dorado) */
+.chip-filter-icon.cat-color-gold[data-tooltip]::before {
+    background: #ca8a04;
+    border-color: #fde047;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-gold[data-tooltip]::after {
+    border-top-color: #ca8a04;
+}
+
+/* 9. Comercio (Rosa Coral) */
+.chip-filter-icon.cat-color-shop[data-tooltip]::before {
+    background: #db2777;
+    border-color: #f472b6;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-shop[data-tooltip]::after {
+    border-top-color: #db2777;
 }
 
 .chip-filter-icon:hover {
@@ -1567,6 +1786,60 @@ body:not(.page-home) {
     box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
 }
 
+/* 9. Hospitales y Salud (Rojo Emergencias Médicas) */
+.chip-filter-icon.cat-color-health {
+    background-color: #e11d48;
+    border-color: #be123c;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-health:hover {
+    background-color: #ffe4e6;
+    border-color: #fda4af;
+    color: #be123c;
+}
+.chip-filter-icon.cat-color-health.active {
+    background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+    border-color: #e11d48;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(225, 29, 72, 0.45);
+}
+
+/* 10. Policía y Seguridad (Azul Cobalto Oficial) */
+.chip-filter-icon.cat-color-police {
+    background-color: #1d4ed8;
+    border-color: #1e40af;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-police:hover {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+.chip-filter-icon.cat-color-police.active {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+    border-color: #1d4ed8;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(29, 78, 216, 0.45);
+}
+
+/* 11. Bancos y Cajeros Automáticos ATM (Verde Financiero / Éxito) */
+.chip-filter-icon.cat-color-atm {
+    background-color: #059669;
+    border-color: #047857;
+    color: #ffffff;
+}
+.chip-filter-icon.cat-color-atm:hover {
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+    color: #047857;
+}
+.chip-filter-icon.cat-color-atm.active {
+    background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+    border-color: #059669;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.45);
+}
+
 /* --------------------------------------------------------------------------
    ADAPTACIÓN RESPONSIVA (MÓVIL / TABLET)
    -------------------------------------------------------------------------- */
@@ -1641,46 +1914,66 @@ body:not(.page-home) {
 
 .place-detail-photo {
     width: 100%;
-    height: 520px;
+    height: 560px;
     object-fit: cover;
+    object-position: center 25%;
     background-color: #051c20;
 }
 
 @media (max-width: 991.98px) {
     .place-detail-photo {
-        height: 380px;
+        height: 420px;
     }
 }
 
 @media (max-width: 575.98px) {
     .place-detail-photo {
-        height: 290px;
+        height: 320px;
     }
 }
 
-/* Tarjeta flotante superpuesta en la esquina con curva orgánica elegante */
+/* Tarjeta flotante superpuesta con menor solapamiento para ver la imagen completa */
 .lugar-header-flotante {
     position: relative;
     background: #ffffff;
-    border-radius: 2rem;
+    border-radius: 1.75rem;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-    margin-top: -90px;
+    margin-top: -38px;
     z-index: 4;
 }
 
 @media (min-width: 992px) {
     .lugar-header-flotante {
-        border-top-right-radius: 3.5rem;
+        border-top-right-radius: 3rem;
         max-width: 820px;
-        margin-top: -120px;
+        margin-top: -48px;
+    }
+}
+
+.lugar-header-top-bar {
+    width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .lugar-header-top-bar {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    .lugar-header-top-bar > div {
+        width: 100%;
+    }
+    .lugar-header-top-bar > div:last-child {
+        justify-content: flex-start;
+        flex-wrap: wrap;
     }
 }
 
 .lugar-header-titulo {
-    font-size: clamp(1.75rem, 3.5vw, 2.65rem);
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
     color: #0f172a;
 }
 
@@ -1735,6 +2028,8 @@ body:not(.page-home) {
     width: 100%;
     overflow: hidden;
     line-height: 0;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .wave-divider svg {
@@ -1742,6 +2037,7 @@ body:not(.page-home) {
     display: block;
     width: calc(100% + 1.3px);
     height: 70px;
+    filter: drop-shadow(0 -4px 12px rgba(0, 0, 0, 0.08));
 }
 
 /* Ajuste móvil */
@@ -1813,13 +2109,16 @@ body:not(.page-home) {
     line-height: 1;
 }
 
-/* Colores de pines por categoría */
 .pin-nature { background: #0d9488; }
 .pin-gastro { background: #f97316; }
 .pin-hotel  { background: #0284c7; }
 .pin-night  { background: #8b5cf6; }
 .pin-museum { background: #eab308; }
 .pin-water  { background: #06b6d4; }
+.pin-shop   { background: #ec4899; }
+.pin-health { background: #e11d48; }
+.pin-police { background: #1d4ed8; }
+.pin-atm    { background: #059669; }
 .pin-taxi   { background: #eab308; color: #111827; }
 .pin-taxi i { color: #111827 !important; }
 
@@ -2365,20 +2664,23 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     width: 48px;
     height: 48px;
     padding: 0;
-    background: rgba(255, 255, 255, 0.92) !important;
-    color: #0f3b43 !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.28) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
     pointer-events: auto;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
 }
 
 .promo-carousel-control:hover,
 .promo-carousel-control:focus {
-    background: #ffffff !important;
-    color: #0d9488 !important;
-    transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+    background: rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
 }
 
 .promo-carousel-control-prev {
@@ -2393,7 +2695,7 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 .promo-carousel-stage {
     position: relative;
-    height: 485px;
+    height: 480px;
 }
 
 .promo-carousel-card {
@@ -2607,22 +2909,27 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 /* Publicidad de eventos en la portada */
 .modal-eventos-beni {
-    border-radius: 1.35rem;
+    border-radius: 1.25rem;
     box-shadow: 0 1.25rem 3rem rgba(8, 61, 74, .28);
 }
 
 .modal-eventos-beni .modal-header {
     background: linear-gradient(120deg, #0E4D5E, #2A9D8F);
+    padding: 0.75rem 1.25rem !important;
 }
 
 .modal-eventos-eyebrow {
     display: block;
-    margin-bottom: .15rem;
+    margin-bottom: .1rem;
     color: #DDF4F1;
-    font-size: .72rem;
+    font-size: .68rem;
     font-weight: 800;
     letter-spacing: .075em;
     text-transform: uppercase;
+}
+
+.modal-eventos-beni .modal-title {
+    font-size: 1.05rem !important;
 }
 
 .evento-publicidad-card {
@@ -2631,49 +2938,59 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: min(68vh, 610px);
-    padding: 1rem;
+    min-height: auto;
+    padding: 0.75rem 1rem 0.25rem 1rem;
     background: radial-gradient(circle at top, #E2F2F0, #EEF5F7 65%);
 }
 
 .evento-publicidad-imagen {
     display: block;
     max-width: 100%;
-    max-height: min(58vh, 525px);
-    border-radius: .95rem;
-    box-shadow: 0 .75rem 1.75rem rgba(15, 23, 42, .2);
+    max-height: min(48vh, 420px);
+    border-radius: .75rem;
+    box-shadow: 0 .5rem 1.25rem rgba(15, 23, 42, .18);
     object-fit: contain;
 }
 
 .evento-publicidad-info {
-    width: min(100%, 525px);
-    margin-top: 1rem;
-    padding: .8rem 1rem;
+    width: min(100%, 500px);
+    margin-top: 0.65rem;
+    padding: .65rem .85rem;
     border: 1px solid rgba(255, 255, 255, .72);
-    border-radius: .9rem;
-    background: rgba(255, 255, 255, .93);
-    box-shadow: 0 .25rem .85rem rgba(15, 23, 42, .12);
+    border-radius: .75rem;
+    background: rgba(255, 255, 255, .95);
+    box-shadow: 0 .2rem .65rem rgba(15, 23, 42, .08);
+}
+
+.modal-eventos-beni .modal-footer {
+    padding: 0.5rem 1rem 0.85rem 1rem !important;
+}
+
+#carruselEventosBeni .carousel-indicators {
+    margin-top: 0.25rem !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.5rem !important;
 }
 
 #carruselEventosBeni .carousel-control-prev,
 #carruselEventosBeni .carousel-control-next {
-    width: 12%;
+    width: 10%;
 }
 
 #carruselEventosBeni .carousel-control-prev-icon,
 #carruselEventosBeni .carousel-control-next-icon {
-    width: 2.4rem;
-    height: 2.4rem;
-    padding: .5rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: .45rem;
     border-radius: 50%;
     background-color: rgba(14, 77, 94, .82);
     background-size: 55%;
 }
 
 #carruselEventosBeni .carousel-indicators [data-bs-target] {
-    width: .55rem;
-    height: .55rem;
-    margin: 0 .32rem;
+    width: .5rem;
+    height: .5rem;
+    margin: 0 .25rem;
     border: 0;
     border-radius: 50%;
     background-color: #2A9D8F;
@@ -2681,11 +2998,13 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 @media (max-width: 575.98px) {
     .modal-eventos-beni { border-radius: 1rem; }
-    .evento-publicidad-card { min-height: auto; padding: .75rem; }
-    .evento-publicidad-imagen { max-height: 62vh; }
-    .evento-publicidad-info { width: 100%; margin-top: .75rem; padding: .65rem .8rem; }
-    .evento-publicidad-info h3 { font-size: .85rem; }
-    .evento-publicidad-info p { font-size: .72rem; }
+    .modal-eventos-beni .modal-header { padding: 0.65rem 1rem !important; }
+    .evento-publicidad-card { min-height: auto; padding: .5rem .5rem .25rem .5rem; }
+    .evento-publicidad-imagen { max-height: 44vh; }
+    .evento-publicidad-info { width: 100%; margin-top: .5rem; padding: .5rem .65rem; }
+    .evento-publicidad-info h3 { font-size: .82rem; }
+    .evento-publicidad-info p { font-size: .7rem; }
+    .modal-eventos-beni .modal-footer { padding: 0.4rem 0.75rem 0.65rem 0.75rem !important; }
 }
 
 /* ==========================================================================
@@ -2800,7 +3119,7 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 /* Tarjetas y Promociones */
 .promo-card-banner {
-    height: 195px;
+    height: 320px;
     background-color: #081c15;
     cursor: pointer;
 }
@@ -2829,17 +3148,51 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     height: 180px;
     width: 100%;
 }
+.bg-teal-dark {
+    background-color: #09252a !important;
+}
+.modal-header-teal {
+    background-color: #0f3b43 !important;
+    color: #ffffff !important;
+}
+/* Asegurar visibilidad y espacio suficiente en cabeceras de modales frente al navbar flotante */
+.modal {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+.modal-dialog-centered {
+    margin-top: clamp(64px, 8vh, 85px) !important;
+    margin-bottom: 2rem !important;
+}
+@media (max-width: 768px) {
+    .modal-dialog-centered {
+        margin-top: 58px !important;
+        margin-bottom: 1.5rem !important;
+        margin-left: 0.75rem !important;
+        margin-right: 0.75rem !important;
+    }
+}
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.modal-header .btn-close {
+    opacity: 0.85;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.modal-header .btn-close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
 .modal-lightbox-viewport {
-    min-height: 380px;
-    max-height: 75vh;
+    min-height: 280px;
+    max-height: 65vh;
     background: #000000;
 }
 .modal-lightbox-img {
-    max-height: 70vh;
+    max-height: 65vh;
     width: 100%;
 }
 .modal-lightbox-footer {
-    background: rgba(15, 59, 67, 0.95);
+    background: rgba(15, 59, 67, 0.98);
 }
 
 /* Detalle de Lugares */
@@ -2919,3 +3272,1258 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 .h-min-140 {
     min-height: 140px !important;
 }
+
+/* ==========================================================================
+   Estilos Especiales: 18 de Noviembre y Servicios Esenciales
+   ========================================================================== */
+.nav-link-festivo {
+    background: linear-gradient(135deg, #059669, #0d9488) !important;
+    border: 1px solid rgba(52, 211, 153, 0.7) !important;
+    border-radius: 999px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35) !important;
+    transition: all 0.3s ease !important;
+}
+.nav-link-festivo:hover {
+    background: linear-gradient(135deg, #047857, #0f766e) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.5) !important;
+}
+
+.seccion-festividades-18nov {
+    background: linear-gradient(180deg, #09252a 0%, #0d3840 50%, #09252a 100%);
+    border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+}
+
+/* ==========================================================================
+   ESTILO DE TARJETAS DE EVENTOS - REFERENCIA TURISMO SUIZO
+   ========================================================================== */
+.card-evento-swiss {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-evento-swiss:hover {
+    transform: translateY(-4px);
+}
+
+.evento-swiss-media {
+    aspect-ratio: 16 / 10;
+    width: 100%;
+    background-color: #0b1a1d;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.evento-swiss-img {
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-evento-swiss:hover .evento-swiss-img {
+    transform: scale(1.05);
+}
+
+.evento-swiss-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%);
+    pointer-events: none;
+}
+
+/* Date Badge Flotante (Caja Cuadrada Translúcida sobre la Foto) */
+.evento-date-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    min-width: 62px;
+    padding: 6px 10px;
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    z-index: 2;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.card-evento-swiss:hover .evento-date-badge {
+    transform: scale(1.08);
+    background: rgba(13, 148, 136, 0.9);
+    border-color: rgba(45, 212, 191, 0.4);
+}
+
+.evento-date-prefix {
+    font-size: 0.65rem;
+    text-transform: lowercase;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.evento-date-day {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.evento-date-month {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: lowercase;
+    color: #2dd4bf;
+    margin-top: 2px;
+}
+
+.card-evento-swiss:hover .evento-date-month {
+    color: #facc15;
+}
+
+/* Tipografía de la Tarjeta */
+.evento-swiss-title {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    transition: color 0.2s ease;
+}
+
+.card-evento-swiss:hover .evento-swiss-title {
+    color: #2dd4bf !important;
+}
+
+.btn-ver-todos-eventos {
+    color: #f43f5e;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+.btn-ver-todos-eventos:hover {
+    color: #fb7185;
+    transform: translateX(4px);
+}
+
+/* Barra Flotante Moderna de Momentos / Horarios Gastronómicos */
+#filtroHorariosGastronomia {
+    background: #ffffff !important;
+    border: 1px solid rgba(13, 148, 136, 0.2) !important;
+    box-shadow: 0 4px 20px rgba(15, 59, 67, 0.08) !important;
+    transition: all 0.3s ease;
+    padding: 0.35rem 0.5rem !important;
+    border-radius: 999px !important;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+
+#filtroHorariosGastronomia::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+.btn-filtro-momento {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 1.1rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    border-radius: 999px !important;
+    border: 1px solid transparent !important;
+    background-color: transparent;
+    color: #475569 !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    #filtroHorariosGastronomia {
+        padding: 0.3rem 0.4rem !important;
+        border-radius: 999px !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .btn-filtro-momento {
+        padding: 0.35rem 0.85rem !important;
+        font-size: 0.78rem !important;
+        gap: 0.35rem;
+    }
+}
+
+.btn-filtro-momento:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f3b43 !important;
+    transform: translateY(-1px);
+}
+
+.btn-filtro-momento.active {
+    background: linear-gradient(135deg, #0f3b43 0%, #0d9488 100%) !important;
+    color: #ffffff !important;
+    border-color: #0d9488 !important;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35) !important;
+    transform: translateY(-1px);
+}
+
+.btn-filtro-momento.active i {
+    color: #2dd4bf !important;
+}
+
+/* Indicador de momento activo */
+.btn-filtro-momento i {
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-filtro-momento:hover i {
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   ESTILOS DE LA SECCIÓN INTERACTIVA: ENTRADA FOLKLÓRICA UNIVERSITARIA
+   ========================================================================== */
+.seccion-entrada-universitaria-mapa {
+    background: radial-gradient(circle at 10% 20%, #0d3840 0%, #06191c 90%);
+    position: relative;
+    border-top: 1px solid rgba(45, 212, 191, 0.2);
+    border-bottom: 1px solid rgba(45, 212, 191, 0.2);
+}
+
+.entrada-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(45, 212, 191, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.punto-vivo-pulse {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    box-shadow: 0 0 0 rgba(34, 197, 94, 0.7);
+    animation: pulsoVivo 1.8s infinite;
+}
+
+@keyframes pulsoVivo {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* Tarjetas de Fraternidades estilizadas */
+.panel-fraternidades-entrada {
+    border-radius: 1.25rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35) !important;
+}
+
+.item-fraternidad-card {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 1rem;
+    background: #ffffff;
+    padding-left: 1.1rem !important;
+}
+
+.item-fraternidad-card:hover {
+    border-color: #0d9488 !important;
+    transform: translateY(-2px) translateX(3px);
+    box-shadow: 0 10px 25px rgba(13, 148, 136, 0.16) !important;
+    background: #fafdfc;
+}
+
+/* Barra de acento lateral según departamento */
+.frat-card-accent-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+}
+.frat-card-accent-bar.accent-beni {
+    background: linear-gradient(180deg, #10b981, #0d9488);
+}
+.frat-card-accent-bar.accent-nacional {
+    background: linear-gradient(180deg, #f59e0b, #ea580c);
+}
+
+/* Burbuja de Orden Numérico */
+.frat-orden-bubble {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #0f3b43, #0d9488);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+.frat-title-text {
+    font-size: 0.95rem;
+    line-height: 1.25;
+}
+
+/* Badge de Hora de Ingreso */
+.frat-hora-badge {
+    background-color: #f0fdfa !important;
+    color: #0f766e !important;
+    border: 1px solid #ccfbf1 !important;
+    border-radius: 999px !important;
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+}
+
+/* Badge Danza Folklórica */
+.frat-danza-pill {
+    background: #fffbeb !important;
+    color: #b45309 !important;
+    border: 1px solid #fef3c7 !important;
+    border-radius: 999px !important;
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2px;
+}
+
+/* Badge Departamento */
+.frat-depto-pill {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 999px !important;
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+}
+
+#listaContenedorFraternidades::-webkit-scrollbar {
+    width: 6px;
+}
+#listaContenedorFraternidades::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+#listaContenedorFraternidades::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+#listaContenedorFraternidades::-webkit-scrollbar-thumb:hover {
+    background: #0d9488;
+}
+
+/* Marcadores personalizados para el mapa de la Entrada */
+.marcador-entrada-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    border: 2.5px solid #ffffff;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.marcador-entrada-custom:hover {
+    transform: scale(1.15);
+}
+
+.marcador-entrada-salida {
+    background: linear-gradient(135deg, #10b981, #047857);
+}
+
+.marcador-entrada-hito {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+}
+
+.marcador-entrada-meta {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.marcador-pulso-anillo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    animation: marcadorOnda 2s infinite ease-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.marcador-entrada-salida .marcador-pulso-anillo {
+    border: 2px solid #10b981;
+}
+
+.marcador-entrada-meta .marcador-pulso-anillo {
+    border: 2px solid #ef4444;
+}
+
+@keyframes marcadorOnda {
+    0% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* Leyenda flotante sobre el mapa */
+.leyenda-mapa-entrada {
+    background: rgba(9, 37, 42, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(45, 212, 191, 0.3) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Indicador de zoom/ampliar en la tarjeta de evento */
+.evento-zoom-hint {
+    width: 32px;
+    height: 32px;
+    opacity: 0.85;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 2;
+}
+
+.card-evento-swiss:hover .evento-zoom-hint {
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: #0d9488 !important;
+    border-color: #2dd4bf;
+}
+
+/* Modal Lightbox Visor de Afiches */
+.modal-content-visor-afiche {
+    background: #09252a !important;
+    border: 1px solid rgba(45, 212, 191, 0.25) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+.modal-content-visor-afiche .modal-header {
+    background: linear-gradient(135deg, #09252a 0%, #0d3840 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.visor-afiche-img-wrap {
+    min-height: 250px;
+    background: radial-gradient(circle, rgba(15, 59, 67, 0.4) 0%, rgba(0, 0, 0, 0.85) 100%);
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+}
+
+.visor-afiche-img {
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visor-afiche-img:hover {
+    transform: scale(1.015);
+}
+
+/* ==========================================================================
+   CUADRÍCULA HOVER DE 4 FOTOS EN TARJETAS DEL CATÁLOGO (ESTILO EXPERIENCIAS)
+   ========================================================================== */
+.place-card-hover-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 3px !important;
+    padding: 3px !important;
+    background: #09252a;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: inherit;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: scale(0.985);
+    z-index: 3 !important;
+}
+
+.place-card-hover-tile {
+    border-radius: 6px;
+    background-color: #051c20;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.place-card-hover-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.4s ease;
+}
+
+/* Al pasar el cursor sobre la tarjeta del catálogo */
+.item-lugar:hover .place-card-hover-grid,
+.place-card:hover .place-card-hover-grid,
+.place-card-editorial:hover .place-card-hover-grid,
+.place-card-media-wrapper:hover .place-card-hover-grid {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+.place-card-hover-tile:hover .place-card-hover-img {
+    transform: scale(1.08);
+}
+
+/* Eliminar espacio sobrante en la parte inferior de las tarjetas del catálogo */
+.place-card-editorial {
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: transparent !important;
+}
+
+.place-card-panel-editorial {
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+/* ==========================================================================
+   OPTIMIZACIONES EXCLUSIVAS PARA MODO CELULAR / PANTALLAS TÁCTILES
+   ========================================================================== */
+@media (max-width: 767.98px) {
+    /* Altura balanceada de la imagen para teléfonos */
+    .place-card-media-wrapper {
+        height: 220px !important;
+    }
+
+    /* Panel curvado adaptado a pantallas pequeñas */
+    .place-card-panel-editorial {
+        padding: 0.85rem 1rem 1rem 1rem !important;
+        border-top-right-radius: 28px !important;
+        margin-top: -24px !important;
+    }
+
+    /* Título más compacto y legible en celular */
+    .place-card-title-link h5 {
+        font-size: 1.05rem !important;
+        line-height: 1.25 !important;
+    }
+
+    /* Fila inferior de acciones: evitar desbordamientos y organizar ordenadamente */
+    .place-card-hover-actions {
+        padding-top: 0.65rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .place-card-hover-actions > div:first-child {
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 0.4rem !important;
+    }
+
+    /* Botón circular favorito en móvil */
+    .place-btn-icon {
+        width: 36px !important;
+        height: 36px !important;
+        flex-shrink: 0;
+    }
+
+    /* Botón de flecha circular en móvil */
+    .btn-place-arrow-circle {
+        width: 38px !important;
+        height: 38px !important;
+        flex-shrink: 0;
+    }
+    .btn-place-arrow-circle i {
+        font-size: 1.15rem !important;
+    }
+
+    /* Texto de horario en móvil */
+    .place-card-horario-subtext {
+        font-size: 0.7rem !important;
+        max-width: 130px !important;
+    }
+
+    /* Permitir ver la cuadrícula de 4 fotos en celular al tocar / mantener presionado */
+    .place-card:active .place-card-hover-grid,
+    .place-card-editorial:active .place-card-hover-grid,
+    .place-card-media-wrapper:active .place-card-hover-grid,
+    .place-card.touch-active .place-card-hover-grid {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* Desactivar tooltips CSS flotantes en celular para que no bloqueen los botones de categorías */
+    .chip-filter-icon[data-tooltip]::before,
+    .chip-filter-icon[data-tooltip]::after {
+        display: none !important;
+    }
+
+    /* Barra horizontal de categorías deslizable suave en móvil si hay poco espacio */
+    .category-filter-container {
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+        gap: 0.45rem !important;
+    }
+
+    .chip-filter-icon {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1.1rem !important;
+        border-width: 1.5px !important;
+    }
+
+    /* Cabecera de detalle de lugar en celular */
+    .lugar-header-flotante {
+        margin-top: -30px !important;
+        padding: 1.25rem !important;
+        border-radius: 1.25rem !important;
+    }
+    .lugar-header-titulo {
+        font-size: 1.35rem !important;
+    }
+}
+
+/* ==========================================================================
+   BOTÓN COMPARTIR Y NOTIFICACIÓN TOAST FLOTANTE
+   ========================================================================== */
+.place-btn-share:hover {
+    transform: scale(1.12);
+    background-color: #ccfbf1 !important;
+    border-color: #0d9488 !important;
+}
+
+.place-btn-share:hover i {
+    color: #0f766e !important;
+}
+
+.toast-flotante-notificacion {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(9, 37, 42, 0.95);
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(45, 212, 191, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-flotante-notificacion.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   CARRUSEL DE PROMOCIONES EN DETALLE
+   ========================================================================== */
+.detalle-promo-carousel .detalle-promo-img-box {
+    height: 180px;
+    border-radius: 0.75rem;
+    background-color: #09252a;
+}
+
+.detalle-promo-carousel .detalle-promo-img {
+    height: 100%;
+    object-fit: contain;
+}
+
+.detalle-promo-carousel .promo-det-ctrl {
+    width: 36px;
+    height: 36px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.detalle-promo-carousel .promo-det-ctrl:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.detalle-promo-carousel .promo-det-ctrl.carousel-control-prev {
+    left: 4px;
+}
+
+.detalle-promo-carousel .promo-det-ctrl.carousel-control-next {
+    right: 4px;
+}
+
+.detalle-promo-carousel .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    border: 0;
+    margin: 0 3px;
+    transition: all 0.25s ease;
+}
+
+.detalle-promo-carousel .carousel-indicators button.active {
+    width: 22px;
+    border-radius: 99px;
+    background-color: #0d9488;
+}
+
+/* ==========================================================================
+   MODAL CRONOGRAMA UAB - PALETA OFICIAL BENITOURS Y DISEÑO MÓVIL
+   ========================================================================== */
+.modal-uab-benitours .modal-content {
+    background-color: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(15, 59, 67, 0.35);
+}
+
+.modal-uab-benitours .uab-header-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+}
+
+.modal-uab-benitours .uab-modal-title {
+    font-size: 1.05rem;
+    line-height: 1.25;
+}
+
+.modal-uab-benitours .uab-modal-sub {
+    font-size: 0.75rem;
+}
+
+.modal-uab-benitours .uab-badge-mes {
+    background-color: rgba(9, 37, 42, 0.75) !important;
+    color: #e6fffa !important;
+    border: 1px solid rgba(45, 212, 191, 0.45) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Selector de pestañas con desplazamiento horizontal fluido en móviles */
+.modal-uab-benitours .uab-tabs-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+}
+.modal-uab-benitours .uab-tabs-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-uab-benitours .nav-pills {
+    margin-bottom: 0 !important;
+    padding-bottom: 2px;
+}
+
+.modal-uab-benitours .nav-pills .nav-link {
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    line-height: 1.4 !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.modal-uab-benitours .nav-pills .nav-link.active {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+    border-color: #0d9488 !important;
+    box-shadow: 0 3px 10px rgba(13, 148, 136, 0.3) !important;
+}
+
+/* Chips con desplazamiento horizontal táctil */
+.modal-uab-benitours .uab-chips-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+}
+.modal-uab-benitours .uab-chips-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-uab-benitours .uab-chips-filter {
+    flex-wrap: nowrap !important;
+}
+
+.modal-uab-benitours .btn-chip-uab {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.modal-uab-benitours .btn-chip-uab:hover {
+    background-color: #e6fffa;
+    color: #0f3b43;
+    border-color: #0d9488;
+}
+
+.modal-uab-benitours .btn-chip-uab.active {
+    background-color: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+    box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+}
+
+/* Tarjetas de actividades del cronograma */
+.modal-uab-benitours .item-agenda-uab {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    border: 1px solid #edf2f7 !important;
+}
+
+.modal-uab-benitours .item-agenda-uab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(15, 59, 67, 0.08) !important;
+    border-color: #0d9488 !important;
+}
+
+.modal-uab-benitours .uab-date-box {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+/* Adaptación responsive para pantallas pequeñas (móviles) */
+@media (max-width: 575.98px) {
+    .modal-uab-benitours .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-uab-benitours .uab-header-avatar {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .modal-uab-benitours .btn-close {
+        padding: 0.5rem;
+        margin-top: 0 !important;
+        opacity: 0.85;
+    }
+
+    .modal-uab-benitours .uab-modal-title {
+        font-size: 0.95rem;
+    }
+
+    .modal-uab-benitours .uab-modal-sub {
+        font-size: 0.7rem;
+    }
+
+    .modal-uab-benitours .uab-date-box {
+        padding: 0.4rem 0.75rem !important;
+    }
+
+    .modal-uab-benitours .uab-item-title {
+        font-size: 0.9rem !important;
+    }
+
+    .modal-uab-benitours .nav-pills .nav-link {
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.85rem !important;
+        line-height: 1.35 !important;
+    }
+}
+
+/* ==========================================================================
+   SECCIÓN AGENDA Y CALENDARIO MENSUAL NOVIEMBRE 2026
+   ========================================================================== */
+.seccion-agenda-calendario {
+    background-color: #fafbfc;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+}
+
+.agenda-chips-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    width: 100%;
+    white-space: nowrap;
+    padding-bottom: 2px;
+}
+.agenda-chips-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.agenda-filter-chip {
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.agenda-filter-chip:hover {
+    border-color: #0d9488;
+    color: #0f3b43;
+    background-color: #f0fdfa;
+}
+
+.agenda-filter-chip.active {
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.35);
+}
+
+.agenda-filter-chip.chip-folklore.active {
+    background-color: #16a34a !important;
+    border-color: #16a34a !important;
+}
+
+.agenda-filter-chip.chip-fexpobeni.active {
+    background-color: #d97706 !important;
+    border-color: #d97706 !important;
+}
+
+.agenda-filter-chip.chip-remates.active {
+    background-color: #ea580c !important;
+    border-color: #ea580c !important;
+}
+
+.agenda-filter-chip.chip-ferias.active {
+    background-color: #0284c7 !important;
+    border-color: #0284c7 !important;
+}
+
+.agenda-filter-chip.chip-civicos.active {
+    background-color: #e11d48 !important;
+    border-color: #e11d48 !important;
+}
+
+/* Grilla del Calendario */
+.agenda-weekdays-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    font-family: monospace;
+}
+
+.agenda-calendar-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-cell {
+    min-height: 48px;
+    height: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    position: relative;
+}
+
+.calendar-day-cell.day-empty {
+    border-color: transparent !important;
+    background: transparent !important;
+    cursor: default;
+    pointer-events: none;
+}
+
+.calendar-day-cell:hover:not(.day-empty) {
+    border-color: #0d9488;
+    background-color: #f0fdfa;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+}
+
+.calendar-day-cell.day-active {
+    border: 2px solid #0f3b43 !important;
+    background-color: #e6fffa !important;
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3);
+}
+
+.calendar-day-cell .day-num {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #334155;
+    text-align: right;
+    line-height: 1;
+}
+
+.calendar-day-cell.has-events .day-num {
+    color: #0f172a;
+}
+
+.calendar-day-dots {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-wrap: wrap;
+    min-height: 8px;
+    margin-top: 2px;
+}
+
+.calendar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-academico { background-color: #0d9488; }
+.dot-cultura   { background-color: #8b5cf6; }
+.dot-ferias    { background-color: #0284c7; }
+.dot-festivales{ background-color: #eab308; }
+.dot-folklore  { background-color: #16a34a; }
+.dot-remates   { background-color: #ea580c; }
+.dot-civicos   { background-color: #e11d48; }
+.dot-fexpobeni { background-color: #f59e0b; }
+
+/* Tarjeta de Detalle del Día Seleccionado */
+.agenda-big-day {
+    font-size: 3rem;
+    line-height: 0.9;
+    letter-spacing: -1px;
+}
+
+.agenda-event-item {
+    border-left: 3px solid #0d9488;
+    background-color: #f8fafc;
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1rem;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.agenda-event-item:hover {
+    background-color: #f1f5f9;
+    transform: translateX(3px);
+}
+
+.agenda-box-wrapper {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.agenda-calendar-container {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+@media (max-width: 575.98px) {
+    .calendar-day-cell {
+        min-height: 36px;
+        padding: 2px 3px;
+        border-radius: 4px;
+    }
+    .calendar-day-cell .day-num {
+        font-size: 0.6875rem;
+    }
+    .calendar-dot {
+        width: 4px;
+        height: 4px;
+    }
+    .agenda-big-day {
+        font-size: 2.25rem;
+    }
+    .agenda-weekdays-row {
+        font-size: 0.6875rem;
+    }
+    .agenda-box-wrapper {
+        padding: 0.875rem !important;
+    }
+}
+
+/* Adaptación móvil para la Sección de Entrada Folklórica Universitaria */
+@media (max-width: 767.98px) {
+    .seccion-entrada-universitaria-mapa {
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+
+    .entrada-titulo-principal {
+        font-size: 1.65rem !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.02em;
+        word-break: break-word;
+    }
+
+    .seccion-entrada-universitaria-mapa .badge.hero-badge-glass {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.3px;
+    }
+
+    #mapaEntradaRecorrido {
+        min-height: 320px !important;
+    }
+
+    .item-fraternidad-card {
+        padding: 0.75rem !important;
+        padding-left: 0.95rem !important;
+    }
+
+    .frat-title-text {
+        font-size: 0.88rem !important;
+    }
+
+    .frat-orden-bubble {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .frat-hora-badge,
+    .frat-danza-pill,
+    .frat-depto-pill {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+}
+
+/* ========================================================
+   MODAL ITINERARIO - TARJETAS Y ACCIONES INFERIORES
+   ======================================================== */
+.modal-itinerario-custom .modal-content {
+    background-color: #f8fafc;
+}
+
+.modal-itinerario-icon-badge {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+}
+
+.modal-itinerario-icon-badge i,
+.modal-itinerario-icon-badge svg {
+    color: #ffffff !important;
+    font-size: 1.15rem !important;
+    line-height: 1;
+}
+
+.itinerario-item-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.itinerario-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
+    border-color: #cbd5e1 !important;
+}
+
+.itinerario-num-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 9999px;
+    background: #0f766e;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.itinerario-card-thumb {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    object-fit: cover;
+}
+
+.itinerario-item-title {
+    font-size: 0.95rem;
+    color: #0f172a;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@media (max-width: 575.98px) {
+    .itinerario-card-thumb {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+    }
+    
+    .itinerario-item-title {
+        font-size: 0.9rem;
+    }
+    
+    .itinerario-item-card {
+        padding: 0.85rem !important;
+    }
+}
+
+
+
+

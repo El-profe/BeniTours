@@ -19,7 +19,7 @@ class Lugar {
         $condicionVisibilidad = PublicacionService::getSqlCondicionVisibilidad('l', 'pub');
         
         $sql = "SELECT l.id_lugar, l.id_municipio, l.nombre, l.slug, l.descripcion, l.direccion, 
-                       l.referencia_ubicacion, l.horario_atencion, l.tipo_lugar,
+                       l.referencia_ubicacion, l.horario_atencion, l.turnos_comida, l.tipo_lugar,
                        l.estado_operativo, l.aviso_temporal_motivo, l.aviso_temporal_reapertura,
                        l.whatsapp_contacto, l.telefono_contacto, l.facebook_url, l.instagram_url, l.tiktok_url, l.id_categoria,
                        l.latitud, l.longitud,

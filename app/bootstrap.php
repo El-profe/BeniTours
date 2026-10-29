@@ -54,7 +54,8 @@ require_once __DIR__ . '/Core/Autoloader.php';
 // 6. Cabeceras HTTP de seguridad emitidas de forma defensiva desde PHP
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
-    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    || (isset($_SERVER['HTTP_CF_VISITOR']) && str_contains($_SERVER['HTTP_CF_VISITOR'], 'https'));
 
 if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
@@ -63,15 +64,18 @@ if (!headers_sent()) {
     header('Permissions-Policy: camera=(), microphone=(), geolocation=(self)');
     header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
 
-    $csp = "default-src 'self'; "
+    $csp = "default-src 'self' data:; "
         . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net; "
         . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; "
         . "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        . "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com https://*.google.com https://*.googleapis.com https://*.gstatic.com; "
-        . "connect-src 'self' https://*.tile.openstreetmap.org https://unpkg.com https://api.telegram.org; "
+        . "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://api.qrserver.com; "
+        . "media-src 'self' data: blob:; "
+        . "connect-src 'self' https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://api.telegram.org; "
+        . "frame-src 'self' https://www.openstreetmap.org https://*.openstreetmap.org https://drive.google.com https://*.google.com; "
         . "frame-ancestors 'self'; "
         . "object-src 'none'; "
-        . "base-uri 'self';";
+        . "base-uri 'self'; "
+        . ($isHttps ? "upgrade-insecure-requests;" : "");
 
     header("Content-Security-Policy: {$csp}");
 

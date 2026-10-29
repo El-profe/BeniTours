@@ -44,13 +44,28 @@ class Router {
         // Manejo de [ClaseControlador, método]
         if (is_array($handler) && count($handler) === 2) {
             [$class, $action] = $handler;
-            if (class_exists($class)) {
-                $controllerInstance = new $class();
-                if (method_exists($controllerInstance, $action)) {
-                    $controllerInstance->$action();
-                    return;
-                }
+            if (!class_exists($class)) {
+                http_response_code(500);
+                error_log("Router Error: La clase de controlador '{$class}' no existe.");
+                die("Error de configuración de ruta: La clase '{$class}' no existe.");
             }
+
+            try {
+                $controllerInstance = new $class();
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                error_log("Router Error: Fallo al instanciar '{$class}': " . $e->getMessage());
+                die("Error al inicializar controlador ({$class}): " . htmlspecialchars($e->getMessage()));
+            }
+
+            if (!method_exists($controllerInstance, $action)) {
+                http_response_code(500);
+                error_log("Router Error: El método '{$action}' no existe en '{$class}'.");
+                die("Error de configuración de ruta: El método '{$action}' no existe en '{$class}'.");
+            }
+
+            $controllerInstance->$action();
+            return;
         }
 
         http_response_code(500);

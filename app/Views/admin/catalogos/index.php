@@ -139,6 +139,18 @@
                         <span>Planes y Tarifas</span>
                         <span class="tab-counter"><?= count($planes) ?></span>
                     </button>
+                    <button class="nav-link <?= $tabActivo === 'portada-video' ? 'active' : '' ?>" 
+                            id="tab-portada-video-btn" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#tab-portada-video" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="tab-portada-video" 
+                            aria-selected="<?= $tabActivo === 'portada-video' ? 'true' : 'false' ?>">
+                        <i class="bi bi-camera-reels-fill text-warning"></i>
+                        <span>Portada & Video</span>
+                        <span class="badge bg-warning text-dark extra-small rounded-pill ms-1 px-2 py-0 fw-bold">Hero</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -458,6 +470,125 @@
                         <?php else: ?>
                             <div class="col-12 text-center py-4 text-muted">No hay planes comerciales registrados.</div>
                         <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- ======================================================= -->
+                <!-- PESTAÑA 4: PORTADA & VIDEO DEL HERO                     -->
+                <!-- ======================================================= -->
+                <div class="tab-pane fade <?= $tabActivo === 'portada-video' ? 'show active' : '' ?>" id="tab-portada-video" role="tabpanel" aria-labelledby="tab-portada-video-btn">
+                    <div class="row g-4">
+                        
+                        <!-- Columna 1: Actualizar Video de Fondo (video.mp4) -->
+                        <div class="col-lg-7">
+                            <div class="card border rounded-4 p-4 shadow-2xs h-100 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center p-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-play-circle-fill fs-5 text-dark"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold text-dark mb-0">Video de Fondo del Inicio</h5>
+                                            <small class="text-muted">Archivo principal reproducido en bucle cinematográfico</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-light text-dark border rounded-pill px-3 py-1 extra-small fw-semibold">
+                                        <i class="bi bi-filetype-mp4 me-1 text-danger"></i> MP4
+                                    </span>
+                                </div>
+
+                                <!-- Vista Previa del Video Actual -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-dark small mb-2 d-flex align-items-center justify-content-between">
+                                        <span>Vista Previa Actual</span>
+                                        <span class="badge bg-teal-subtle text-teal rounded-pill extra-small">
+                                            <?= $infoVideo['tamano_mb'] ?> MB &bull; <?= $infoVideo['modificado'] ?>
+                                        </span>
+                                    </label>
+                                    <div class="rounded-4 overflow-hidden border shadow-sm bg-dark position-relative" style="max-height: 280px;">
+                                        <video class="w-100 d-block" controls muted playsinline poster="<?= htmlspecialchars($infoPoster['url']) ?>?v=<?= time() ?>" style="max-height: 280px; object-fit: cover;">
+                                            <source src="<?= htmlspecialchars($infoVideo['url']) ?>?v=<?= time() ?>" type="video/mp4">
+                                            Tu navegador no soporta reproducción de video HTML5.
+                                        </video>
+                                    </div>
+                                </div>
+
+                                <!-- Formulario de Reemplazo de Video -->
+                                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos/video/guardar" method="POST" enctype="multipart/form-data" class="mt-auto">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                                    
+                                    <div class="p-3 bg-light rounded-4 border mb-3">
+                                        <label for="video_archivo" class="form-label fw-bold small text-dark mb-1">
+                                            <i class="bi bi-cloud-arrow-up-fill text-teal me-1"></i> Seleccionar Nuevo Video (MP4)
+                                        </label>
+                                        <input type="file" class="form-control rounded-3" id="video_archivo" name="video_archivo" accept="video/mp4,video/*" required>
+                                        <div class="form-text extra-small mt-2 text-muted">
+                                            <i class="bi bi-info-circle me-1 text-teal"></i>
+                                            <strong>Recomendación técnica:</strong> Resolución Full HD (1920x1080) o 720p, optimizado en formato MP4 (H.264), sin audio o con audio comprimido, tamaño máximo permitido: <strong>50 MB</strong>.
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm w-100 d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-check2-circle fs-5"></i>
+                                        <span>Guardar y Reemplazar Video</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Imagen de Poster Previo (hero-poster.webp) -->
+                        <div class="col-lg-5">
+                            <div class="card border rounded-4 p-4 shadow-2xs h-100 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-teal-subtle text-teal d-flex align-items-center justify-content-center p-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-image-fill fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold text-dark mb-0">Póster de Carga</h5>
+                                            <small class="text-muted">Imagen estática mientras carga el video</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-light text-dark border rounded-pill px-3 py-1 extra-small fw-semibold">
+                                        WEBP / JPG
+                                    </span>
+                                </div>
+
+                                <!-- Vista Previa de la Imagen Actual -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-dark small mb-2 d-flex align-items-center justify-content-between">
+                                        <span>Póster Actual</span>
+                                        <span class="badge bg-light text-secondary border rounded-pill extra-small">
+                                            <?= $infoPoster['tamano_kb'] ?> KB
+                                        </span>
+                                    </label>
+                                    <div class="rounded-4 overflow-hidden border shadow-sm bg-dark" style="height: 190px;">
+                                        <img src="<?= htmlspecialchars($infoPoster['url']) ?>?v=<?= time() ?>" alt="Póster hero" class="w-100 h-100 object-fit-cover">
+                                    </div>
+                                </div>
+
+                                <!-- Formulario de Reemplazo de Póster -->
+                                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos/poster/guardar" method="POST" enctype="multipart/form-data" class="mt-auto">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+
+                                    <div class="p-3 bg-light rounded-4 border mb-3">
+                                        <label for="poster_archivo" class="form-label fw-bold small text-dark mb-1">
+                                            <i class="bi bi-card-image text-teal me-1"></i> Seleccionar Nueva Imagen
+                                        </label>
+                                        <input type="file" class="form-control rounded-3" id="poster_archivo" name="poster_archivo" accept="image/webp,image/jpeg,image/png" required>
+                                        <div class="form-text extra-small mt-2 text-muted">
+                                            Se convertirá automáticamente al formato WebP optimizado para máxima velocidad de carga.
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-outline-teal rounded-pill px-4 py-2 fw-semibold w-100 d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-arrow-repeat fs-5"></i>
+                                        <span>Actualizar Imagen Póster</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

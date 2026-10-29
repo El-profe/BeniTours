@@ -9,26 +9,35 @@ document.addEventListener('DOMContentLoaded', () => {
         enlace.classList.add('active');
     }
 
+    function filtrarPorCategoriaSlug(slug, linkEl) {
+        if (!slug) return false;
+        const chip = document.querySelector(`#explorar button[data-slug="${slug}"]`) ||
+                     Array.from(document.querySelectorAll('#explorar button[data-categoria]')).find(c => {
+                         const title = (c.getAttribute('data-tooltip') || c.getAttribute('title') || '').toLowerCase();
+                         const slugClean = slug.replace(/-/g, ' ');
+                         return title.includes(slugClean) || slugClean.includes(title);
+                     });
+        if (chip) {
+            chip.click();
+            document.getElementById('explorar')?.scrollIntoView({ behavior: 'smooth' });
+            if (linkEl) activarEnlace(linkEl);
+            if (menu?.classList.contains('show') && window.bootstrap?.Collapse) {
+                window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+            }
+            return true;
+        }
+        return false;
+    }
+
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             const catSlug = link.getAttribute('data-categoria-slug');
             const destHash = link.getAttribute('href')?.split('#')[1];
 
-            // Si es Hoteles en la misma página de catálogo, activar filtro dinámico
+            // Si tiene data-categoria-slug en la misma página de catálogo, activar filtro dinámico
             if (catSlug && (location.pathname.endsWith('/') || location.pathname.endsWith('/catalogo') || location.pathname.includes('index.php'))) {
-                const chipHotel = document.querySelector(`#explorar button[data-categoria="2"]`) ||
-                                  Array.from(document.querySelectorAll('#explorar button[data-categoria]')).find(c => {
-                                      const title = (c.getAttribute('title') || '').toLowerCase();
-                                      return title.includes('hotel') || title.includes('alojam');
-                                  });
-                if (chipHotel) {
+                if (filtrarPorCategoriaSlug(catSlug, link)) {
                     e.preventDefault();
-                    chipHotel.click();
-                    document.getElementById('explorar')?.scrollIntoView({ behavior: 'smooth' });
-                    activarEnlace(link);
-                    if (menu?.classList.contains('show') && window.bootstrap?.Collapse) {
-                        window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
-                    }
                     return;
                 }
             }
@@ -48,15 +57,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Cierre suave de menú en móvil y filtrado de categoría al hacer clic en elementos dentro de los dropdowns (#navbarMain .dropdown-item)
+    document.querySelectorAll('#navbarMain .dropdown-item').forEach(dropItem => {
+        dropItem.addEventListener('click', (e) => {
+            const catSlug = dropItem.getAttribute('data-categoria-slug');
+            const destHash = dropItem.getAttribute('href')?.split('#')[1];
+
+            if (catSlug && (location.pathname.endsWith('/') || location.pathname.endsWith('/catalogo') || location.pathname.includes('index.php'))) {
+                if (filtrarPorCategoriaSlug(catSlug)) {
+                    e.preventDefault();
+                    const parentNavLink = dropItem.closest('.dropdown')?.querySelector('.nav-link');
+                    if (parentNavLink) activarEnlace(parentNavLink);
+                    return;
+                }
+            }
+
+            if (destHash && document.getElementById(destHash)) {
+                if (menu?.classList.contains('show') && window.bootstrap?.Collapse) {
+                    e.preventDefault();
+                    menu.addEventListener('hidden.bs.collapse', () => {
+                        document.getElementById(destHash)?.scrollIntoView({ behavior: 'smooth' });
+                    }, { once: true });
+                    window.bootstrap.Collapse.getOrCreateInstance(menu).hide();
+                }
+            }
+        });
+    });
+
     // ScrollSpy interactivo para actualizar el enlace activo al desplazarse
     const seccionesObservadas = [
         { id: 'inicio', linkAttr: 'inicio' },
         { id: 'explorar', linkAttr: 'explorar' },
+        { id: 'eventos-18-noviembre', linkAttr: 'eventos-18-noviembre' },
+        { id: 'agenda-festividades', linkAttr: 'eventos' },
         { id: 'promociones', linkAttr: 'promociones' },
         { id: 'guia-trinidad', linkAttr: 'guia-trinidad' },
         { id: 'transporte', linkAttr: 'transporte' },
-        { id: 'galeria', linkAttr: 'galeria' }
+        { id: 'galeria', linkAttr: 'eventos' }
     ];
+
+    // Control del Navbar: Transparente en el Hero ➔ Sólido al hacer scroll
+    const navbarPrincipal = document.getElementById('navbarPrincipal') || document.querySelector('.navbar-trinidad');
+    const UMBRAL_SCROLL_NAVBAR = 70;
+
+    function actualizarEstiloNavbarScroll() {
+        if (!navbarPrincipal) return;
+        const currentScroll = window.scrollY || document.documentElement.scrollTop;
+        if (currentScroll > UMBRAL_SCROLL_NAVBAR) {
+            navbarPrincipal.classList.remove('navbar-transparente');
+            navbarPrincipal.classList.add('navbar-scrolled');
+        } else {
+            navbarPrincipal.classList.add('navbar-transparente');
+            navbarPrincipal.classList.remove('navbar-scrolled');
+        }
+    }
+
+    // Inicializar estado del navbar
+    actualizarEstiloNavbarScroll();
+
+    // Eventos del menú desplegable en móvil para asegurar fondo legible cuando está arriba
+    if (menu) {
+        menu.addEventListener('show.bs.collapse', () => {
+            navbarPrincipal?.classList.add('menu-abierto');
+        });
+        menu.addEventListener('hidden.bs.collapse', () => {
+            navbarPrincipal?.classList.remove('menu-abierto');
+        });
+    }
 
     let tickingScroll = false;
     window.addEventListener('scroll', () => {
@@ -64,7 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tickingScroll = true;
         requestAnimationFrame(() => {
             tickingScroll = false;
-            const scrollPos = window.scrollY + 220;
+
+            // 1. Actualizar apariencia transparente / sólida del navbar
+            actualizarEstiloNavbarScroll();
+
+            // 2. ScrollSpy interactivo para actualizar el enlace activo
+            const scrollPos = (window.scrollY || document.documentElement.scrollTop) + 220;
             let seccionActual = 'inicio';
 
             for (const sec of seccionesObservadas) {
@@ -80,6 +152,73 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }, { passive: true });
+
+    // Manejador global para compartir lugar y ubicación (Tanto en Catálogo como en Ficha de Detalle)
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-btn-compartir]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const nombre = btn.dataset.nombre || 'Lugar en BeniTours';
+        const direccion = btn.dataset.direccion || '';
+        const coords = btn.dataset.coordenadas || '';
+        const urlFicha = btn.dataset.url || window.location.href;
+        
+        let textoCompartir = `📍 ¡Mira este lugar en BeniTours!:\n*${nombre}*`;
+        if (direccion) {
+            textoCompartir += `\n📌 Dirección: ${direccion}`;
+        }
+        if (coords) {
+            textoCompartir += `\n🗺️ Ubicación en Mapa: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coords)}`;
+        }
+        textoCompartir += `\n🔗 Ver ficha completa: ${urlFicha}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: nombre,
+                    text: textoCompartir,
+                    url: urlFicha
+                });
+                return;
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.log('Error o cancelación en share:', err);
+                }
+            }
+        }
+
+        // Fallback para computadoras de escritorio o navegadores sin navigator.share
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(`${nombre} - ${urlFicha}`);
+                mostrarToastNotificacion('¡Enlace copiado al portapapeles!');
+                return;
+            } catch (err) {
+                console.warn('Clipboard writeText falló:', err);
+            }
+        }
+
+        // Fallback final: Abrir ventana de WhatsApp Web
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoCompartir)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+    });
+
+    function mostrarToastNotificacion(mensaje) {
+        let toastEl = document.getElementById('toastNotificacionGlobal');
+        if (!toastEl) {
+            toastEl = document.createElement('div');
+            toastEl.id = 'toastNotificacionGlobal';
+            toastEl.className = 'toast-flotante-notificacion';
+            document.body.appendChild(toastEl);
+        }
+        toastEl.innerHTML = `<i class="bi bi-check-circle-fill text-success me-2"></i> ${escapeHtml(mensaje)}`;
+        toastEl.classList.add('visible');
+        setTimeout(() => {
+            toastEl.classList.remove('visible');
+        }, 2800);
+    }
 
     // 2. Elementos del DOM del catálogo
     const inputBuscar = document.getElementById('inputBuscarHero');
@@ -168,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnVerMas?.addEventListener('click', () => {
         catalogoExpandido = !catalogoExpandido;
         actualizarVisibilidadPorFilas();
+        if (typeof AOS !== 'undefined') {
+            setTimeout(() => AOS.refreshHard(), 100);
+        }
         if (!catalogoExpandido) {
             contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -535,6 +677,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // 8. Comercio / Tiendas (Rosa Coral)
         if (cat.includes('artesan') || cat.includes('comercio') || cat.includes('tienda') || ico.includes('shop') || ico.includes('bag')) {
             return 'pin-shop';
+        }
+        // 9. Hospitales y Salud (Rojo Emergencias)
+        if (cat.includes('salud') || cat.includes('hospital') || cat.includes('medic') || ico.includes('hospital') || ico.includes('heart-pulse')) {
+            return 'pin-health';
+        }
+        // 10. Policía y Seguridad (Azul Cobalto)
+        if (cat.includes('polic') || cat.includes('seguridad') || ico.includes('shield')) {
+            return 'pin-police';
+        }
+        // 11. Bancos y Cajeros Automáticos (Verde Dinero)
+        if (cat.includes('banco') || cat.includes('cajero') || cat.includes('atm') || ico.includes('money') || ico.includes('cash')) {
+            return 'pin-atm';
         }
         return 'pin-default';
     }
@@ -1005,6 +1159,23 @@ document.addEventListener('DOMContentLoaded', () => {
             chips.forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             categoriaSeleccionada = chip.getAttribute('data-categoria') || '';
+
+            // Sincronizar barra de horarios: resetear a "Todos" al cambiar de categoría
+            const contenedorFiltroHorarios = document.getElementById('filtroHorariosGastronomia');
+            if (contenedorFiltroHorarios) {
+                const botonesMomento = contenedorFiltroHorarios.querySelectorAll('.btn-filtro-momento');
+                botonesMomento.forEach(b => {
+                    const esTodos = (b.getAttribute('data-momento') || '') === 'todos';
+                    b.classList.toggle('active', esTodos);
+                });
+                // Si la categoría seleccionada es distinta de Gastronomía (1) y no es "Todos", ocultar la barra de horarios
+                if (categoriaSeleccionada !== '' && categoriaSeleccionada !== '1') {
+                    contenedorFiltroHorarios.classList.add('d-none');
+                } else {
+                    contenedorFiltroHorarios.classList.remove('d-none');
+                }
+            }
+
             filtrarLugares();
         });
     });
@@ -1089,15 +1260,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     `;
                 }
-                if (lug.facebook_url) {
-                    redesSocialesHtml += `
-                        <a href="${escapeHtml(lug.facebook_url)}" target="_blank" rel="noopener noreferrer" 
-                           class="btn btn-sm text-white rounded-circle p-0 d-flex align-items-center justify-content-center" 
-                           style="width: 28px; height: 28px; background-color: #1877f2;" title="Ver en Facebook" onclick="event.stopPropagation();">
-                            <i class="bi bi-facebook" style="font-size: 0.75rem;"></i>
-                        </a>
-                    `;
-                }
                 if (lug.instagram_url) {
                     redesSocialesHtml += `
                         <a href="${escapeHtml(lug.instagram_url)}" target="_blank" rel="noopener noreferrer" 
@@ -1110,12 +1272,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 redesSocialesHtml += `</div>`;
             }
 
+            let hoverGridHtml = '';
+            let listaFotos = Array.isArray(lug.fotos_galeria) && lug.fotos_galeria.length > 0 ? [...lug.fotos_galeria] : [];
+            if (listaFotos.length === 0 && lug.imagen) {
+                listaFotos.push(lug.imagen);
+            }
+            if (listaFotos.length > 0) {
+                let fotosMostrar = listaFotos.slice(0, 4);
+                while (fotosMostrar.length < 4) {
+                    fotosMostrar.push(listaFotos[fotosMostrar.length % listaFotos.length]);
+                }
+                const tilesHtml = fotosMostrar.map((nomFoto, idxF) => `
+                    <div class="place-card-hover-tile overflow-hidden position-relative">
+                        <img src="${baseUrl}/imagen?f=${encodeURIComponent(nomFoto)}"
+                             alt="${escapeHtml(lug.nombre)} foto ${idxF + 1}"
+                             class="w-100 h-100 object-fit-cover place-card-hover-img"
+                             loading="lazy">
+                    </div>
+                `).join('');
+                hoverGridHtml = `<div class="place-card-hover-grid">${tilesHtml}</div>`;
+            }
+
             const mediaHtml = lug.imagen ? `
                 <img src="${baseUrl}/imagen?f=${encodeURIComponent(lug.imagen)}" 
                      alt="${escapeHtml(lug.nombre)}" 
                      class="w-100 h-100 object-fit-cover place-card-img"
                      loading="lazy"
                      decoding="async">
+                ${hoverGridHtml}
             ` : `
                 <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, #09252a 0%, #0d9488 100%); min-height: 280px;">
                     <div class="place-icon-bubble shadow-sm mb-2">
@@ -1125,13 +1309,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            let horarioSubtextHtml = '';
+            if (lug.horario_atencion) {
+                let horarioTextoCorto = lug.horario_atencion;
+                if (horarioTextoCorto.length > 38) {
+                    horarioTextoCorto = horarioTextoCorto.substring(0, 36) + '...';
+                }
+                horarioSubtextHtml = `
+                    <span class="place-card-horario-subtext extra-small text-muted d-flex align-items-center" title="${escapeHtml(lug.horario_atencion)}">
+                        <i class="bi bi-calendar-week text-teal me-1 font-2xs"></i>
+                        <span class="text-truncate max-w-180">${escapeHtml(horarioTextoCorto)}</span>
+                    </span>
+                `;
+            }
+
+            const badgeHorarioFinalHtml = estadoHorarioHtml || `
+                <span class="badge bg-light text-secondary border rounded-pill extra-small" title="Información disponible">
+                    <i class="bi bi-info-circle text-teal"></i> Info
+                </span>
+            `;
+
+            const turnosVal = escapeHtml(lug.turnos_comida || '');
+            const horarioTextoVal = escapeHtml((lug.horario_atencion || '').toLowerCase());
             const cardHtml = `
                 <div class="col-md-6 col-lg-4 item-lugar tarjeta-lugar-col"
                      data-id="${escapeHtml(lug.id_lugar)}"
                      data-nombre="${escapeHtml((lug.nombre || '').toLowerCase())}"
                      data-categoria="${escapeHtml(lug.id_categoria)}"
                      data-municipio="${escapeHtml(lug.id_municipio || 1)}"
-                     data-coordenadas="${escapeHtml(lug.coordenadas_gps || '')}">
+                     data-coordenadas="${escapeHtml(lug.coordenadas_gps || '')}"
+                     data-turnos="${turnosVal}"
+                     data-horario-texto="${horarioTextoVal}">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden position-relative place-card place-card-editorial">
                         <!-- Contenedor de Imagen Inmersiva -->
                         <div class="place-card-media-wrapper position-relative">
@@ -1181,11 +1389,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <i class="bi bi-heart text-danger fs-6"></i>
                                     </button>
 
-                                    ${estadoHorarioHtml || `
-                                        <span class="badge bg-light text-secondary border rounded-pill extra-small" title="Información disponible">
-                                            <i class="bi bi-info-circle text-teal"></i> Info
-                                        </span>
-                                    `}
+                                    <button type="button" 
+                                            class="btn btn-white bg-white rounded-circle shadow-xs place-btn-icon place-btn-share" 
+                                            data-btn-compartir
+                                            data-nombre="${escapeHtml(lug.nombre)}"
+                                            data-direccion="${escapeHtml(lug.direccion || '')}"
+                                            data-coordenadas="${escapeHtml(lug.coordenadas_gps || '')}"
+                                            data-url="${urlFicha}"
+                                            title="Compartir lugar"
+                                            aria-label="Compartir lugar">
+                                        <i class="bi bi-share-fill text-teal fs-6"></i>
+                                    </button>
+
+                                    <!-- Estado de Horario y Horario Detallado debajo -->
+                                    <div class="d-flex flex-column align-items-start gap-1">
+                                        ${badgeHorarioFinalHtml}
+                                        ${horarioSubtextHtml}
+                                    </div>
 
                                     ${redesSocialesHtml}
                                 </div>
@@ -1207,9 +1427,33 @@ document.addEventListener('DOMContentLoaded', () => {
         catalogoExpandido = false;
         actualizarVisibilidadPorFilas();
 
+        if (typeof AOS !== 'undefined') {
+            setTimeout(() => AOS.refreshHard(), 100);
+        }
+
         // Las tarjetas se recrean al filtrar; recuperar de inmediato el estado de cada corazón.
         window.BeniTursItinerario?.actualizar();
     }
+
+    // Soporte táctil en celulares: tocar la foto de la tarjeta muestra las 4 fotos
+    document.addEventListener('touchstart', (e) => {
+        const mediaWrapper = e.target.closest('.place-card-media-wrapper');
+        const card = e.target.closest('.place-card');
+        
+        if (mediaWrapper && card) {
+            // Si tiene cuadrícula de 4 fotos, alternar visualización
+            const hasGrid = card.querySelector('.place-card-hover-grid');
+            if (hasGrid) {
+                const wasActive = card.classList.contains('touch-active');
+                document.querySelectorAll('.place-card.touch-active').forEach(c => c.classList.remove('touch-active'));
+                if (!wasActive) {
+                    card.classList.add('touch-active');
+                }
+            }
+        } else if (!e.target.closest('.place-card')) {
+            document.querySelectorAll('.place-card.touch-active').forEach(c => c.classList.remove('touch-active'));
+        }
+    }, { passive: true });
 
     function escapeHtml(str) {
         return String(str ?? '').replace(/[&<>"']/g, char => ({
@@ -1878,70 +2122,748 @@ window.aplicarFiltroRapidoHero = function(termino) {
 };
 
 /**
- * Interactividad del Mapa Departamental Regional del Beni
+ * Interactividad del Mapa Departamental Regional del Beni (Si existe en página)
  * Efecto Hover Revelador fotográfico y Clic con desplazamiento suave hacia la Galería
  */
 document.addEventListener('DOMContentLoaded', () => {
     const gruposRegiones = Array.from(document.querySelectorAll('.region-beni-grupo'));
-    if (!gruposRegiones.length) return;
-
-    const overlays = Array.from(document.querySelectorAll('.provincia-overlay'));
-    const overlayMap = new Map();
-    overlays.forEach(overlay => {
-        const id = overlay.dataset.overlay;
-        if (id) overlayMap.set(id, overlay);
-    });
-
-    gruposRegiones.forEach(grupo => {
-        const provId = grupo.dataset.provincia;
-        const overlay = overlayMap.get(provId);
-
-        // Al pasar el mouse sobre la provincia, activar su etiqueta y pin en la capa superior
-        grupo.addEventListener('mouseenter', () => {
-            if (overlay) overlay.classList.add('is-hover');
+    if (gruposRegiones.length > 0) {
+        const overlays = Array.from(document.querySelectorAll('.provincia-overlay'));
+        const overlayMap = new Map();
+        overlays.forEach(overlay => {
+            const id = overlay.dataset.overlay;
+            if (id) overlayMap.set(id, overlay);
         });
 
-        grupo.addEventListener('mouseleave', () => {
-            if (overlay) overlay.classList.remove('is-hover');
-        });
+        gruposRegiones.forEach(grupo => {
+            const provId = grupo.dataset.provincia;
+            const overlay = overlayMap.get(provId);
 
-        grupo.addEventListener('focus', () => {
-            if (overlay) overlay.classList.add('is-hover');
-        });
+            // Al pasar el mouse sobre la provincia, activar su etiqueta y pin en la capa superior
+            grupo.addEventListener('mouseenter', () => {
+                if (overlay) overlay.classList.add('is-hover');
+            });
 
-        grupo.addEventListener('blur', () => {
-            if (overlay) overlay.classList.remove('is-hover');
-        });
+            grupo.addEventListener('mouseleave', () => {
+                if (overlay) overlay.classList.remove('is-hover');
+            });
 
-        // Al hacer clic sobre cualquier provincia
-        grupo.addEventListener('click', (e) => {
-            e.preventDefault();
+            grupo.addEventListener('focus', () => {
+                if (overlay) overlay.classList.add('is-hover');
+            });
 
-            // Resaltar brevemente la provincia seleccionada
-            grupo.classList.add('is-active');
-            if (overlay) overlay.classList.add('is-active');
+            grupo.addEventListener('blur', () => {
+                if (overlay) overlay.classList.remove('is-hover');
+            });
 
-            // Desplazar suavemente a la sección Galería de Fotos
-            const seccionGaleria = document.getElementById('galeria');
-            if (seccionGaleria) {
-                seccionGaleria.scrollIntoView({ behavior: 'smooth' });
-            }
-
-            // Remover la clase is-active para que cuando el usuario vuelva a ver el mapa
-            // no quede congelado con la foto revelada ni la etiqueta pegada
-            setTimeout(() => {
-                gruposRegiones.forEach(g => g.classList.remove('is-active'));
-                overlays.forEach(o => o.classList.remove('is-active', 'is-hover'));
-            }, 600);
-        });
-
-        // Soporte de accesibilidad para teclado (Enter o Espacio)
-        grupo.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            // Al hacer clic sobre cualquier provincia
+            grupo.addEventListener('click', (e) => {
                 e.preventDefault();
-                grupo.click();
+
+                // Resaltar brevemente la provincia seleccionada
+                grupo.classList.add('is-active');
+                if (overlay) overlay.classList.add('is-active');
+
+                // Desplazar suavemente a la sección Galería de Fotos
+                const seccionGaleria = document.getElementById('galeria');
+                if (seccionGaleria) {
+                    seccionGaleria.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Remover la clase is-active para que cuando el usuario vuelva a ver el mapa
+                // no quede congelado con la foto revelada ni la etiqueta pegada
+                setTimeout(() => {
+                    gruposRegiones.forEach(g => g.classList.remove('is-active'));
+                    overlays.forEach(o => o.classList.remove('is-active', 'is-hover'));
+                }, 600);
+            });
+
+            // Soporte de accesibilidad para teclado (Enter o Espacio)
+            grupo.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    grupo.click();
+                }
+            });
+        });
+    }
+
+    // =========================================================================
+    // Filtro Específico por Horario para Gastronomía y Locales
+    // =========================================================================
+    const contenedorFiltroHorarios = document.getElementById('filtroHorariosGastronomia');
+    if (contenedorFiltroHorarios) {
+        const botonesMomento = contenedorFiltroHorarios.querySelectorAll('.btn-filtro-momento');
+
+        botonesMomento.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const momento = btn.getAttribute('data-momento') || 'todos';
+
+                // Cambiar estado activo en botones de forma limpia con clase .active
+                botonesMomento.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Consultar las tarjetas actuales en el DOM (tanto estáticas como renderizadas por AJAX)
+                const tarjetasLugares = document.querySelectorAll('.tarjeta-lugar-col');
+                let visibles = 0;
+                tarjetasLugares.forEach(tarjeta => {
+                    const turnosRaw = (tarjeta.getAttribute('data-turnos') || '').trim().toLowerCase();
+                    const turnosAttr = turnosRaw ? turnosRaw.split(',') : [];
+                    let cumple = true;
+
+                    if (momento !== 'todos') {
+                        // REGLA ESTRICTA: Solo entran lugares con turnos de comida explícitos en BD
+                        // Lugares como museos, plazas o lagunas sin restaurante quedan automáticamente fuera
+                        cumple = turnosAttr.includes(momento);
+                    }
+
+                    if (cumple) {
+                        tarjeta.classList.remove('d-none');
+                        visibles++;
+                    } else {
+                        tarjeta.classList.add('d-none');
+                    }
+                });
+
+                // Actualizar badge contador
+                const badgeContador = document.getElementById('contadorResultados');
+                if (badgeContador) {
+                    badgeContador.textContent = `${visibles} lugares disponibles`;
+                }
+            });
+        });
+    }
+
+    // Buscador interactivo en vivo de Fraternidades (en Modal si existe)
+    const inputBuscadorFrat = document.getElementById('buscadorFraternidades');
+    if (inputBuscadorFrat) {
+        inputBuscadorFrat.addEventListener('input', () => {
+            const term = inputBuscadorFrat.value.toLowerCase().trim();
+            const filas = document.querySelectorAll('#tablaFraternidades .fila-fraternidad');
+            filas.forEach(fila => {
+                const texto = fila.textContent.toLowerCase();
+                fila.classList.toggle('d-none', term !== '' && !texto.includes(term));
+            });
+        });
+    }
+
+    // ==========================================================================
+    // MAPA INTERACTIVO Y FILTRADO DE LA ENTRADA UNIVERSITARIA NACIONAL
+    // ==========================================================================
+    const contenedorMapaEntrada = document.getElementById('mapaEntradaRecorrido');
+    if (contenedorMapaEntrada) {
+        // Trazado oficial importado de «untitled (1).geojson».
+        // GeoJSON usa [longitud, latitud] y Leaflet usa [latitud, longitud].
+        const recorridoEntradaGeoJson = {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [
+                        [-64.895427, -14.819019], [-64.902470, -14.818431],
+                        [-64.902663, -14.818502], [-64.902792, -14.818596],
+                        [-64.902961, -14.818640], [-64.903132, -14.818639],
+                        [-64.902670, -14.822785], [-64.902736, -14.824507],
+                        [-64.903539, -14.834448], [-64.904628, -14.834374],
+                        [-64.904716, -14.835471], [-64.903678, -14.835570],
+                        [-64.903657, -14.835349]
+                    ]
+                }
+            }]
+        };
+        const rutaCoords = recorridoEntradaGeoJson.features[0].geometry.coordinates
+            .map(([longitud, latitud]) => [latitud, longitud]);
+        const puntoSalida = rutaCoords[0];
+        const puntoHito = rutaCoords[8];
+        const puntoMeta = rutaCoords[rutaCoords.length - 1];
+
+        // Capas: Calles (OpenStreetMap con subdominios y HTTPS) y Satélite (Esri World Imagery)
+        const capaCalles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap',
+            maxZoom: 19
+        });
+
+        const capaSatelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 19
+        });
+
+        let mapaEntrada = L.map('mapaEntradaRecorrido', {
+            center: [-14.8270, -64.9030],
+            zoom: 15,
+            layers: [capaCalles],
+            zoomControl: true,
+            scrollWheelZoom: false
+        });
+
+        // 1. Trazar Polilínea de alto impacto visual y contraste
+        // Capa 1: Sombra negra suave de fondo para separar del mapa
+        L.polyline(rutaCoords, {
+            color: '#000000',
+            weight: 12,
+            opacity: 0.4,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(mapaEntrada);
+
+        // Capa 2: Borde oscuro institucional (#09252a verde oscuro)
+        L.polyline(rutaCoords, {
+            color: '#09252a',
+            weight: 8,
+            opacity: 0.95,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(mapaEntrada);
+
+        // Capa 3: Línea vibrante Verde Teal / Turquesa amazónico
+        L.polyline(rutaCoords, {
+            color: '#0d9488',
+            weight: 6,
+            opacity: 1,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(mapaEntrada);
+
+        // Capa 4: Línea central de dirección dorada resplandeciente
+        const lineaRuta = L.polyline(rutaCoords, {
+            color: '#facc15',
+            weight: 3,
+            opacity: 1,
+            dashArray: '8, 8',
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(mapaEntrada);
+
+        // 2. Marcadores personalizados para los hitos clave con pulso y sombra
+        function crearIconoHito(claseExtra, iconoBi, animar = false) {
+            const efectoPulso = animar ? '<span class="marcador-pulso-anillo"></span>' : '';
+            return L.divIcon({
+                className: 'custom-leaflet-div-icon',
+                html: `<div class="marcador-entrada-custom ${claseExtra}" style="width: 38px; height: 38px; font-size: 16px;">
+                         ${efectoPulso}
+                         <i class="bi ${iconoBi} position-relative" style="z-index: 2;"></i>
+                       </div>`,
+                iconSize: [38, 38],
+                iconAnchor: [19, 19],
+                popupAnchor: [0, -20]
+            });
+        }
+
+        // Hito 1: Salida / Concentración
+        const markerSalida = L.marker(puntoSalida, {
+            icon: crearIconoHito('marcador-entrada-salida', 'bi-flag-fill', true)
+        }).addTo(mapaEntrada);
+        markerSalida.bindPopup(`
+            <div class="text-center p-2" style="min-width: 190px;">
+                <span class="badge bg-success text-white mb-2 px-3 py-1 rounded-pill fw-bold">PUNTO DE PARTIDA</span>
+                <h6 class="fw-bold mb-1 text-dark fs-6">Av. Cambódromo</h6>
+                <p class="small text-muted mb-0">Concentración de delegaciones y fraternidades junto al Estadio Gran Mamoré (14:00 hrs).</p>
+            </div>
+        `);
+
+        // Hito 2: giro hacia la calle Antonio Vaca Díez
+        const markerHito = L.marker(puntoHito, {
+            icon: crearIconoHito('marcador-entrada-hito', 'bi-geo-alt-fill', false)
+        }).addTo(mapaEntrada);
+        markerHito.bindPopup(`
+            <div class="text-center p-2" style="min-width: 190px;">
+                <span class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill fw-bold">HITO PRINCIPAL</span>
+                <h6 class="fw-bold mb-1 text-dark fs-6">Calle Antonio Vaca Díez</h6>
+                <p class="small text-muted mb-0">Giro oficial hacia el borde norte de la Plaza Principal.</p>
+            </div>
+        `);
+
+        // Hito 3: llegada en la Plaza Principal
+        const markerMeta = L.marker(puntoMeta, {
+            icon: crearIconoHito('marcador-entrada-meta', 'bi-trophy-fill', true)
+        }).addTo(mapaEntrada);
+        markerMeta.bindPopup(`
+            <div class="text-center p-2" style="min-width: 190px;">
+                <span class="badge bg-danger text-white mb-2 px-3 py-1 rounded-pill fw-bold">LLEGADA Y PALCO</span>
+                <h6 class="fw-bold mb-1 text-dark fs-6">Plaza Principal</h6>
+                <p class="small text-muted mb-0">Llegada frente a la Plaza Principal Mariscal Ballivián y la Catedral.</p>
+            </div>
+        `);
+
+        // Reenfocar la vista del circuito
+        const btnCentrar = document.getElementById('btnCentrarRecorrido');
+        function centrarCircuito() {
+            mapaEntrada.fitBounds(lineaRuta.getBounds(), { padding: [50, 50] });
+        }
+        btnCentrar?.addEventListener('click', centrarCircuito);
+
+        // Ajustar tamaño al cargar la vista
+        setTimeout(() => {
+            mapaEntrada.invalidateSize();
+            centrarCircuito();
+        }, 400);
+
+        // Alternar Capas (Calles / Satélite)
+        let capaActual = 'calles';
+        const btnCambiarCapa = document.getElementById('btnCambiarCapaEntrada');
+        const txtCapa = document.getElementById('textoCapaEntrada');
+        btnCambiarCapa?.addEventListener('click', () => {
+            if (capaActual === 'calles') {
+                mapaEntrada.removeLayer(capaCalles);
+                mapaEntrada.addLayer(capaSatelite);
+                capaActual = 'satelite';
+                if (txtCapa) txtCapa.textContent = 'Calles';
+                btnCambiarCapa.classList.replace('btn-outline-warning', 'btn-warning');
+            } else {
+                mapaEntrada.removeLayer(capaSatelite);
+                mapaEntrada.addLayer(capaCalles);
+                capaActual = 'calles';
+                if (txtCapa) txtCapa.textContent = 'Satélite';
+                btnCambiarCapa.classList.replace('btn-warning', 'btn-outline-warning');
             }
         });
-    });
+
+        // Buscador en vivo de Fraternidades en la columna derecha
+        const buscadorSeccion = document.getElementById('buscadorFraternidadesSeccion');
+        const itemsFrat = document.querySelectorAll('.item-fraternidad-card');
+        const noResultados = document.getElementById('noResultadosFrat');
+        const contadorTxt = document.getElementById('contadorFraternidadesTxt');
+
+        buscadorSeccion?.addEventListener('input', () => {
+            const termino = buscadorSeccion.value.toLowerCase().trim();
+            let visibles = 0;
+
+            itemsFrat.forEach(item => {
+                const searchData = item.getAttribute('data-search') || '';
+                if (termino === '' || searchData.includes(termino)) {
+                    item.classList.remove('d-none');
+                    visibles++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            if (noResultados) {
+                noResultados.classList.toggle('d-none', visibles > 0);
+            }
+
+            if (contadorTxt) {
+                contadorTxt.textContent = `${visibles} agrupaciones`;
+            }
+        });
+    }
+
+    // Modal Visor de Afiche Completo para Eventos
+    const modalAficheEl = document.getElementById('modalVisorAficheEvento');
+    if (modalAficheEl) {
+        const modalAficheInstance = window.bootstrap?.Modal ? window.bootstrap.Modal.getOrCreateInstance(modalAficheEl) : null;
+        const imgModal = document.getElementById('modalVisorEventoImg');
+        const tituloModal = document.getElementById('modalVisorEventoTitulo');
+        const lugarModal = document.getElementById('modalVisorEventoLugar');
+        const fechasModal = document.getElementById('modalVisorEventoFechas');
+        const btnEnlace = document.getElementById('modalVisorBtnEnlace');
+        const btnRecorrido = document.getElementById('modalVisorBtnRecorrido');
+
+        document.querySelectorAll('[data-action="ver-afiche-evento"]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const imgSrc = card.getAttribute('data-evento-img') || '';
+                const titulo = card.getAttribute('data-evento-titulo') || 'Evento';
+                const lugar = card.getAttribute('data-evento-lugar') || 'Trinidad · Beni';
+                const fechas = card.getAttribute('data-evento-fechas') || '';
+                const enlace = card.getAttribute('data-evento-enlace') || '';
+                const esEntrada = card.getAttribute('data-evento-es-entrada') === '1';
+
+                if (imgModal) {
+                    imgModal.src = imgSrc;
+                    imgModal.alt = titulo;
+                }
+                if (tituloModal) tituloModal.textContent = titulo;
+                if (lugarModal) lugarModal.innerHTML = `<i class="bi bi-geo-alt-fill text-warning me-1"></i> ${lugar}`;
+                if (fechasModal) fechasModal.innerHTML = `<i class="bi bi-calendar-event text-info me-1"></i> ${fechas}`;
+
+                // Configurar botón externo o web
+                if (btnEnlace) {
+                    if (enlace && enlace.trim() !== '') {
+                        btnEnlace.href = enlace;
+                        btnEnlace.classList.remove('d-none');
+                    } else {
+                        btnEnlace.classList.add('d-none');
+                    }
+                }
+
+                // Configurar botón de recorrido hacia el mapa de la Entrada
+                if (btnRecorrido) {
+                    if (esEntrada) {
+                        btnRecorrido.classList.remove('d-none');
+                        btnRecorrido.onclick = () => {
+                            setTimeout(() => {
+                                document.getElementById('entrada-universitaria')?.scrollIntoView({ behavior: 'smooth' });
+                            }, 300);
+                        };
+                    } else {
+                        btnRecorrido.classList.add('d-none');
+                    }
+                }
+
+                if (modalAficheInstance) {
+                    modalAficheInstance.show();
+                }
+            });
+        });
+    }
+
+    // Modal: Programa Oficial y Cronograma 58° Aniversario UAB
+    const modalAgendaUABEl = document.getElementById('modalAgendaUAB');
+    if (modalAgendaUABEl) {
+        const modalAgendaUABInstance = window.bootstrap?.Modal ? window.bootstrap.Modal.getOrCreateInstance(modalAgendaUABEl) : null;
+        
+        document.querySelectorAll('[data-action="ver-agenda-uab"]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (modalAgendaUABInstance) {
+                    modalAgendaUABInstance.show();
+                }
+            });
+        });
+
+        // Botón en el modal para cerrar e ir suavemente a la sección de la Agenda
+        document.getElementById('btnIrACronogramaSeccion')?.addEventListener('click', () => {
+            if (modalAgendaUABInstance) {
+                modalAgendaUABInstance.hide();
+            }
+            setTimeout(() => {
+                const sec = document.getElementById('agenda-festividades');
+                if (sec) {
+                    sec.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 300);
+        });
+
+        // Visor de documentos por página (Pág 1, Pág 2, Pág 3)
+        const baseUrl = window.APP_CONFIG?.baseUrl || '';
+        const imgPaginaUABActiva = document.getElementById('imgPaginaUABActiva');
+        const btnAbrirPaginaActual = document.getElementById('btnAbrirPaginaActual');
+        const btnGroupPaginas = document.querySelectorAll('#btnGroupPaginasUAB button[data-pagina]');
+
+        const paginasImagenes = {
+            '1': `${baseUrl}/assets/img/programa_uab_pag1.png`,
+            '2': `${baseUrl}/assets/img/programa_uab_pag2.png`,
+            '3': `${baseUrl}/assets/img/programa_uab_pag3.png`
+        };
+
+        btnGroupPaginas.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pag = btn.getAttribute('data-pagina');
+                if (!pag || !paginasImagenes[pag]) return;
+
+                btnGroupPaginas.forEach(b => {
+                    b.classList.remove('active', 'btn-teal-action');
+                    b.classList.add('btn-outline-teal');
+                });
+                btn.classList.add('active', 'btn-teal-action');
+                btn.classList.remove('btn-outline-teal');
+
+                if (imgPaginaUABActiva) {
+                    imgPaginaUABActiva.src = paginasImagenes[pag];
+                }
+                if (btnAbrirPaginaActual) {
+                    btnAbrirPaginaActual.href = paginasImagenes[pag];
+                }
+            });
+        });
+    }
+
+    // =========================================================================
+    // SECCIÓN DE AGENDA Y CALENDARIO INTERACTIVO (NOVIEMBRE 2026)
+    // =========================================================================
+    const seccionAgendaEl = document.getElementById('agenda-festividades');
+    if (seccionAgendaEl) {
+        // Función helper para escapar texto HTML de forma segura
+        function escapeHtmlAgenda(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        let eventosAgenda = [];
+        try {
+            const rawJson = document.getElementById('datosAgendaUABJSON')?.textContent;
+            if (rawJson) {
+                eventosAgenda = JSON.parse(rawJson);
+            }
+        } catch (e) {
+            console.error('Error al parsear eventos de la agenda:', e);
+        }
+
+        // Elementos DOM del Calendario
+        const daysGridEl = document.getElementById('agendaCalendarDaysGrid');
+        const labelMesEl = document.getElementById('labelCalMes');
+        const btnPrevMes = document.getElementById('btnCalPrevMes');
+        const btnNextMes = document.getElementById('btnCalNextMes');
+        const btnVerTodos = document.getElementById('btnVerTodosLosDias');
+
+        // Elementos DOM del Detalle del Día
+        const diaNumeroEl = document.getElementById('agendaDetalleDiaNumero');
+        const mesAnoEl = document.getElementById('agendaDetalleMesAno');
+        const diaSemanaEl = document.getElementById('agendaDetalleDiaSemana');
+        const badgeTotalDiaEl = document.getElementById('badgeTotalEventosDia');
+        const eventsListEl = document.getElementById('agendaEventsList');
+        const btnDiaAnterior = document.getElementById('btnDiaAnterior');
+        const btnDiaSiguiente = document.getElementById('btnDiaSiguiente');
+        const chipsFiltro = document.querySelectorAll('.agenda-filter-chip');
+
+        // Estado del calendario
+        let categoriaActiva = 'todos';
+        let diaSeleccionado = 3; // Iniciar en el primer día de actividades (03 de Noviembre)
+
+        // Parsear días en los que ocurre cada actividad
+        function obtenerDiasEvento(fechaCorta) {
+            // Formatos posibles: "03/11", "03/11 al 06/11", "17/11 y 18/11"
+            const dias = [];
+            if (!fechaCorta) return dias;
+
+            if (fechaCorta.includes('al')) {
+                const parts = fechaCorta.split('al');
+                const d1 = parseInt(parts[0].trim().split('/')[0], 10);
+                const d2 = parseInt(parts[1].trim().split('/')[0], 10);
+                if (!isNaN(d1) && !isNaN(d2)) {
+                    for (let d = d1; d <= d2; d++) dias.push(d);
+                }
+            } else if (fechaCorta.includes('y')) {
+                const parts = fechaCorta.split('y');
+                parts.forEach(p => {
+                    const d = parseInt(p.trim().split('/')[0], 10);
+                    if (!isNaN(d)) dias.push(d);
+                });
+            } else {
+                const d = parseInt(fechaCorta.split('/')[0], 10);
+                if (!isNaN(d)) dias.push(d);
+            }
+            return dias;
+        }
+
+        // Mapear eventos por día
+        function mapearEventosPorDia() {
+            const mapa = {};
+            for (let d = 1; d <= 30; d++) {
+                mapa[d] = [];
+            }
+
+            eventosAgenda.forEach(ev => {
+                if (categoriaActiva !== 'todos' && ev.categoria !== categoriaActiva) {
+                    return;
+                }
+                const dias = obtenerDiasEvento(ev.fecha_corta);
+                dias.forEach(d => {
+                    if (mapa[d]) {
+                        mapa[d].push(ev);
+                    }
+                });
+            });
+
+            return mapa;
+        }
+
+        // Obtener lista de días con actividades según el filtro
+        function obtenerDiasConActividades(mapa) {
+            const lista = [];
+            for (let d = 1; d <= 30; d++) {
+                if (mapa[d] && mapa[d].length > 0) {
+                    lista.push(d);
+                }
+            }
+            return lista;
+        }
+
+        // Nombres de días de la semana en español para Noviembre 2026 (El 1 de Nov 2026 fue Domingo)
+        const nombresDiasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        function getDiaSemanaNov2026(dia) {
+            const date = new Date(2026, 10, dia); // Mes 10 es Noviembre (0-indexed)
+            return nombresDiasSemana[date.getDay()];
+        }
+
+        // Renderizar Cuadrícula del Calendario (Noviembre 2026)
+        function renderizarCalendario() {
+            if (!daysGridEl) return;
+            daysGridEl.innerHTML = '';
+
+            const mapaEventos = mapearEventosPorDia();
+            const primerDiaSemana = 7; // El 1 de Noviembre de 2026 fue Domingo (columna 7)
+
+            // Celdas vacías previas al día 1
+            for (let i = 1; i < primerDiaSemana; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day-cell day-empty';
+                daysGridEl.appendChild(emptyCell);
+            }
+
+            // Días 1 al 30 de Noviembre
+            for (let dia = 1; dia <= 30; dia++) {
+                const cell = document.createElement('div');
+                const eventosDelDia = mapaEventos[dia] || [];
+                const tieneEventos = eventosDelDia.length > 0;
+
+                cell.className = `calendar-day-cell ${tieneEventos ? 'has-events' : ''} ${dia === diaSeleccionado ? 'day-active' : ''}`;
+                cell.setAttribute('data-dia', dia);
+
+                // Puntos de color por categoría
+                let dotsHtml = '';
+                if (tieneEventos) {
+                    const dotsRendered = new Set();
+                    eventosDelDia.forEach(ev => {
+                        const cat = ev.categoria || 'academico';
+                        if (!dotsRendered.has(cat) && dotsRendered.size < 4) {
+                            dotsRendered.add(cat);
+                            dotsHtml += `<span class="calendar-dot dot-${escapeHtmlAgenda(cat)}"></span>`;
+                        }
+                    });
+                }
+
+                cell.innerHTML = `
+                    <div class="calendar-day-dots">${dotsHtml}</div>
+                    <span class="day-num">${dia}</span>
+                `;
+
+                cell.addEventListener('click', () => {
+                    seleccionarDia(dia);
+                });
+
+                daysGridEl.appendChild(cell);
+            }
+        }
+
+        // Renderizar la columna derecha con los eventos del día
+        function renderizarDetalleDia() {
+            const mapaEventos = mapearEventosPorDia();
+            const eventosDelDia = mapaEventos[diaSeleccionado] || [];
+
+            if (diaNumeroEl) diaNumeroEl.textContent = diaSeleccionado < 10 ? `0${diaSeleccionado}` : diaSeleccionado;
+            if (diaSemanaEl) diaSemanaEl.textContent = `${getDiaSemanaNov2026(diaSeleccionado)}, Noviembre 2026`;
+            if (badgeTotalDiaEl) {
+                badgeTotalDiaEl.textContent = `${eventosDelDia.length} ${eventosDelDia.length === 1 ? 'actividad' : 'actividades'}`;
+            }
+
+            if (!eventsListEl) return;
+
+            if (eventosDelDia.length === 0) {
+                eventsListEl.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-calendar-event fs-2 d-block mb-2 text-black-50"></i>
+                        <p class="small mb-1 fw-bold">Sin eventos específicos programados para este día</p>
+                        <p class="extra-small text-muted mb-0">Selecciona otro día con puntos o usa las flechas de navegación.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            eventosDelDia.forEach(ev => {
+                const queryMapa = encodeURIComponent(`${ev.lugar}, Trinidad, Beni, Bolivia`);
+                const icono = ev.icono || 'bi-calendar-event';
+                const badgeClass = ev.badge || 'bg-teal';
+
+                html += `
+                    <div class="agenda-event-item shadow-2xs">
+                        <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                            <span class="badge ${badgeClass} rounded-pill extra-small fw-bold">
+                                <i class="bi ${icono} me-1"></i> ${escapeHtmlAgenda(ev.tipo)}
+                            </span>
+                            <span class="badge bg-dark bg-opacity-75 text-white rounded-pill extra-small px-2 py-1">
+                                <i class="bi bi-clock me-1 text-warning"></i> ${escapeHtmlAgenda(ev.hora)}
+                            </span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-2 fs-6 lh-sm">
+                            ${escapeHtmlAgenda(ev.titulo)}
+                        </h6>
+                        <div class="extra-small text-secondary mb-2 d-flex flex-column gap-1">
+                            <div><i class="bi bi-people text-teal me-1"></i> <strong>Organiza:</strong> ${escapeHtmlAgenda(ev.organiza)}</div>
+                            <div><i class="bi bi-geo-alt-fill text-danger me-1"></i> <strong>Lugar:</strong> ${escapeHtmlAgenda(ev.lugar)}</div>
+                        </div>
+                        <div class="text-end pt-1">
+                            <a href="https://www.google.com/maps/search/?api=1&query=${queryMapa}" 
+                               target="_blank" rel="noopener noreferrer" 
+                               class="btn btn-xs btn-outline-teal rounded-pill px-3 fw-semibold">
+                                <i class="bi bi-geo-alt"></i> Cómo llegar
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            eventsListEl.innerHTML = html;
+        }
+
+        // Seleccionar un día específico
+        function seleccionarDia(dia) {
+            diaSeleccionado = dia;
+            // Actualizar clase activa en las celdas
+            document.querySelectorAll('.calendar-day-cell').forEach(c => {
+                const d = parseInt(c.getAttribute('data-dia'), 10);
+                c.classList.toggle('day-active', d === dia);
+            });
+            renderizarDetalleDia();
+        }
+
+        // Navegación con flechas `<` y `>` al siguiente día con actividades
+        btnDiaAnterior?.addEventListener('click', () => {
+            const mapa = mapearEventosPorDia();
+            const diasConEventos = obtenerDiasConActividades(mapa);
+            if (diasConEventos.length === 0) return;
+
+            const prevDias = diasConEventos.filter(d => d < diaSeleccionado);
+            if (prevDias.length > 0) {
+                seleccionarDia(prevDias[prevDias.length - 1]);
+            } else {
+                seleccionarDia(diasConEventos[diasConEventos.length - 1]); // Loop al último
+            }
+        });
+
+        btnDiaSiguiente?.addEventListener('click', () => {
+            const mapa = mapearEventosPorDia();
+            const diasConEventos = obtenerDiasConActividades(mapa);
+            if (diasConEventos.length === 0) return;
+
+            const nextDias = diasConEventos.filter(d => d > diaSeleccionado);
+            if (nextDias.length > 0) {
+                seleccionarDia(nextDias[0]);
+            } else {
+                seleccionarDia(diasConEventos[0]); // Loop al primero
+            }
+        });
+
+        // Filtros por Categoría (Chips)
+        chipsFiltro.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chipsFiltro.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                categoriaActiva = chip.getAttribute('data-cat') || 'todos';
+
+                renderizarCalendario();
+                // Si el día actual no tiene eventos en la nueva categoría, ir al primer día con eventos
+                const mapa = mapearEventosPorDia();
+                const diasConEventos = obtenerDiasConActividades(mapa);
+                if (!diasConEventos.includes(diaSeleccionado) && diasConEventos.length > 0) {
+                    seleccionarDia(diasConEventos[0]);
+                } else {
+                    renderizarDetalleDia();
+                }
+            });
+        });
+
+        // Ver todos los eventos (muestra resumen)
+        btnVerTodos?.addEventListener('click', (e) => {
+            e.preventDefault();
+            categoriaActiva = 'todos';
+            chipsFiltro.forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === 'todos'));
+            renderizarCalendario();
+            seleccionarDia(3);
+        });
+
+        // Inicializar renderizado
+        renderizarCalendario();
+        renderizarDetalleDia();
+    }
 });
 
