@@ -63,19 +63,24 @@ class SolicitudController extends Controller {
             $archivo = $_FILES['comprobante'] ?? [];
             if (!is_array($archivo)) throw new InvalidArgumentException('Adjunte un comprobante válido.');
             $idSolicitud = SolicitudEntradaService::recibir($_POST, $archivo);
+            
+            // Consumir intento en el limitador de tasa para solicitudes legítimas procesadas
+            RateLimiterService::registrarFallo($rateKey, 5, 600);
         } catch (InvalidArgumentException $e) {
+            RateLimiterService::registrarFallo($rateKey, 5, 600);
             $this->json(['success'=>false, 'error'=>$e->getMessage()], 422);
             return;
         } catch (Throwable $e) {
+            RateLimiterService::registrarFallo($rateKey, 5, 600);
             error_log('Error al recibir solicitud: ' . $e->getMessage());
             $this->json(['success'=>false, 'error'=>'No se pudo guardar la solicitud. Intente nuevamente.'], 500);
             return;
         }
-        // La solicitud ya está confirmada: un fallo de Telegram no debe deshacerla.
+        // La solicitud ya está confirmada en base de datos: un retraso o fallo de Telegram no debe demorar la respuesta al usuario.
         try {
-            TelegramService::procesarPendientes(1, $idSolicitud);
+            TelegramService::procesarPendientes(1, $idSolicitud, 2);
         } catch (Throwable $e) {
-            error_log('Telegram: solicitud #' . $idSolicitud . ' guardada; entrega pendiente.');
+            error_log('Telegram: solicitud #' . $idSolicitud . ' guardada; entrega en cola pendiente.');
         }
         $this->json(['success'=>true,
             'message'=>'Solicitud enviada con éxito. Verificaremos tu abono en breve.']);

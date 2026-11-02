@@ -7,6 +7,7 @@ use App\Models\Municipio;
 use App\Models\Tarifa;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CsrfMiddleware;
+use App\Services\VideoService;
 
 class CatalogoController extends Controller {
     private Categoria $categoriaModel;
@@ -340,18 +341,26 @@ class CatalogoController extends Controller {
         }
 
         $dirDestino = dirname(__DIR__, 3) . '/public/assets/video';
-        if (!is_dir($dirDestino)) {
-            mkdir($dirDestino, 0755, true);
-        }
-
         $rutaDestino = $dirDestino . '/video.mp4';
 
-        if (!move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
-            $this->redirigirConError('No se pudo guardar el archivo en el servidor. Verifica los permisos de carpeta.', 'portada-video');
+        $resultado = VideoService::optimizarYGuardar($archivo['tmp_name'], $rutaDestino);
+
+        if (!$resultado['exito']) {
+            $this->redirigirConError($resultado['error'] ?? 'No se pudo guardar el archivo en el servidor. Verifica los permisos de carpeta.', 'portada-video');
             return;
         }
 
-        $this->redirigirConExito('¡Video promocional de portada actualizado exitosamente!', 'portada-video');
+        $mbOrig = round($resultado['tamano_original'] / (1024 * 1024), 2);
+        $mbFinal = round($resultado['tamano_final'] / (1024 * 1024), 2);
+
+        if ($resultado['comprimido_con_ffmpeg']) {
+            $ahorro = round((1 - ($resultado['tamano_final'] / max(1, $resultado['tamano_original']))) * 100);
+            $msg = "¡Video procesado y optimizado con éxito! Reducido de {$mbOrig} MB a {$mbFinal} MB (-{$ahorro}% de ahorro) con reproducción instantánea para celulares (+FastStart).";
+        } else {
+            $msg = "¡Video promocional de portada guardado exitosamente ({$mbFinal} MB)!";
+        }
+
+        $this->redirigirConExito($msg, 'portada-video');
     }
 
     /**

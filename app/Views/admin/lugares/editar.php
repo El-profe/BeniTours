@@ -71,6 +71,7 @@ $tieneCoordsIniciales = (!empty($lugar['latitud']) || !empty($coordGpsValor));
     <form id="formEditarFicha" action="<?= htmlspecialchars($baseUrl) ?>/admin/lugares/actualizar" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" id="csrfTokenGlobal" value="<?= htmlspecialchars($csrfToken) ?>">
         <input type="hidden" name="id_lugar" id="idLugarGlobal" value="<?= (int)$lugar['id_lugar'] ?>">
+        <input type="hidden" name="token_envio" value="<?= htmlspecialchars($tokenEnvio) ?>">
 
         <div class="row g-4">
             <!-- COLUMNA PRINCIPAL (Galería y Descripción) -->
@@ -783,6 +784,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewGrid = document.getElementById('gridPreviewNuevasFotos');
     const conteoNuevasFotos = document.getElementById('conteoNuevasFotos');
     const btnLimpiar = document.getElementById('btnLimpiarNuevasFotos');
+    const formEditarFicha = document.getElementById('formEditarFicha');
+    const botonesGuardarFicha = formEditarFicha ? Array.from(formEditarFicha.querySelectorAll('button[type="submit"]')) : [];
+    let compresionesPendientes = 0;
+    let envioFichaEnCurso = false;
+
+    const cambiarEstadoGuardadoFicha = (ocupado) => {
+        botonesGuardarFicha.forEach((boton) => {
+            if (ocupado) {
+                boton.dataset.textoOriginal = boton.innerHTML;
+                boton.disabled = true;
+                boton.setAttribute('aria-busy', 'true');
+                boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Optimizando fotos...</span>';
+            } else {
+                boton.disabled = false;
+                boton.removeAttribute('aria-busy');
+                if (boton.dataset.textoOriginal) boton.innerHTML = boton.dataset.textoOriginal;
+            }
+        });
+    };
+
+    window.addEventListener('compresor-imagen:inicio', (evento) => {
+        if (evento.detail?.input !== inputFotos) return;
+        compresionesPendientes++;
+        cambiarEstadoGuardadoFicha(true);
+    });
+
+    window.addEventListener('compresor-imagen:fin', (evento) => {
+        if (evento.detail?.input !== inputFotos) return;
+        compresionesPendientes = Math.max(0, compresionesPendientes - 1);
+        if (compresionesPendientes === 0) cambiarEstadoGuardadoFicha(false);
+    });
+
+    formEditarFicha?.addEventListener('submit', (evento) => {
+        if (compresionesPendientes > 0) {
+            evento.preventDefault();
+            conteoNuevasFotos.textContent = 'Espera un momento: las fotos todavia se estan optimizando.';
+            return;
+        }
+        if (envioFichaEnCurso) {
+            evento.preventDefault();
+            return;
+        }
+
+        envioFichaEnCurso = true;
+        if (evento.submitter?.name) {
+            const intentoGuardado = document.createElement('input');
+            intentoGuardado.type = 'hidden';
+            intentoGuardado.name = evento.submitter.name;
+            intentoGuardado.value = evento.submitter.value;
+            formEditarFicha.appendChild(intentoGuardado);
+        }
+        botonesGuardarFicha.forEach((boton) => {
+            boton.disabled = true;
+            boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Guardando cambios...</span>';
+        });
+    });
 
     if (dropzone && inputFotos) {
         dropzone.addEventListener('click', () => inputFotos.click());
@@ -807,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let files = e.dataTransfer.files;
                 if (window.CompresorImagen) {
                     conteoNuevasFotos.textContent = 'Optimizando fotos en el navegador...';
-                    const res = await Promise.all(Array.from(files).map(f => window.CompresorImagen.comprimir(f, { maxDimension: 1280, calidad: 0.82 })));
+                    const res = await window.CompresorImagen.comprimirLote(files, { maxDimension: 1200, calidad: 0.80, input: inputFotos });
                     if (typeof DataTransfer !== 'undefined') {
                         const dt = new DataTransfer();
                         res.forEach(r => dt.items.add(r.file));
@@ -824,7 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.CompresorImagen && inputFotos.files.length > 0) {
                 previewContainer.classList.remove('d-none');
                 conteoNuevasFotos.innerHTML = '<span class="spinner-border spinner-border-sm me-1 text-success"></span> Optimizando fotos en el navegador...';
-                const res = await Promise.all(Array.from(inputFotos.files).map(f => window.CompresorImagen.comprimir(f, { maxDimension: 1280, calidad: 0.82 })));
+                const res = await window.CompresorImagen.comprimirLote(inputFotos.files, { maxDimension: 1200, calidad: 0.80, input: inputFotos });
                 if (typeof DataTransfer !== 'undefined') {
                     const dt = new DataTransfer();
                     res.forEach(r => dt.items.add(r.file));

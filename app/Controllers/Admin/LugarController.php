@@ -84,6 +84,8 @@ class LugarController extends Controller {
         $tarifas    = (new Tarifa())->listarPlanesActivos();
         $tarifaVigente = (new Tarifa())->obtenerTarifaVigente();
         $configComercial = require dirname(__DIR__, 3) . '/config/comercial.php';
+        $tokenEnvio = bin2hex(random_bytes(32));
+        $_SESSION['admin_crear_ficha_token'] = $tokenEnvio;
         $error = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_error']);
 
@@ -95,7 +97,8 @@ class LugarController extends Controller {
             'tarifaVigente' => $tarifaVigente,
             'cobro'         => $configComercial,
             'error'         => $error,
-            'csrfToken'     => CsrfMiddleware::obtenerToken()
+            'csrfToken'     => CsrfMiddleware::obtenerToken(),
+            'tokenEnvio'    => $tokenEnvio
         ], 'admin');
     }
 
@@ -105,6 +108,15 @@ class LugarController extends Controller {
             header("Location: {$this->config['base_url']}/admin/lugares/crear");
             exit();
         }
+
+        $tokenEnvio = (string)($_POST['token_envio'] ?? '');
+        $tokenEsperado = $_SESSION['admin_crear_ficha_token'] ?? '';
+        if (!is_string($tokenEsperado) || $tokenEsperado === '' || !hash_equals($tokenEsperado, $tokenEnvio)) {
+            $_SESSION['admin_flash'] = 'La solicitud ya fue procesada o expiró. No se creó una ficha duplicada.';
+            header("Location: {$this->config['base_url']}/admin/lugares");
+            exit();
+        }
+        unset($_SESSION['admin_crear_ficha_token']);
 
         $nombre = trim($_POST['nombre'] ?? '');
         $idCategoria = (int)($_POST['id_categoria'] ?? 0);
@@ -252,6 +264,8 @@ class LugarController extends Controller {
         $mensaje     = $_SESSION['admin_flash'] ?? null;
         $error       = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
+        $tokenEnvio = bin2hex(random_bytes(32));
+        $_SESSION['admin_editar_ficha_token_' . $id] = $tokenEnvio;
 
         $this->render('admin/lugares/editar', [
             'titulo'            => 'Editar Ficha: ' . $lugar['nombre'],
@@ -265,7 +279,8 @@ class LugarController extends Controller {
             'paradas'           => $paradas,
             'mensaje'           => $mensaje,
             'error'             => $error,
-            'csrfToken'         => CsrfMiddleware::obtenerToken()
+            'csrfToken'         => CsrfMiddleware::obtenerToken(),
+            'tokenEnvio'        => $tokenEnvio
         ], 'admin');
     }
 
@@ -277,6 +292,16 @@ class LugarController extends Controller {
         }
 
         $id = (int)($_POST['id_lugar'] ?? 0);
+        $tokenEnvio = (string)($_POST['token_envio'] ?? '');
+        $claveToken = 'admin_editar_ficha_token_' . $id;
+        $tokenEsperado = $_SESSION[$claveToken] ?? '';
+        if ($id <= 0 || !is_string($tokenEsperado) || $tokenEsperado === '' || !hash_equals($tokenEsperado, $tokenEnvio)) {
+            $_SESSION['admin_flash'] = 'La actualización ya fue procesada o expiró. No se guardaron cambios duplicados.';
+            header("Location: {$this->config['base_url']}/admin/lugares" . ($id > 0 ? "/editar?id={$id}" : ''));
+            exit();
+        }
+        unset($_SESSION[$claveToken]);
+
         $nombre = trim($_POST['nombre'] ?? '');
         $idCategoria = (int)($_POST['id_categoria'] ?? 0);
         $tipoLugar = in_array($_POST['tipo_lugar'] ?? '', ['PUBLICO', 'COMERCIAL']) ? $_POST['tipo_lugar'] : 'COMERCIAL';

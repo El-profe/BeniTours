@@ -1,23 +1,26 @@
 <div class="container-fluid p-0">
-    <!-- Encabezado Superior -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
+    <!-- Encabezado Superior Responsivo -->
+    <div class="d-flex justify-content-between align-items-md-center align-items-start mb-4 flex-column flex-md-row gap-3">
+        <div class="header-eventos-info">
+            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                 <span class="badge rounded-pill px-3 py-1 fw-bold border" style="background-color: #E2F2F0; color: #0E4D5E; border-color: #B8E1DA !important;">
                     <i class="bi bi-calendar-event-fill me-1 text-teal"></i> Agenda Cultural & Promocional
                 </span>
                 <span class="text-muted small">BeniTours &bull; Difusión Departamental</span>
             </div>
-            <h1 class="h3 fw-bold text-dark mb-0">Eventos Destacados del Beni</h1>
-            <small class="text-muted">Administra los eventos, ferias y festividades que se muestran automáticamente en el pop-up de la portada.</small>
+            <h1 class="h3 fw-bold text-dark mb-1 fs-4-mobile">Eventos Destacados del Beni</h1>
+            <p class="text-muted small mb-0">Administra los eventos, ferias y festividades que se muestran automáticamente en el pop-up de la portada.</p>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-outline-teal rounded-pill px-3 py-2 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalFraternidadAdmin">
-                <i class="bi bi-people-fill me-1"></i> + Nueva Fraternidad
+        <div class="d-flex align-items-center gap-2 flex-wrap w-100-mobile">
+            <button type="button" class="btn btn-outline-teal rounded-pill px-3 py-2 fw-bold shadow-sm flex-fill-mobile" id="btnNuevaActividadTop">
+                <i class="bi bi-calendar-plus-fill me-1"></i> <span class="btn-text">+ Actividad Agenda</span>
             </button>
-            <button type="button" class="btn btn-nuevo-evento rounded-pill px-4 py-2 fw-bold shadow-sm" id="btnNuevoEvento">
-                <i class="bi bi-plus-circle-fill me-1"></i> Nuevo Evento
+            <button type="button" class="btn btn-outline-warning text-dark rounded-pill px-3 py-2 fw-bold shadow-sm flex-fill-mobile" id="btnNuevaFraternidadTop">
+                <i class="bi bi-people-fill me-1"></i> <span class="btn-text">+ Fraternidad</span>
+            </button>
+            <button type="button" class="btn btn-nuevo-evento rounded-pill px-3 py-2 fw-bold shadow-sm flex-fill-mobile" id="btnNuevoEvento">
+                <i class="bi bi-plus-circle-fill me-1"></i> <span class="btn-text">+ Afiche</span>
             </button>
         </div>
     </div>
@@ -45,8 +48,8 @@
 
     <!-- Tabla de Eventos -->
     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-5">
-        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-dark">
+        <div class="card-header bg-white border-bottom p-3 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <span class="fw-bold text-dark fs-6">
                 <i class="bi bi-stars text-warning me-1"></i> Cartelera de Eventos (<?= count($eventos) ?>)
             </span>
             <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Los eventos expirados se ocultan automáticamente en la portada.</small>
@@ -174,20 +177,20 @@
      SECCIÓN 2: GESTIÓN DE LA ENTRADA UNIVERSITARIA
      ========================================== -->
 <div class="card border-0 shadow-sm rounded-4 mb-4 mt-5 overflow-hidden" id="tabFraternidadesAdmin">
-    <div class="card-header bg-white py-3 px-4 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div>
-            <div class="d-flex align-items-center gap-2">
+    <div class="card-header bg-white py-3 px-3 px-sm-4 border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div class="flex-grow-1">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                 <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold">Trinidad 2026</span>
                 <h5 class="fw-bold mb-0 text-dark">
                     <i class="bi bi-people-fill text-warning me-2"></i>Rol de Fraternidades - Entrada Universitaria
                 </h5>
             </div>
-            <p class="text-muted extra-small mb-0 mt-1">
+            <p class="text-muted extra-small mb-0">
                 Administra el orden de ingreso, agrupaciones folklóricas, danzas representativas y universidades participantes.
             </p>
         </div>
-        <div>
-            <button type="button" class="btn btn-warning rounded-pill px-3 py-2 fw-bold text-dark shadow-sm d-flex align-items-center gap-2" id="btnNuevaFraternidad">
+        <div class="w-100 w-md-auto text-end">
+            <button type="button" class="btn btn-warning rounded-pill px-3 py-2 fw-bold text-dark shadow-sm d-inline-flex align-items-center justify-content-center gap-2 w-100 w-md-auto" id="btnNuevaFraternidad">
                 <i class="bi bi-plus-circle-fill"></i>
                 <span>Nueva Fraternidad</span>
             </button>
@@ -281,7 +284,157 @@
     </div>
 </div>
 
+<!-- ==========================================
+     SECCIÓN 3: AGENDA Y CRONOGRAMA OFICIAL (CALENDARIO INTERACTIVO)
+     ========================================== -->
+<div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden" id="tabAgendaAdmin">
+    <div class="card-header bg-white py-3 px-3 px-sm-4 border-0 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div class="flex-grow-1">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <span class="badge bg-teal text-white rounded-pill px-3 py-1 fw-bold">Cronograma Oficial 2026</span>
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-calendar3-range-fill text-teal me-2"></i>Agenda y Actividades del Calendario Interactivo
+                </h5>
+            </div>
+            <p class="text-muted extra-small mb-0">
+                Administra todas las actividades cívicas, folklóricas, académicas, remates y ferias que alimentan el calendario interactivo de la portada.
+            </p>
+        </div>
+        <div class="w-100 w-md-auto text-end">
+            <button type="button" class="btn btn-teal-action rounded-pill px-3 py-2 fw-bold text-white shadow-sm d-inline-flex align-items-center justify-content-center gap-2 w-100 w-md-auto" id="btnNuevaActividad">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Nueva Actividad</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase extra-small fw-bold text-secondary">
+                    <tr>
+                        <th class="text-center" style="width: 90px;">Fecha</th>
+                        <th style="width: 110px;">Hora</th>
+                        <th>Actividad / Evento</th>
+                        <th>Categoría</th>
+                        <th>Lugar & Organización</th>
+                        <th class="text-center" style="width: 90px;">Estado</th>
+                        <th class="text-end" style="width: 120px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    <?php if (empty($actividades)): ?>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-calendar-x fs-2 text-secondary opacity-50 d-block mb-2"></i>
+                                No hay actividades registradas en la agenda. Haz clic en <strong>"Nueva Actividad"</strong> para añadir una.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($actividades as $act): ?>
+                            <tr>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1.5 fw-bold font-monospace">
+                                        <?= htmlspecialchars($act['fecha_corta']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-teal-subtle text-teal-dark border border-teal-subtle px-2 py-1 extra-small fw-semibold">
+                                        <i class="bi bi-clock me-1"></i><?= htmlspecialchars($act['hora']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark font-sm-responsive mb-0.5"><?= htmlspecialchars($act['titulo']) ?></div>
+                                    <span class="badge bg-light text-secondary border px-2 py-0.5 extra-small">
+                                        <?= htmlspecialchars($act['tipo']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-2.5 py-1 extra-small fw-bold text-uppercase 
+                                        <?= match($act['categoria']) {
+                                            'civicos'    => 'bg-danger-subtle text-danger border border-danger-subtle',
+                                            'folklore'   => 'bg-success-subtle text-success border border-success-subtle',
+                                            'fexpobeni'  => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+                                            'remates'    => 'bg-secondary-subtle text-secondary border border-secondary-subtle',
+                                            'ferias'     => 'bg-info-subtle text-info-emphasis border border-info-subtle',
+                                            'academico'  => 'bg-teal-subtle text-teal-dark border border-teal-subtle',
+                                            'festivales' => 'bg-danger text-white',
+                                            default      => 'bg-light text-dark'
+                                        } ?>">
+                                        <?= htmlspecialchars($act['categoria']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small text-dark fw-medium">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($act['lugar']) ?>
+                                    </div>
+                                    <div class="extra-small text-muted">
+                                        <i class="bi bi-person-fill text-secondary me-1"></i><?= htmlspecialchars($act['organiza'] ?: 'Comité Organizador') ?>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ((int)$act['activo'] === 1): ?>
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 extra-small fw-bold">Activo</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 extra-small fw-bold">Inactivo</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end align-items-center gap-1.5">
+                                        <!-- Botón Editar -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 btn-editar-actividad p-1 px-2"
+                                                data-actividad='<?= json_encode($act, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>'
+                                                title="Editar actividad">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <!-- Eliminar -->
+                                        <form action="<?= htmlspecialchars($baseUrl) ?>/admin/eventos/actividad/eliminar" method="POST" class="d-inline m-0" onsubmit="return confirm('¿Seguro que deseas eliminar esta actividad del cronograma?');">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                                            <input type="hidden" name="id_actividad" value="<?= (int)$act['id_actividad'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 p-1 px-2" title="Eliminar actividad">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <style>
+.btn-teal-action {
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out;
+}
+.btn-teal-action:hover, .btn-teal-action:focus {
+    background-color: #0f766e !important;
+    border-color: #0f766e !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35) !important;
+}
+
+.btn-outline-teal {
+    color: #0d9488 !important;
+    border: 1px solid #0d9488 !important;
+    background-color: transparent !important;
+    transition: all 0.2s ease-in-out;
+}
+.btn-outline-teal:hover, .btn-outline-teal:focus {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25) !important;
+}
+
 /* Estilos para el botón Nuevo Evento y hover */
 .btn-nuevo-evento {
     background-color: #0d9488 !important;
@@ -313,6 +466,88 @@
     border-radius: 0.75rem;
     background-color: #1e293b;
 }
+
+/* ========================================================
+   ADAPTACIÓN RESPONSIVA PARA MÓVILES (< 768px y < 576px)
+   ======================================================== */
+@media (max-width: 767.98px) {
+    .fs-4-mobile {
+        font-size: 1.35rem !important;
+        line-height: 1.25 !important;
+    }
+
+    .w-100-mobile {
+        width: 100% !important;
+    }
+
+    .flex-fill-mobile {
+        flex: 1 1 calc(50% - 0.5rem) !important;
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.75rem !important;
+        text-align: center;
+        justify-content: center;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    #btnNuevaActividadTop {
+        flex: 1 1 100% !important;
+    }
+
+    /* Tablas con scroll horizontal suave y limpio en móviles */
+    .table-responsive {
+        border-radius: 0.85rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table th, .table td {
+        white-space: nowrap;
+        padding: 0.65rem 0.75rem !important;
+    }
+
+    /* Permitir que la columna de título/evento se lea sin truncarse excesivamente */
+    .table td:nth-child(3) {
+        white-space: normal !important;
+        min-width: 200px;
+    }
+
+    /* Tarjetas del panel en móvil */
+    .card-header {
+        padding: 1rem 1rem !important;
+    }
+
+    .card-header h5 {
+        font-size: 1.05rem !important;
+        line-height: 1.35 !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .btn-text {
+        font-size: 0.78rem;
+    }
+
+    .flex-fill-mobile {
+        flex: 1 1 100% !important;
+    }
+
+    .card-header h5 {
+        font-size: 0.98rem !important;
+    }
+
+    .card-header .badge {
+        font-size: 0.72rem !important;
+    }
+
+    /* Modal padding en móvil */
+    .modal-body {
+        padding: 1.25rem 1rem !important;
+    }
+
+    .modal-header, .modal-footer {
+        padding: 1rem !important;
+    }
+}
 </style>
 
 <!-- Modal Crear / Editar Evento -->
@@ -323,11 +558,19 @@
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                 <input type="hidden" name="id_evento" id="formIdEvento" value="0">
 
-                <div class="modal-header bg-teal text-white border-0 py-3 px-4">
-                    <h5 class="modal-title fw-bold" id="modalEventoTitulo">
-                        <i class="bi bi-calendar-plus me-2"></i>Nuevo Evento / Afiche
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-header text-white border-0 py-3 px-4" style="background: linear-gradient(135deg, #0E4D5E, #2A9D8F);">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); flex-shrink: 0;">
+                            <i class="bi bi-calendar-event fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="modalEventoTitulo">
+                                Nuevo Evento / Afiche
+                            </h5>
+                            <small class="text-white-50" id="modalEventoSubtitulo">Difusión en el pop-up y cartelera destacada</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body p-4">
@@ -438,11 +681,19 @@
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                 <input type="hidden" name="id_fraternidad" id="formFratId" value="0">
 
-                <div class="modal-header bg-warning text-dark border-0 py-3 px-4">
-                    <h5 class="modal-title fw-bold" id="modalFratTitulo">
-                        <i class="bi bi-person-plus-fill me-2"></i>Nueva Fraternidad
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-header text-white border-0 py-3 px-4" style="background: linear-gradient(135deg, #b45309, #d97706);">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); flex-shrink: 0;">
+                            <i class="bi bi-people-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="modalFratTitulo">
+                                Nueva Fraternidad
+                            </h5>
+                            <small class="text-white-50" id="modalFratSubtitulo">Entrada Folklórica Universitaria</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body p-4">
@@ -507,6 +758,98 @@
     </div>
 </div>
 
+<!-- ==========================================
+     MODAL GESTIÓN DE ACTIVIDAD DE LA AGENDA
+     ========================================== -->
+<div class="modal fade" id="modalActividadForm" tabindex="-1" aria-labelledby="modalActividadTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <form action="<?= htmlspecialchars($baseUrl) ?>/admin/eventos/actividad/guardar" method="POST" id="formActividadAdmin">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                <input type="hidden" name="id_actividad" id="formActividadId" value="0">
+
+                <div class="modal-header text-white border-0 py-3 px-4" style="background: linear-gradient(135deg, #0E4D5E, #2A9D8F);">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.2); flex-shrink: 0;">
+                            <i class="bi bi-calendar3-range-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-white mb-0" id="modalActividadTitulo">
+                                Nueva Actividad de Agenda
+                            </h5>
+                            <small class="text-white-50" id="modalActividadSubtitulo">Cronograma y Calendario Interactivo 2026</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="formActFechaCorta" class="form-label fw-bold text-dark small">Día / Rango <span class="text-danger">*</span></label>
+                            <input type="text" name="fecha_corta" id="formActFechaCorta" class="form-control rounded-3" placeholder="Ej. 10/11 o 14/11 al 18/11" required>
+                            <small class="text-muted extra-small">Indica el día o rango dentro de Noviembre.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="formActHora" class="form-label fw-bold text-dark small">Hora / Horario <span class="text-danger">*</span></label>
+                            <input type="text" name="hora" id="formActHora" class="form-control rounded-3" placeholder="Ej. 08:30 o 16:00 a 21:00" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="formActTitulo" class="form-label fw-bold text-dark small">Título del Evento / Actividad <span class="text-danger">*</span></label>
+                            <input type="text" name="titulo" id="formActTitulo" class="form-control rounded-3" placeholder="Ej. Sesión de Honor, Entrada Folklórica, Remate Ganadero..." required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="formActCategoria" class="form-label fw-bold text-dark small">Categoría del Calendario <span class="text-danger">*</span></label>
+                            <select name="categoria" id="formActCategoria" class="form-select rounded-3" required>
+                                <option value="academico">Académico</option>
+                                <option value="cultura">Cultura y Arte</option>
+                                <option value="ferias">Ferias</option>
+                                <option value="festivales">Festivales</option>
+                                <option value="folklore">Folklore</option>
+                                <option value="remates">Remates Ganaderos</option>
+                                <option value="civicos">Cívicos y Efemérides</option>
+                                <option value="fexpobeni">Fexpobeni</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="formActTipo" class="form-label fw-bold text-dark small">Etiqueta Corta (Tipo)</label>
+                            <input type="text" name="tipo" id="formActTipo" class="form-control rounded-3" placeholder="Ej. ACTO CÍVICO, FERIA, PROTOCOLO">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="formActLugar" class="form-label fw-bold text-dark small">Lugar / Ubicación <span class="text-danger">*</span></label>
+                            <input type="text" name="lugar" id="formActLugar" class="form-control rounded-3" placeholder="Ej. Plaza Principal, Salón Bicentenario, Campo Ferial..." required>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="formActOrganiza" class="form-label fw-bold text-dark small">Organizado por</label>
+                            <input type="text" name="organiza" id="formActOrganiza" class="form-control rounded-3" placeholder="Ej. Rectorado UAB, Gobernación del Beni, FEXPOBENI...">
+                        </div>
+
+                        <div class="col-12 pt-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="activo" id="formActActivo" value="1" checked>
+                                <label class="form-check-label fw-bold text-dark small" for="formActActivo">Actividad visible en el calendario interactivo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-teal-action rounded-pill px-4 fw-bold text-white">
+                        <i class="bi bi-save me-1"></i> Guardar Actividad
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('modalEventoForm');
@@ -532,6 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalFratEl = document.getElementById('modalFraternidadForm');
     const modalFratInstance = modalFratEl ? new bootstrap.Modal(modalFratEl) : null;
     const btnNuevaFrat = document.getElementById('btnNuevaFraternidad');
+    const btnNuevaFratTop = document.getElementById('btnNuevaFraternidadTop');
     const formFratId = document.getElementById('formFratId');
     const formFratOrden = document.getElementById('formFratOrden');
     const formFratHora = document.getElementById('formFratHora');
@@ -542,8 +886,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const formFratActivo = document.getElementById('formFratActivo');
     const modalFratTitulo = document.getElementById('modalFratTitulo');
 
-    // Abrir Modal Nueva Fraternidad
-    btnNuevaFrat?.addEventListener('click', () => {
+    // Elementos modal Actividad Agenda
+    const modalActEl = document.getElementById('modalActividadForm');
+    const modalActInstance = modalActEl ? new bootstrap.Modal(modalActEl) : null;
+    const btnNuevaAct = document.getElementById('btnNuevaActividad');
+    const btnNuevaActTop = document.getElementById('btnNuevaActividadTop');
+    const formActId = document.getElementById('formActividadId');
+    const formActFechaCorta = document.getElementById('formActFechaCorta');
+    const formActHora = document.getElementById('formActHora');
+    const formActTitulo = document.getElementById('formActTitulo');
+    const formActCategoria = document.getElementById('formActCategoria');
+    const formActTipo = document.getElementById('formActTipo');
+    const formActLugar = document.getElementById('formActLugar');
+    const formActOrganiza = document.getElementById('formActOrganiza');
+    const formActActivo = document.getElementById('formActActivo');
+    const modalActTitulo = document.getElementById('modalActividadTitulo');
+
+    function abrirModalNuevaActividad() {
+        formActId.value = '0';
+        formActFechaCorta.value = '';
+        formActHora.value = '10:00';
+        formActTitulo.value = '';
+        formActCategoria.value = 'cultura';
+        formActTipo.value = 'ACTIVIDAD';
+        formActLugar.value = '';
+        formActOrganiza.value = '';
+        formActActivo.checked = true;
+        modalActTitulo.textContent = 'Nueva Actividad de Agenda';
+        const sub = document.getElementById('modalActividadSubtitulo');
+        if (sub) sub.textContent = 'Cronograma y Calendario Interactivo 2026';
+        modalActInstance?.show();
+    }
+
+    btnNuevaAct?.addEventListener('click', abrirModalNuevaActividad);
+    btnNuevaActTop?.addEventListener('click', abrirModalNuevaActividad);
+
+    // Abrir Modal Editar Actividad
+    document.querySelectorAll('.btn-editar-actividad').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dataStr = btn.getAttribute('data-actividad');
+            if (!dataStr) return;
+            try {
+                const act = JSON.parse(dataStr);
+                formActId.value = act.id_actividad;
+                formActFechaCorta.value = act.fecha_corta || '';
+                formActHora.value = act.hora || '';
+                formActTitulo.value = act.titulo || '';
+                formActCategoria.value = act.categoria || 'cultura';
+                formActTipo.value = act.tipo || 'ACTIVIDAD';
+                formActLugar.value = act.lugar || '';
+                formActOrganiza.value = act.organiza || '';
+                formActActivo.checked = parseInt(act.activo) === 1;
+
+                modalActTitulo.textContent = 'Editar Actividad de Agenda';
+                const sub = document.getElementById('modalActividadSubtitulo');
+                if (sub) sub.textContent = 'Modifica el horario, fecha o datos de la actividad';
+                modalActInstance?.show();
+            } catch (e) {
+                console.error('Error parseando actividad', e);
+            }
+        });
+    });
+
+    function abrirModalNuevaFraternidad() {
         formFratId.value = '0';
         formFratOrden.value = '<?= count($fraternidades ?? []) + 1 ?>';
         formFratHora.value = '';
@@ -552,9 +957,15 @@ document.addEventListener('DOMContentLoaded', () => {
         formFratUniv.value = 'Universidad Autónoma del Beni José Ballivián';
         formFratDepto.value = 'Beni';
         formFratActivo.checked = true;
-        modalFratTitulo.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Nueva Fraternidad';
+        modalFratTitulo.textContent = 'Nueva Fraternidad';
+        const sub = document.getElementById('modalFratSubtitulo');
+        if (sub) sub.textContent = 'Entrada Folklórica Universitaria';
         modalFratInstance?.show();
-    });
+    }
+
+    // Abrir Modal Nueva Fraternidad (desde ambos botones: superior y de sección)
+    btnNuevaFrat?.addEventListener('click', abrirModalNuevaFraternidad);
+    btnNuevaFratTop?.addEventListener('click', abrirModalNuevaFraternidad);
 
     // Abrir Modal Editar Fraternidad
     document.querySelectorAll('.btn-editar-fraternidad').forEach(btn => {
@@ -572,7 +983,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 formFratDepto.value = frat.departamento || 'Beni';
                 formFratActivo.checked = parseInt(frat.activo) === 1;
 
-                modalFratTitulo.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Fraternidad';
+                modalFratTitulo.textContent = 'Editar Fraternidad';
+                const sub = document.getElementById('modalFratSubtitulo');
+                if (sub) sub.textContent = 'Modifica el orden de ingreso o información de la agrupación';
                 modalFratInstance?.show();
             } catch (e) {
                 console.error('Error parseando datos de fraternidad', e);
@@ -607,7 +1020,9 @@ document.addEventListener('DOMContentLoaded', () => {
         formImagen.required = true;
         reqAsterisco.classList.remove('d-none');
         mostrarPreview(null);
-        modalTitulo.innerHTML = '<i class="bi bi-calendar-plus me-2"></i>Nuevo Evento / Afiche';
+        modalTitulo.textContent = 'Nuevo Evento / Afiche';
+        const sub = document.getElementById('modalEventoSubtitulo');
+        if (sub) sub.textContent = 'Difusión en el pop-up y cartelera destacada';
         modalInstance?.show();
     });
 
@@ -635,7 +1050,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 mostrarPreview(imgUrl || null);
 
-                modalTitulo.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Evento';
+                modalTitulo.textContent = 'Editar Evento';
+                const sub = document.getElementById('modalEventoSubtitulo');
+                if (sub) sub.textContent = 'Modifica los datos del evento seleccionado';
                 modalInstance?.show();
             } catch (e) {
                 console.error('Error al abrir evento para editar', e);

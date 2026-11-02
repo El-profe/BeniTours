@@ -27,13 +27,13 @@ class TelegramService {
         return (string)($respuesta['result']['username'] ?? '');
     }
 
-    private static function api(string $metodo, array $datos): array {
+    private static function api(string $metodo, array $datos, int $timeoutSegundos = 10): array {
         if (self::$transporte !== null) return (self::$transporte)($metodo, $datos);
         if (!self::configurado()) throw new RuntimeException('Telegram no está configurado.');
         $config = self::configuracion();
         $curl = curl_init('https://api.telegram.org/bot' . $config['telegram_token'] . '/' . $metodo);
         curl_setopt_array($curl, [CURLOPT_POST=>true, CURLOPT_POSTFIELDS=>$datos,
-            CURLOPT_RETURNTRANSFER=>true, CURLOPT_CONNECTTIMEOUT=>5, CURLOPT_TIMEOUT=>20,
+            CURLOPT_RETURNTRANSFER=>true, CURLOPT_CONNECTTIMEOUT=>3, CURLOPT_TIMEOUT=>$timeoutSegundos,
             CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS, CURLOPT_FOLLOWLOCATION=>false,
             CURLOPT_SSL_VERIFYPEER=>true, CURLOPT_SSL_VERIFYHOST=>2]);
         $respuesta = curl_exec($curl);
@@ -53,7 +53,7 @@ class TelegramService {
         return htmlspecialchars($texto, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
-    public static function notificarNuevaSolicitud(int $idSolicitud, array $datos, string $rutaComprobante): int {
+    public static function notificarNuevaSolicitud(int $idSolicitud, array $datos, string $rutaComprobante, int $timeoutSegundos = 10): int {
         $config = self::configuracion();
         $mime = ComprobanteService::validarImagen($rutaComprobante);
         $caption = "🔔 <b>NUEVA SOLICITUD COMERCIAL - BENITOURS</b>\n" .
@@ -70,11 +70,11 @@ class TelegramService {
         $respuesta = self::api('sendPhoto', ['chat_id'=>$config['admin_chat_id'],
             'photo'=>new \CURLFile($rutaComprobante, $mime, basename($rutaComprobante)),
             'caption'=>$caption, 'parse_mode'=>'HTML', 'protect_content'=>'true',
-            'reply_markup'=>json_encode($teclado, JSON_UNESCAPED_UNICODE)]);
+            'reply_markup'=>json_encode($teclado, JSON_UNESCAPED_UNICODE)], $timeoutSegundos);
         return (int)$respuesta['result']['message_id'];
     }
 
-    public static function notificarNuevaSolicitudTexto(int $idSolicitud, array $datos): int {
+    public static function notificarNuevaSolicitudTexto(int $idSolicitud, array $datos, int $timeoutSegundos = 10): int {
         $config = self::configuracion();
         $texto = "🔔 <b>NUEVA SOLICITUD EN EFECTIVO - BENITOURS</b>\n" .
             '🏪 <b>Negocio:</b> ' . self::html($datos['nombre_establecimiento']) . "\n" .
@@ -90,7 +90,7 @@ class TelegramService {
         ]];
         $respuesta = self::api('sendMessage', ['chat_id'=>$config['admin_chat_id'],
             'text'=>$texto, 'parse_mode'=>'HTML', 'protect_content'=>'true',
-            'reply_markup'=>json_encode($teclado, JSON_UNESCAPED_UNICODE)]);
+            'reply_markup'=>json_encode($teclado, JSON_UNESCAPED_UNICODE)], $timeoutSegundos);
         return (int)$respuesta['result']['message_id'];
     }
 
@@ -127,7 +127,7 @@ class TelegramService {
     }
 
     // Reserva corta en BD, HTTP fuera de la transacción. Un trabajador caído se reintenta.
-    public static function procesarPendientes(int $limite = 10, ?int $idSolicitud = null): int {
+    public static function procesarPendientes(int $limite = 10, ?int $idSolicitud = null, int $timeoutSegundos = 10): int {
         if (!self::configurado()) return 0;
         $db = Database::getConnection();
         $procesados = 0;
@@ -148,7 +148,7 @@ class TelegramService {
                 throw $e;
             }
             try {
-                self::procesar($job);
+                self::procesar($job, $timeoutSegundos);
                 $db->prepare("UPDATE telegram_notificaciones SET estado='ENVIADA', ultimo_error=NULL WHERE id_notificacion=?")->execute([$job['id_notificacion']]);
                 $procesados++;
             } catch (Throwable $e) {
@@ -162,15 +162,15 @@ class TelegramService {
         return $procesados;
     }
 
-    private static function procesar(array $job): void {
+    private static function procesar(array $job, int $timeoutSegundos = 10): void {
         $db = Database::getConnection();
         $s = (new \App\Models\Solicitud())->buscarPorId((int)$job['id_solicitud']);
         if ($job['tipo'] === 'NUEVA') {
             if ($s['estado'] !== 'PENDIENTE' || $s['telegram_message_id']) return;
             if (!empty($s['comprobante_archivo'])) {
-                $messageId = self::notificarNuevaSolicitud((int)$s['id_solicitud'], $s, ComprobanteService::ruta($s['comprobante_archivo']));
+                $messageId = self::notificarNuevaSolicitud((int)$s['id_solicitud'], $s, ComprobanteService::ruta($s['comprobante_archivo']), $timeoutSegundos);
             } else {
-                $messageId = self::notificarNuevaSolicitudTexto((int)$s['id_solicitud'], $s);
+                $messageId = self::notificarNuevaSolicitudTexto((int)$s['id_solicitud'], $s, $timeoutSegundos);
             }
             $db->prepare('UPDATE solicitudes SET telegram_message_id=? WHERE id_solicitud=?')->execute([$messageId,$s['id_solicitud']]);
             // Si la resolución coincidió con sendPhoto, reactivar el trabajo de resolución.

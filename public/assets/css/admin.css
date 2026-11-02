@@ -1128,37 +1128,40 @@ h1, h2, h3, h4, h5, h6, .btn, .nav-link, .sidebar-link {
     color: #6f42c1;
 }
 
-/* Selector de categorías en chips compactos */
+/* ==========================================================================
+   SELECTOR DE CATEGORÍAS MODERNO & TARJETAS ESPACIOSAS
+   ========================================================================== */
 .category-pill-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-    gap: 0.6rem;
-    max-height: 240px;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 0.75rem;
+    max-height: 280px;
     overflow-y: auto;
-    padding: 0.35rem;
-    border: 1px solid #e5ede8;
-    border-radius: 1rem;
-    background: #fbfdfc;
+    padding: 0.6rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1.25rem;
+    background: #f8fafc;
 }
 
 .category-pill-card {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 0.75rem;
-    border: 1.5px solid #e3ece6;
-    border-radius: 0.75rem;
+    gap: 0.75rem;
+    padding: 0.75rem 0.95rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
     cursor: pointer;
     background: #ffffff;
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .category-pill-card:hover {
-    border-color: #80bf98;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border-color: #2A9D8F;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(42, 157, 143, 0.12);
 }
 
 .category-pill-card input[type="radio"] {
@@ -1167,25 +1170,199 @@ h1, h2, h3, h4, h5, h6, .btn, .nav-link, .sidebar-link {
     pointer-events: none;
 }
 
-.category-pill-card:has(input[type="radio"]:checked) {
-    border-color: #198754;
-    background: #ecfdf5;
-    color: #065f46;
-    box-shadow: 0 0 0 1px #198754;
+.category-pill-icon-box {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+    background: #e6f4ea;
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: all 0.2s ease;
 }
 
-.category-pill-icon {
-    font-size: 1rem;
-    color: #198754;
-    flex-shrink: 0;
+.category-pill-content {
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .category-pill-name {
-    font-size: 0.8rem;
+    display: block;
+    font-size: 0.84rem;
     font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: #1e293b;
+    line-height: 1.25;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.category-pill-card:has(input[type="radio"]:checked) {
+    border-color: #2A9D8F !important;
+    background: #f0fdfa !important;
+    box-shadow: 0 0 0 2px rgba(42, 157, 143, 0.22), 0 6px 16px rgba(42, 157, 143, 0.12) !important;
+}
+
+.category-pill-card:has(input[type="radio"]:checked) .category-pill-icon-box {
+    background: #2A9D8F !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(42, 157, 143, 0.35);
+}
+
+.category-pill-card:has(input[type="radio"]:checked) .category-pill-name {
+    color: #0f766e;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   CONSTRUCTOR VISUAL DE DÍAS Y HORARIOS DE ATENCIÓN
+   ========================================================================== */
+.card-horario-panel {
+    border-color: #e2e8f0 !important;
+    background: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+.horario-panel-icon-badge {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 9px;
+    background: #e6f4ea;
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+}
+
+.switch-horario-24:checked {
+    background-color: #2A9D8F;
+    border-color: #2A9D8F;
+}
+
+/* Chips de atajos de días */
+.btn-preset-chip {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+}
+
+.btn-preset-chip:hover {
+    background: #e2e8f0;
+    color: #0f766e;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+
+.btn-preset-chip.active {
+    background: #0d9488 !important;
+    color: #ffffff !important;
+    border-color: #0d9488 !important;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+
+/* Grilla de días segmentados independientes */
+.dias-semana-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.45rem;
+}
+
+@media (max-width: 575.98px) {
+    .dias-semana-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.dia-check-pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.2rem;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.dia-check-pill:hover {
+    border-color: #2A9D8F;
+    background: #f8fafc;
+    color: #0f766e;
+    transform: translateY(-1px);
+}
+
+.dia-check-pill input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.dia-check-pill:has(input[type="checkbox"]:checked) {
+    background: #0d9488;
+    border-color: #0d9488;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(13, 148, 136, 0.28);
+}
+
+.dia-check-pill--dom:has(input[type="checkbox"]:checked) {
+    background: #ea580c;
+    border-color: #ea580c;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+}
+
+/* Rango de Horarios */
+.horario-time-group .input-group-text {
+    border-radius: 0.75rem 0 0 0.75rem;
+    font-size: 0.95rem;
+}
+
+.horario-time-group input[type="time"] {
+    border-radius: 0 0.75rem 0.75rem 0;
+    font-size: 0.9rem;
+    color: #1e293b;
+    border-color: #cbd5e1;
+}
+
+.horario-time-group input[type="time"]:focus {
+    border-color: #2A9D8F;
+    box-shadow: 0 0 0 0.2rem rgba(42, 157, 143, 0.15);
+}
+
+.btn-outline-teal {
+    color: #0d9488;
+    border-color: #0d9488;
+    background: transparent;
+    transition: all 0.18s ease;
+}
+
+.btn-outline-teal:hover {
+    color: #ffffff;
+    background-color: #0d9488;
+    border-color: #0d9488;
+    box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+}
+
+/* Caja de previsualización en vivo */
+.horario-preview-box {
+    background: linear-gradient(90deg, #f0fdfa 0%, #f8fafc 100%);
+    border: 1px solid #ccfbf1;
 }
 
 /* Dropzone de fotos mejorada */
@@ -1592,6 +1769,88 @@ body.admin-theme #modalInformeComercio .modal-header { background: linear-gradie
         padding: 0.4rem 0.65rem;
         font-size: 0.75rem;
     }
+
+    /* Transformación de Tabla de Solicitudes a Tarjetas en Celular */
+    .solicitudes-table-modern thead {
+        display: none !important;
+    }
+
+    .solicitudes-table-modern,
+    .solicitudes-table-modern tbody,
+    .solicitudes-table-modern tr.solicitud-row {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .solicitudes-table-modern tr.solicitud-row {
+        background: #ffffff !important;
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 1.25rem !important;
+        margin-bottom: 1rem !important;
+        padding: 1rem !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        position: relative;
+    }
+
+    .solicitudes-table-modern tbody td {
+        display: block !important;
+        width: 100% !important;
+        padding: 0.45rem 0 !important;
+        border: none !important;
+        text-align: left !important;
+    }
+
+    .solicitudes-table-modern tbody td.ps-4 {
+        padding-left: 0 !important;
+        padding-bottom: 0.75rem !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .solicitudes-table-modern tbody td[data-estado] {
+        display: inline-block !important;
+        width: auto !important;
+        margin-top: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .solicitudes-table-modern tbody td[data-acciones] {
+        padding-top: 0.85rem !important;
+        border-top: 1px dashed #e2e8f0 !important;
+        margin-top: 0.65rem !important;
+        text-align: left !important;
+    }
+
+    .solicitudes-table-modern td[data-acciones] .d-inline-flex {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+
+    .solicitudes-table-modern td[data-acciones] .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        white-space: nowrap !important;
+        padding: 0.45rem 0.85rem !important;
+        font-size: 0.82rem !important;
+        border-radius: 9999px !important;
+    }
+
+    .solicitudes-table-modern td[data-acciones] .btn-outline-danger {
+        flex: 0 0 auto !important;
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+    }
+
+    .solicitudes-table-modern .btn-cobro-efectivo {
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
 }
 
 /* Sustituci\u00f3n integral de los verdes heredados de Bootstrap y m\u00f3dulos administrativos. */
@@ -1662,6 +1921,56 @@ body.admin-theme .admin-search-chip { background: #E2F2F0; color: #217E73; }
 
 .extra-small {
     font-size: 0.75rem !important;
+}
+
+/* Botones y estilos Teal para el panel administrativo */
+.bg-teal {
+    background-color: #0d9488 !important;
+    color: #ffffff !important;
+}
+
+body.admin-theme .btn-teal-action,
+.btn-teal-action {
+    background-color: #0d9488 !important;
+    border: 1px solid #0d9488 !important;
+    color: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+body.admin-theme .btn-teal-action:hover,
+body.admin-theme .btn-teal-action:focus,
+.btn-teal-action:hover,
+.btn-teal-action:focus {
+    background-color: #0f766e !important;
+    border-color: #0f766e !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35) !important;
+}
+
+body.admin-theme .btn-outline-teal,
+.btn-outline-teal {
+    color: #0d9488 !important;
+    border: 1px solid #0d9488 !important;
+    background-color: transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+body.admin-theme .btn-outline-teal:hover,
+body.admin-theme .btn-outline-teal:focus,
+.btn-outline-teal:hover,
+.btn-outline-teal:focus {
+    background-color: #0d9488 !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25) !important;
 }
 
 

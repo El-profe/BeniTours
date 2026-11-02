@@ -44,10 +44,12 @@ class Router {
         // Manejo de [ClaseControlador, método]
         if (is_array($handler) && count($handler) === 2) {
             [$class, $action] = $handler;
+            $esProduccion = (string)env('APP_ENV', 'production') === 'production';
+
             if (!class_exists($class)) {
                 http_response_code(500);
                 error_log("Router Error: La clase de controlador '{$class}' no existe.");
-                die("Error de configuración de ruta: La clase '{$class}' no existe.");
+                die($esProduccion ? "Error interno del servidor. Por favor, intente más tarde." : "Error de configuración de ruta: La clase '{$class}' no existe.");
             }
 
             try {
@@ -55,21 +57,28 @@ class Router {
             } catch (\Throwable $e) {
                 http_response_code(500);
                 error_log("Router Error: Fallo al instanciar '{$class}': " . $e->getMessage());
-                die("Error al inicializar controlador ({$class}): " . htmlspecialchars($e->getMessage()));
+                die($esProduccion ? "Error interno del servidor. Por favor, intente más tarde." : "Error al inicializar controlador ({$class}): " . htmlspecialchars($e->getMessage()));
             }
 
             if (!method_exists($controllerInstance, $action)) {
                 http_response_code(500);
                 error_log("Router Error: El método '{$action}' no existe en '{$class}'.");
-                die("Error de configuración de ruta: El método '{$action}' no existe en '{$class}'.");
+                die($esProduccion ? "Error interno del servidor. Por favor, intente más tarde." : "Error de configuración de ruta: El método '{$action}' no existe en '{$class}'.");
             }
 
-            $controllerInstance->$action();
+            try {
+                $controllerInstance->$action();
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                error_log("Router Execution Error in {$class}::{$action}: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+                die($esProduccion ? "Se ha producido un error inesperado al procesar la solicitud." : "Error en ejecución ({$class}::{$action}): " . htmlspecialchars($e->getMessage()));
+            }
             return;
         }
 
         http_response_code(500);
-        die("Error de configuración de ruta: El manejador no pudo ser invocado.");
+        $esProduccion = (string)env('APP_ENV', 'production') === 'production';
+        die($esProduccion ? "Error interno del servidor." : "Error de configuración de ruta: El manejador no pudo ser invocado.");
     }
 
     /**

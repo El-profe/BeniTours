@@ -60,12 +60,12 @@
         </ol>
     </nav>
 
-    <!-- 1. HERO FOTOGRÁFICO PANORÁMICO (Estilo Keliauk Lietuvoje) -->
+    <!-- 1. HERO FOTOGRÁFICO PANORÁMICO -->
     <div class="lugar-panoramico-hero mb-0">
         <?php if (!empty($fotos)): ?>
-            <div id="carruselLugar" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500" role="region" aria-roledescription="carrusel" aria-label="Fotografías de <?= htmlspecialchars($lugar['nombre']) ?>">
+            <div id="carruselLugar" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4500" role="region" aria-roledescription="carrusel" aria-label="Fotografías de <?= htmlspecialchars($lugar['nombre']) ?>">
                 <?php if ($variasFotos): ?>
-                    <div class="carousel-indicators mb-4 pb-2">
+                    <div class="carousel-indicators mb-4 pb-2 z-index-3">
                         <?php foreach ($fotos as $indice => $foto): ?>
                             <button type="button" data-bs-target="#carruselLugar" data-bs-slide-to="<?= $indice ?>"<?= $indice === 0 ? ' class="active" aria-current="true"' : '' ?> aria-label="Fotografía <?= $indice + 1 ?>"></button>
                         <?php endforeach; ?>
@@ -73,11 +73,17 @@
                 <?php endif; ?>
                 <div class="carousel-inner">
                     <?php foreach ($fotos as $indice => $foto): ?>
+                        <?php $imgUrl = htmlspecialchars($baseUrl) . '/imagen?f=' . urlencode($foto['nombre_archivo']); ?>
                         <div class="carousel-item<?= $indice === 0 ? ' active' : '' ?>">
-                            <img src="<?= htmlspecialchars($baseUrl) ?>/imagen?f=<?= urlencode($foto['nombre_archivo']) ?>"
-                                 alt="<?= htmlspecialchars($lugar['nombre']) ?> — fotografía <?= $indice + 1 ?> de <?= count($fotos) ?>"
-                                 class="d-block w-100 object-fit-cover place-detail-photo"
-                                 <?= $indice === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"' ?>>
+                            <div class="place-detail-slide">
+                                <!-- Fondo ambiental desenfocado para rellenar armoniosamente fotos cuadradas o verticales -->
+                                <div class="place-detail-slide-bg" style="background-image: url('<?= $imgUrl ?>');" aria-hidden="true"></div>
+                                <!-- Fotografía principal con relación de aspecto cuidada -->
+                                <img src="<?= $imgUrl ?>"
+                                     alt="<?= htmlspecialchars($lugar['nombre']) ?> — fotografía <?= $indice + 1 ?> de <?= count($fotos) ?>"
+                                     class="d-block place-detail-photo"
+                                     <?= $indice === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"' ?>>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -103,7 +109,7 @@
         <?php endif; ?>
     </div>
 
-    <!-- 2. CABECERA FLOTANTE CON CURVA ORGÁNICA SUPERPUESTA AL HERO -->
+    <!-- 2. CABECERA PRINCIPAL DE DETALLE (Diseño limpio y no invasivo) -->
     <header class="lugar-header-flotante p-4 p-md-5 mb-4 position-relative">
         <!-- Barra Superior de Badges y Botones de Acción -->
         <div class="lugar-header-top-bar d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">

@@ -28,16 +28,37 @@ class RateLimiterService {
     }
 
     /**
-     * Obtiene la IP del cliente considerando posibles proxies reversos o túneles de forma segura.
+     * Obtiene la IP del cliente de forma segura.
+     * Solo confía en cabeceras de proxy (X-Forwarded-For, CF-Connecting-IP) si REMOTE_ADDR
+     * pertenece a un proxy de confianza explícitamente configurado en app.php o .env.
      */
     public static function obtenerIpCliente(): string {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $ip = trim($ips[0]);
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $ip = $remoteAddr;
+
+        $trustedProxies = [];
+        $envTrusted = (string)env('TRUSTED_PROXIES', '');
+        if ($envTrusted !== '') {
+            $trustedProxies = array_filter(array_map('trim', explode(',', $envTrusted)));
         }
+
+        // Si se confía en proxies o si REMOTE_ADDR está en la lista blanca de proxies autorizados
+        $esProxyConfiable = false;
+        if (!empty($trustedProxies)) {
+            if (in_array('*', $trustedProxies, true) || in_array($remoteAddr, $trustedProxies, true)) {
+                $esProxyConfiable = true;
+            }
+        }
+
+        if ($esProxyConfiable) {
+            if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+                $ip = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+            } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+                $ip = trim($ips[0]);
+            }
+        }
+
         return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '127.0.0.1';
     }
 

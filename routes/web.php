@@ -104,6 +104,8 @@ $router->post('/admin/eventos/estado', [\App\Controllers\Admin\EventoController:
 $router->post('/admin/eventos/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminar']);
 $router->post('/admin/eventos/fraternidad/guardar', [\App\Controllers\Admin\EventoController::class, 'guardarFraternidad']);
 $router->post('/admin/eventos/fraternidad/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminarFraternidad']);
+$router->post('/admin/eventos/actividad/guardar', [\App\Controllers\Admin\EventoController::class, 'guardarActividad']);
+$router->post('/admin/eventos/actividad/eliminar', [\App\Controllers\Admin\EventoController::class, 'eliminarActividad']);
 
 
 // Portal de las cuentas aprovisionadas.

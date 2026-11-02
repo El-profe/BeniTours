@@ -1291,33 +1291,36 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <!-- Header Modal -->
-            <div class="modal-header py-3" style="background: linear-gradient(135deg, #881337, #e11d48); color: #ffffff;">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-white text-danger d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 1.15rem;">
+            <div class="modal-header py-2 py-md-3 px-3 px-md-4 align-items-center" style="background: linear-gradient(135deg, #881337, #e11d48); color: #ffffff;">
+                <div class="d-flex align-items-center gap-2 pe-2 flex-grow-1">
+                    <div class="rounded-circle bg-white text-danger d-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px; font-size: 1.05rem;">
                         <i class="bi bi-bar-chart-fill"></i>
                     </div>
-                    <div>
-                        <h5 class="modal-title fw-bold mb-0 text-white" id="modalGraficosRankingTitulo">Gráficos de Conversión y Popularidad de Comercios</h5>
-                        <small class="text-white-50">Comparativa visual de interacciones turísticas generadas en Trinidad</small>
+                    <div class="flex-grow-1">
+                        <h5 class="modal-title fw-bold mb-0 text-white lh-sm" id="modalGraficosRankingTitulo" style="font-size: 0.95rem;">
+                            Gráficos de Conversión y Popularidad
+                        </h5>
+                        <small class="text-white-50 d-none d-md-block extra-small mt-1">Comparativa visual de interacciones turísticas generadas en Trinidad</small>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white flex-shrink-0 ms-2" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <!-- Body Modal -->
-            <div class="modal-body p-4 bg-light">
-                <div class="row g-4">
+            <div class="modal-body p-3 p-md-4 bg-light">
+                <div class="row g-3 g-md-4">
                     <!-- Gráfico 1: Top 10 Comercios por Conversiones Totales -->
                     <div class="col-lg-7">
                         <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <div>
-                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-trophy-fill text-warning me-2"></i>Top 10 Comercios con Más Conversiones</h6>
+                                    <h6 class="fw-bold mb-1 text-dark fs-6"><i class="bi bi-trophy-fill text-warning me-2"></i>Top 10 Comercios con Más Conversiones</h6>
                                     <p class="extra-small text-muted mb-0">Suma total de WhatsApp + Rutas en Mapa</p>
                                 </div>
                                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1">Líderes</span>
                             </div>
-                            <div style="height: 320px; position: relative;">
+                            <!-- Contenedor con altura fluida y scroll horizontal opcional si los nombres son largos -->
+                            <div class="chart-container-scrollable" style="min-height: 340px; position: relative;">
                                 <canvas id="chartRankingConversiones"></canvas>
                             </div>
                         </div>
@@ -1326,14 +1329,14 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                     <!-- Gráfico 2: Distribución por Canal de Interacción -->
                     <div class="col-lg-5">
                         <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <div>
-                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Canales de Contacto</h6>
+                                    <h6 class="fw-bold mb-1 text-dark fs-6"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Canales de Contacto</h6>
                                     <p class="extra-small text-muted mb-0">Distribución de contactos WhatsApp vs. Rutas Maps</p>
                                 </div>
                                 <span class="badge bg-light text-dark border rounded-pill px-2 py-1">Canales</span>
                             </div>
-                            <div style="height: 320px; position: relative;">
+                            <div style="height: 280px; position: relative;">
                                 <canvas id="chartCanalesDona"></canvas>
                             </div>
                         </div>
@@ -1342,9 +1345,9 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
                     <!-- Gráfico 3: Comparativa Multivariable (Vistas vs Conversiones vs Favoritos) -->
                     <div class="col-12">
                         <div class="bg-white p-3 p-md-4 rounded-4 border shadow-xs">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <div>
-                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-steps text-success me-2"></i>Embudo de Atracción: Vistas vs. Contactos Reales</h6>
+                                    <h6 class="fw-bold mb-1 text-dark fs-6"><i class="bi bi-bar-chart-steps text-success me-2"></i>Embudo de Atracción: Vistas vs. Contactos Reales</h6>
                                     <p class="extra-small text-muted mb-0">Compara la visibilidad que recibe la ficha vs cuántos turistas decidieron contactarse</p>
                                 </div>
                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Interacción</span>
@@ -1358,7 +1361,7 @@ $tabActivo = $filtros['tab'] ?? 'finanzas';
             </div>
 
             <!-- Footer Modal -->
-            <div class="modal-footer bg-white py-2">
+            <div class="modal-footer bg-white py-2 px-3">
                 <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -2254,8 +2257,10 @@ function renderizarGraficosModalRanking() {
         if (chartRankingConvInstance) chartRankingConvInstance.destroy();
 
         // Tomar hasta los 10 primeros
+        const esPantallaPequena = window.innerWidth < 576;
         const top10 = datosRanking.slice(0, 10);
-        const labelsTop = top10.map(d => d.nombre.length > 20 ? d.nombre.substring(0, 18) + '...' : d.nombre);
+        const maxLenLabel = esPantallaPequena ? 12 : 20;
+        const labelsTop = top10.map(d => d.nombre.length > maxLenLabel ? d.nombre.substring(0, maxLenLabel - 2) + '…' : d.nombre);
         const dataWhatsapp = top10.map(d => d.whatsapp);
         const dataMapa = top10.map(d => d.mapa);
 
@@ -2283,11 +2288,15 @@ function renderizarGraficosModalRanking() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11, weight: 'bold' } } },
+                    legend: { position: 'top', labels: { boxWidth: 12, font: { size: esPantallaPequena ? 10 : 11, weight: 'bold' } } },
                     tooltip: {
                         backgroundColor: '#0E4D5E',
                         padding: 10,
                         callbacks: {
+                            title: (items) => {
+                                const idx = items[0].dataIndex;
+                                return top10[idx]?.nombre || items[0].label;
+                            },
                             footer: (items) => {
                                 let total = 0;
                                 items.forEach(i => total += i.parsed.x);
@@ -2300,13 +2309,16 @@ function renderizarGraficosModalRanking() {
                     x: {
                         stacked: true,
                         beginAtZero: true,
-                        ticks: { precision: 0 },
+                        ticks: { precision: 0, font: { size: esPantallaPequena ? 10 : 11 } },
                         grid: { color: 'rgba(0, 0, 0, 0.05)' }
                     },
                     y: {
                         stacked: true,
                         grid: { display: false },
-                        ticks: { font: { size: 11 } }
+                        ticks: { 
+                            font: { size: esPantallaPequena ? 9.5 : 11 },
+                            autoSkip: false
+                        }
                     }
                 }
             }

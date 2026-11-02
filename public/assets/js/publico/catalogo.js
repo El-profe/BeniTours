@@ -2252,7 +2252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     const contenedorMapaEntrada = document.getElementById('mapaEntradaRecorrido');
     if (contenedorMapaEntrada) {
-        // Trazado oficial importado de «untitled (1).geojson».
+        // Trazado oficial importado de «coordendas entrada 2026.geojson».
         // GeoJSON usa [longitud, latitud] y Leaflet usa [latitud, longitud].
         const recorridoEntradaGeoJson = {
             type: 'FeatureCollection',
@@ -2262,13 +2262,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 geometry: {
                     type: 'LineString',
                     coordinates: [
-                        [-64.895427, -14.819019], [-64.902470, -14.818431],
-                        [-64.902663, -14.818502], [-64.902792, -14.818596],
-                        [-64.902961, -14.818640], [-64.903132, -14.818639],
-                        [-64.902670, -14.822785], [-64.902736, -14.824507],
-                        [-64.903539, -14.834448], [-64.904628, -14.834374],
-                        [-64.904716, -14.835471], [-64.903678, -14.835570],
-                        [-64.903657, -14.835349]
+                        [-64.895441, -14.819015], [-64.902387, -14.818442],
+                        [-64.902500, -14.818495], [-64.902635, -14.818519],
+                        [-64.902746, -14.818549], [-64.902846, -14.818621],
+                        [-64.903119, -14.818651], [-64.902894, -14.820532],
+                        [-64.902637, -14.822832], [-64.902735, -14.824488],
+                        [-64.903643, -14.835587], [-64.904707, -14.835487]
                     ]
                 }
             }]
@@ -2276,7 +2275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rutaCoords = recorridoEntradaGeoJson.features[0].geometry.coordinates
             .map(([longitud, latitud]) => [latitud, longitud]);
         const puntoSalida = rutaCoords[0];
-        const puntoHito = rutaCoords[8];
+        const puntoHito = rutaCoords[Math.floor(rutaCoords.length * 0.72)];
         const puntoMeta = rutaCoords[rutaCoords.length - 1];
 
         // Capas: Calles (OpenStreetMap con subdominios y HTTPS) y Satélite (Esri World Imagery)
@@ -2351,6 +2350,91 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Marcador animado: Danza tradicional "Los Judas" del Beni recorriendo la ruta
+        const urlBaseJudas = (contenedorMapaEntrada.getAttribute('data-base-url') || '').replace(/\/+$/, '');
+        const imgJudasSrc = `${urlBaseJudas}/assets/img/danza-judas.png`;
+
+        const iconoParticipante = L.divIcon({
+            className: 'custom-leaflet-div-icon',
+            html: `<div class="marcador-recorrido-animado marcador-recorrido-judas" title="Danza de los Judas del Beni">
+                     <span class="judas-pulsing-aura"></span>
+                     <span class="judas-sombra-suelo"></span>
+                     <div class="judas-figura-container">
+                       <img src="${imgJudasSrc}" alt="Danzante de los Judas" class="judas-personaje-img" loading="eager" />
+                     </div>
+                     <span class="badge-mini-judas">Judas</span>
+                   </div>`,
+            iconSize: [68, 78],
+            iconAnchor: [34, 72]
+        });
+        const marcadorParticipante = L.marker(puntoSalida, {
+            icon: iconoParticipante,
+            interactive: false,
+            keyboard: false,
+            zIndexOffset: 1200
+        }).addTo(mapaEntrada);
+
+        function animarParticipante() {
+            if (rutaCoords.length < 2) {
+                return;
+            }
+
+            const segmentos = rutaCoords.slice(1).map((punto, indice) => {
+                const inicio = rutaCoords[indice];
+                return {
+                    inicio,
+                    fin: punto,
+                    distancia: Math.hypot(punto[0] - inicio[0], punto[1] - inicio[1])
+                };
+            });
+            const distanciaTotal = segmentos.reduce((total, segmento) => total + segmento.distancia, 0);
+            const duracionRecorrido = 25000; // 25 segundos para completar el trayecto completo
+            let inicioAnimacion = null;
+
+            function actualizarPosicion(marcaTiempo) {
+                if (inicioAnimacion === null) inicioAnimacion = marcaTiempo;
+                const transcurrido = (marcaTiempo - inicioAnimacion) % duracionRecorrido;
+                const distanciaObjetivo = (transcurrido / duracionRecorrido) * distanciaTotal;
+                let distanciaAcumulada = 0;
+                let posicion = puntoSalida;
+
+                let deltaLng = 0;
+                for (const segmento of segmentos) {
+                    if (distanciaObjetivo <= distanciaAcumulada + segmento.distancia) {
+                        const avance = segmento.distancia === 0
+                            ? 0
+                            : (distanciaObjetivo - distanciaAcumulada) / segmento.distancia;
+                        posicion = [
+                            segmento.inicio[0] + ((segmento.fin[0] - segmento.inicio[0]) * avance),
+                            segmento.inicio[1] + ((segmento.fin[1] - segmento.inicio[1]) * avance)
+                        ];
+                        deltaLng = segmento.fin[1] - segmento.inicio[1];
+                        break;
+                    }
+                    distanciaAcumulada += segmento.distancia;
+                }
+
+                marcadorParticipante.setLatLng(posicion);
+
+                // Voltear la figura según la orientación de marcha (la imagen mira a la derecha por defecto)
+                const contenedorFigura = marcadorParticipante.getElement()?.querySelector('.judas-personaje-img');
+                if (contenedorFigura) {
+                    if (deltaLng < -0.00001) {
+                        // Marchando hacia el oeste (izquierda) -> reflejar horizontalmente
+                        contenedorFigura.style.transform = 'scaleX(-1)';
+                    } else if (deltaLng > 0.00001) {
+                        // Marchando hacia el este (derecha) -> posición natural
+                        contenedorFigura.style.transform = 'scaleX(1)';
+                    }
+                }
+
+                window.requestAnimationFrame(actualizarPosicion);
+            }
+
+            window.requestAnimationFrame(actualizarPosicion);
+        }
+        animarParticipante();
+
         // Hito 1: Salida / Concentración
         const markerSalida = L.marker(puntoSalida, {
             icon: crearIconoHito('marcador-entrada-salida', 'bi-flag-fill', true)
@@ -2363,15 +2447,15 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `);
 
-        // Hito 2: giro hacia la calle Antonio Vaca Díez
+        // Hito 2: punto destacado del recorrido
         const markerHito = L.marker(puntoHito, {
             icon: crearIconoHito('marcador-entrada-hito', 'bi-geo-alt-fill', false)
         }).addTo(mapaEntrada);
         markerHito.bindPopup(`
             <div class="text-center p-2" style="min-width: 190px;">
                 <span class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill fw-bold">HITO PRINCIPAL</span>
-                <h6 class="fw-bold mb-1 text-dark fs-6">Calle Antonio Vaca Díez</h6>
-                <p class="small text-muted mb-0">Giro oficial hacia el borde norte de la Plaza Principal.</p>
+                <h6 class="fw-bold mb-1 text-dark fs-6">Punto destacado del recorrido</h6>
+                <p class="small text-muted mb-0">Tramo oficial de la Entrada Universitaria 2026.</p>
             </div>
         `);
 
@@ -2450,6 +2534,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Cronómetro / Cuenta Regresiva de la Entrada Universitaria Nacional
+    const cronoBox = document.getElementById('cronometroEntradaBox');
+    if (cronoBox) {
+        const fechaEventoStr = cronoBox.getAttribute('data-fecha-evento') || '2026-11-14T09:00:00';
+        const fechaObjetivo = new Date(fechaEventoStr).getTime();
+        const diasEl = document.getElementById('cronoDias');
+        const horasEl = document.getElementById('cronoHoras');
+        const minEl = document.getElementById('cronoMinutos');
+        const segEl = document.getElementById('cronoSegundos');
+        const textoEstadoEl = document.getElementById('cronometroEstadoTexto');
+
+        function actualizarCronometro() {
+            const ahora = new Date().getTime();
+            const diferencia = fechaObjetivo - ahora;
+
+            if (diferencia <= 0) {
+                if (diasEl) diasEl.textContent = '00';
+                if (horasEl) horasEl.textContent = '00';
+                if (minEl) minEl.textContent = '00';
+                if (segEl) segEl.textContent = '00';
+                if (textoEstadoEl) {
+                    textoEstadoEl.innerHTML = '<span class="text-warning"><i class="bi bi-broadcast text-danger me-1"></i> ¡LA ENTRADA ESTÁ EN MARCHA!</span> Disfruta del recorrido en vivo';
+                }
+                return;
+            }
+
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+            if (diasEl) diasEl.textContent = dias < 10 ? `0${dias}` : dias;
+            if (horasEl) horasEl.textContent = horas < 10 ? `0${horas}` : horas;
+            if (minEl) minEl.textContent = minutos < 10 ? `0${minutos}` : minutos;
+            if (segEl) segEl.textContent = segundos < 10 ? `0${segundos}` : segundos;
+        }
+
+        actualizarCronometro();
+        setInterval(actualizarCronometro, 1000);
+    }
+
     // Modal Visor de Afiche Completo para Eventos
     const modalAficheEl = document.getElementById('modalVisorAficheEvento');
     if (modalAficheEl) {
@@ -2501,6 +2626,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         btnRecorrido.classList.add('d-none');
                     }
+                }
+
+                // Configurar botón para ir a la sección de Eventos
+                const btnIrEventos = document.getElementById('modalVisorBtnIrEventos');
+                if (btnIrEventos) {
+                    btnIrEventos.onclick = () => {
+                        setTimeout(() => {
+                            document.getElementById('eventos-18-noviembre')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 300);
+                    };
                 }
 
                 if (modalAficheInstance) {

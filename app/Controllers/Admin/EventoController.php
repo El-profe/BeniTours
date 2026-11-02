@@ -18,6 +18,7 @@ class EventoController extends Controller {
     public function index(): void {
         $eventos = $this->eventoModel->listarTodos();
         $fraternidades = (new \App\Models\Fraternidad())->listarAdmin();
+        $actividades = (new \App\Models\AgendaActividad())->listarAdmin();
         $mensaje = $_SESSION['admin_flash'] ?? null;
         $error   = $_SESSION['admin_error'] ?? null;
         unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
@@ -26,10 +27,83 @@ class EventoController extends Controller {
             'titulo'         => 'Agenda de Eventos y Entrada Universitaria',
             'eventos'        => $eventos,
             'fraternidades'  => $fraternidades,
+            'actividades'    => $actividades,
             'mensaje'        => $mensaje,
             'error'          => $error,
             'csrfToken'      => CsrfMiddleware::obtenerToken()
         ], 'admin');
+    }
+
+    /**
+     * Gestión de Actividades del Cronograma / Calendario Oficial
+     */
+    public function guardarActividad(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Token de seguridad inválido.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabAgendaAdmin");
+            exit();
+        }
+
+        $id = (int)($_POST['id_actividad'] ?? 0);
+        $fechaCorta = trim($_POST['fecha_corta'] ?? '');
+        $hora = trim($_POST['hora'] ?? '');
+        $titulo = trim($_POST['titulo'] ?? '');
+        $organiza = trim($_POST['organiza'] ?? '');
+        $lugar = trim($_POST['lugar'] ?? '');
+        $tipo = trim($_POST['tipo'] ?? '');
+        $categoria = trim($_POST['categoria'] ?? 'cultura');
+        $activo = isset($_POST['activo']) ? 1 : 0;
+
+        if (empty($fechaCorta) || empty($hora) || empty($titulo) || empty($lugar)) {
+            $_SESSION['admin_error'] = 'Por favor completa fecha, hora, título y lugar de la actividad.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabAgendaAdmin");
+            exit();
+        }
+
+        $agendaModel = new \App\Models\AgendaActividad();
+        $icono = $agendaModel->obtenerIconoPorCategoria($categoria);
+        $badge = $agendaModel->obtenerBadgePorCategoria($categoria);
+
+        $datos = [
+            'fecha_corta' => $fechaCorta,
+            'hora'        => $hora,
+            'titulo'      => $titulo,
+            'organiza'    => !empty($organiza) ? $organiza : 'Comité Organizador',
+            'lugar'       => $lugar,
+            'tipo'        => !empty($tipo) ? mb_strtoupper($tipo, 'UTF-8') : 'ACTIVIDAD',
+            'categoria'   => $categoria,
+            'icono'       => $icono,
+            'badge'       => $badge,
+            'activo'      => $activo
+        ];
+
+        if ($id > 0) {
+            $agendaModel->actualizar($id, $datos);
+            $_SESSION['admin_flash'] = "Actividad '{$titulo}' actualizada exitosamente.";
+        } else {
+            $agendaModel->crear($datos);
+            $_SESSION['admin_flash'] = "Nueva actividad '{$titulo}' añadida al cronograma interactivo.";
+        }
+
+        header("Location: {$this->config['base_url']}/admin/eventos#tabAgendaAdmin");
+        exit();
+    }
+
+    public function eliminarActividad(): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !CsrfMiddleware::validarToken($_POST['csrf_token'] ?? '')) {
+            $_SESSION['admin_error'] = 'Token de seguridad inválido.';
+            header("Location: {$this->config['base_url']}/admin/eventos#tabAgendaAdmin");
+            exit();
+        }
+
+        $id = (int)($_POST['id_actividad'] ?? 0);
+        if ($id > 0) {
+            (new \App\Models\AgendaActividad())->eliminar($id);
+            $_SESSION['admin_flash'] = 'Actividad eliminada del cronograma.';
+        }
+
+        header("Location: {$this->config['base_url']}/admin/eventos#tabAgendaAdmin");
+        exit();
     }
 
     /**

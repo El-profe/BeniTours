@@ -8,10 +8,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const estadoMapa = document.getElementById('estadoMapaNuevaFicha');
     const botonesModo = document.querySelectorAll('[data-location-mode]');
     const objectUrlsFotos = new Set();
+    const formFicha = document.getElementById('formCrearFicha');
+    const botonesGuardar = formFicha ? Array.from(formFicha.querySelectorAll('button[type="submit"]')) : [];
     let mapa;
     let marcador;
 
     let archivosFotos = [];
+    let procesandoFotos = false;
+    let envioEnCurso = false;
+    let compresionesPendientes = 0;
+
+    const estadoCompresion = document.createElement('div');
+    estadoCompresion.className = 'small mt-2';
+    estadoCompresion.setAttribute('aria-live', 'polite');
+    previews?.insertAdjacentElement('afterend', estadoCompresion);
+
+    const cambiarEstadoGuardado = (ocupado) => {
+        procesandoFotos = ocupado;
+        botonesGuardar.forEach((boton) => {
+            if (ocupado) {
+                boton.dataset.textoOriginal = boton.innerHTML;
+                boton.disabled = true;
+                boton.setAttribute('aria-busy', 'true');
+                boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Optimizando fotos…</span>';
+            } else {
+                boton.disabled = false;
+                boton.removeAttribute('aria-busy');
+                if (boton.dataset.textoOriginal) boton.innerHTML = boton.dataset.textoOriginal;
+            }
+        });
+    };
+
+    window.addEventListener('compresor-imagen:inicio', (evento) => {
+        if (evento.detail?.input !== inputFotos) return;
+        compresionesPendientes++;
+        cambiarEstadoGuardado(true);
+        estadoCompresion.textContent = 'Optimizando fotos para una subida mas rapida...';
+    });
+
+    window.addEventListener('compresor-imagen:fin', (evento) => {
+        if (evento.detail?.input !== inputFotos) return;
+        compresionesPendientes = Math.max(0, compresionesPendientes - 1);
+        if (compresionesPendientes === 0) {
+            cambiarEstadoGuardado(false);
+            estadoCompresion.textContent = 'Fotos optimizadas y listas para guardar.';
+        }
+    });
+
+    formFicha?.addEventListener('submit', (evento) => {
+        if (procesandoFotos) {
+            evento.preventDefault();
+            estadoCompresion.textContent = 'Espera un momento: las fotos todavia se estan optimizando.';
+            return;
+        }
+        if (envioEnCurso) {
+            evento.preventDefault();
+            return;
+        }
+
+        envioEnCurso = true;
+        botonesGuardar.forEach((boton) => {
+            boton.disabled = true;
+            boton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Guardando ficha...</span>';
+        });
+    });
 
     const elegirPortada = (indice) => {
         inputPortada.value = String(indice);
@@ -101,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si CompresorImagen está disponible, optimizar en el cliente antes de la subida
         if (window.CompresorImagen) {
             previews.innerHTML = '<div class="col-12 py-3 text-center text-muted small"><span class="spinner-border spinner-border-sm me-2 text-success"></span> Optimizando fotos en el navegador para subida rápida...</div>';
-            const resultados = await Promise.all(nuevosArchivos.map(a => window.CompresorImagen.comprimir(a, { maxDimension: 1280, calidad: 0.82 })));
+            const resultados = await window.CompresorImagen.comprimirLote(nuevosArchivos, { maxDimension: 1200, calidad: 0.80, input: inputFotos });
             if (typeof DataTransfer !== 'undefined') {
                 const dt = new DataTransfer();
                 resultados.forEach(r => dt.items.add(r.file));
@@ -368,6 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
     presetDiasBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const preset = btn.dataset.presetDias;
+            presetDiasBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
             checkboxesDias.forEach(cb => {
                 if (preset === 'L-V') {
                     cb.checked = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'].includes(cb.value);

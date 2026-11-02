@@ -246,12 +246,21 @@
         <div class="modal fade" id="modalEventosBeni" tabindex="-1" aria-labelledby="modalEventosBeniTitulo" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                 <div class="modal-content modal-eventos-beni border-0 overflow-hidden">
-                    <div class="modal-header border-0 px-4 py-3">
-                        <div>
-                            <span class="modal-eventos-eyebrow"><i class="bi bi-stars me-1"></i> Agenda del Beni</span>
-                            <h2 class="modal-title h5 fw-bold mb-0 text-white" id="modalEventosBeniTitulo">Eventos destacados <?= date('Y') ?></h2>
+                    <div class="modal-header border-0 px-3 px-sm-4 py-2.5 py-sm-3">
+                        <div class="d-flex flex-column min-w-0">
+                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                <span class="modal-eventos-eyebrow mb-0">
+                                    <i class="bi bi-stars me-1 text-warning"></i> Agenda del Beni
+                                </span>
+                                <?php if (count($eventosDestacados) > 1): ?>
+                                    <span class="badge modal-swipe-hint-pill">
+                                        <i class="bi bi-hand-index-thumb me-1"></i> Desliza para cambiar
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <h2 class="modal-title h5 fw-bold mb-0 text-white text-truncate" id="modalEventosBeniTitulo">Eventos destacados <?= date('Y') ?></h2>
                         </div>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar publicidad de eventos"></button>
+                        <button type="button" class="btn-close btn-close-white flex-shrink-0 ms-2" data-bs-dismiss="modal" aria-label="Cerrar publicidad de eventos"></button>
                     </div>
                     <div class="modal-body p-0 bg-light">
                         <div id="carruselEventosBeni" class="carousel slide" data-bs-interval="false">
@@ -429,7 +438,77 @@
         document.addEventListener('DOMContentLoaded', () => {
             const modalEventos = document.getElementById('modalEventosBeni');
             if (!modalEventos || !window.bootstrap?.Modal) return;
-            window.setTimeout(() => bootstrap.Modal.getOrCreateInstance(modalEventos).show(), 450);
+
+            // Evitar advertencia WAI-ARIA (Blocked aria-hidden on an element because its descendant retained focus)
+            modalEventos.addEventListener('hide.bs.modal', () => {
+                if (document.activeElement && modalEventos.contains(document.activeElement)) {
+                    document.activeElement.blur();
+                }
+            });
+
+            // Gestos táctiles fluidos (Deslizar con el dedo / Swipe y Toque lateral en la imagen)
+            const carruselEl = document.getElementById('carruselEventosBeni');
+            if (carruselEl && window.bootstrap?.Carousel) {
+                const carruselInstance = bootstrap.Carousel.getOrCreateInstance(carruselEl, {
+                    interval: false,
+                    touch: true,
+                    wrap: true
+                });
+
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchStartTime = 0;
+
+                carruselEl.addEventListener('touchstart', (e) => {
+                    if (!e.touches || e.touches.length === 0) return;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    touchStartTime = Date.now();
+                }, { passive: true });
+
+                carruselEl.addEventListener('touchend', (e) => {
+                    if (!e.changedTouches || e.changedTouches.length === 0) return;
+                    const deltaX = e.changedTouches[0].clientX - touchStartX;
+                    const deltaY = e.changedTouches[0].clientY - touchStartY;
+                    const elapsed = Date.now() - touchStartTime;
+
+                    // Si se hizo clic en un enlace como "Más info", permitir comportamiento por defecto
+                    if (e.target.closest('a, button')) return;
+
+                    // 1. Detección de Deslizamiento (Swipe horizontal predominante)
+                    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+                        if (deltaX < 0) {
+                            carruselInstance.next(); // Deslizó hacia la izquierda -> Siguiente evento
+                        } else {
+                            carruselInstance.prev(); // Deslizó hacia la derecha -> Evento anterior
+                        }
+                        return;
+                    }
+
+                    // 2. Detección de Toque directo (Tap en la mitad izquierda o derecha de la imagen)
+                    if (elapsed < 320 && Math.abs(deltaX) < 15 && Math.abs(deltaY) < 15) {
+                        const targetCard = e.target.closest('.evento-publicidad-card');
+                        if (targetCard) {
+                            const rect = targetCard.getBoundingClientRect();
+                            const clickX = e.changedTouches[0].clientX - rect.left;
+                            if (clickX > rect.width * 0.5) {
+                                carruselInstance.next(); // Toque en la derecha -> Siguiente
+                            } else {
+                                carruselInstance.prev(); // Toque en la izquierda -> Anterior
+                            }
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            // Política de Frecuencia Inteligente: Solo mostrar 1 vez por sesión de navegación para no acobardar al usuario
+            const modalVisto = sessionStorage.getItem('benitours_modal_eventos_visto');
+            if (!modalVisto) {
+                window.setTimeout(() => {
+                    bootstrap.Modal.getOrCreateInstance(modalEventos).show();
+                    sessionStorage.setItem('benitours_modal_eventos_visto', '1');
+                }, 600);
+            }
         });
     </script>
     <script src="<?= htmlspecialchars($baseUrl) ?>/assets/js/shared/http.js?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/js/shared/http.js') ?>"></script>

@@ -129,6 +129,18 @@ const CompresorImagen = (() => {
     }
 
     /**
+     * Comprime un grupo de archivos y anuncia su estado para que el formulario
+     * pueda impedir un envio mientras aun se reemplazan los archivos pesados.
+     */
+    function comprimirLote(archivos, config = {}) {
+        const detalle = { input: config.input || null };
+        window.dispatchEvent(new CustomEvent('compresor-imagen:inicio', { detail: detalle }));
+
+        return Promise.all(Array.from(archivos || []).map((archivo) => comprimir(archivo, config)))
+            .finally(() => window.dispatchEvent(new CustomEvent('compresor-imagen:fin', { detail: detalle })));
+    }
+
+    /**
      * Vincula un <input type="file"> para comprimir automáticamente las fotos al seleccionarlas
      * @param {HTMLInputElement} input
      * @param {Object} config
@@ -192,6 +204,7 @@ const CompresorImagen = (() => {
 
     return {
         comprimir,
+        comprimirLote,
         vincular,
         formatearTamano
     };

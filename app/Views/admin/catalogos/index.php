@@ -513,24 +513,29 @@
                                     </div>
                                 </div>
 
-                                <!-- Formulario de Reemplazo de Video -->
-                                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos/video/guardar" method="POST" enctype="multipart/form-data" class="mt-auto">
+                                <!-- Formulario de Reemplazo de Video con Auto-Compresión -->
+                                <form action="<?= htmlspecialchars($baseUrl) ?>/admin/catalogos/video/guardar" method="POST" enctype="multipart/form-data" class="mt-auto" onsubmit="const btn = this.querySelector('button[type=submit]'); btn.disabled = true; btn.innerHTML = '<span class=\'spinner-border spinner-border-sm me-2\'></span> Optimizando y comprimiendo video, por favor espere...';">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                                     
                                     <div class="p-3 bg-light rounded-4 border mb-3">
-                                        <label for="video_archivo" class="form-label fw-bold small text-dark mb-1">
-                                            <i class="bi bi-cloud-arrow-up-fill text-teal me-1"></i> Seleccionar Nuevo Video (MP4)
-                                        </label>
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <label for="video_archivo" class="form-label fw-bold small text-dark mb-0">
+                                                <i class="bi bi-cloud-arrow-up-fill text-teal me-1"></i> Seleccionar Nuevo Video (MP4)
+                                            </label>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill extra-small px-2 py-1">
+                                                <i class="bi bi-cpu-fill me-1"></i> Auto-Compresión Activa
+                                            </span>
+                                        </div>
                                         <input type="file" class="form-control rounded-3" id="video_archivo" name="video_archivo" accept="video/mp4,video/*" required>
                                         <div class="form-text extra-small mt-2 text-muted">
-                                            <i class="bi bi-info-circle me-1 text-teal"></i>
-                                            <strong>Recomendación técnica:</strong> Resolución Full HD (1920x1080) o 720p, optimizado en formato MP4 (H.264), sin audio o con audio comprimido, tamaño máximo permitido: <strong>50 MB</strong>.
+                                            <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>
+                                            <strong>Optimización automática:</strong> El servidor comprimirá el video, removerá audio innecesario y aplicará <em>+FastStart</em> para que reproduzca instantáneamente en celulares.
                                         </div>
                                     </div>
 
                                     <button type="submit" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm w-100 d-flex align-items-center justify-content-center gap-2">
                                         <i class="bi bi-check2-circle fs-5"></i>
-                                        <span>Guardar y Reemplazar Video</span>
+                                        <span>Guardar y Auto-Comprimir Video</span>
                                     </button>
                                 </form>
                             </div>

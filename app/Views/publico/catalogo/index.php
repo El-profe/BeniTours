@@ -602,7 +602,7 @@
                     ?>
                     <div class="col-sm-6 col-lg-4 col-xl-4" data-aos="fade-up" data-aos-delay="<?= $delayEv ?>">
                         <div class="card-evento-swiss group" 
-                             data-action="<?= $esEventoUAB ? 'ver-agenda-uab' : 'ver-afiche-evento' ?>"
+                             data-action="ver-afiche-evento"
                              data-evento-img="<?= htmlspecialchars($imgUrl) ?>"
                              data-evento-titulo="<?= htmlspecialchars($ev['titulo']) ?>"
                              data-evento-lugar="<?= htmlspecialchars($ev['subtitulo_lugar'] ?: 'Trinidad · Beni') ?>"
@@ -610,7 +610,7 @@
                              data-evento-enlace="<?= htmlspecialchars($ev['enlace_externo'] ?? '') ?>"
                              data-evento-es-entrada="<?= stripos($ev['titulo'], 'Entrada') !== false ? '1' : '0' ?>"
                              data-evento-es-uab="<?= $esEventoUAB ? '1' : '0' ?>"
-                             title="<?= $esEventoUAB ? 'Clic para ver cronograma de actividades y afiche oficial' : 'Clic para ver afiche completo' ?>">
+                             title="Clic para ver afiche completo">
                             <div class="evento-swiss-media position-relative rounded-4 overflow-hidden mb-3">
                                 <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($ev['titulo']) ?>" class="w-100 h-100 object-fit-cover evento-swiss-img" loading="lazy" onerror="this.onerror=null; this.src='<?= $baseUrl ?>/assets/img/hero-poster.webp';">
                                 <div class="evento-swiss-overlay"></div>
@@ -621,12 +621,6 @@
                                     <span class="evento-date-day"><?= $dia ?></span>
                                     <span class="evento-date-month"><?= $mesTxt ?>.</span>
                                 </div>
-
-                                <?php if ($esEventoUAB): ?>
-                                    <span class="badge bg-warning text-dark position-absolute bottom-0 end-0 m-3 px-3 py-1 rounded-pill extra-small fw-bold shadow">
-                                        <i class="bi bi-calendar-check-fill me-1"></i> Ver Cronograma
-                                    </span>
-                                <?php endif; ?>
 
                                 <!-- Icono indicador de ampliación/ver afiche completo -->
                                 <div class="evento-zoom-hint position-absolute bottom-0 end-0 m-3 d-flex align-items-center justify-content-center rounded-circle bg-dark bg-opacity-75 text-white shadow" title="Ver afiche completo">
@@ -935,6 +929,9 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-end gap-2 flex-wrap">
+                        <button type="button" id="modalVisorBtnIrEventos" class="btn btn-outline-light btn-sm rounded-pill fw-semibold" data-bs-dismiss="modal">
+                            <i class="bi bi-calendar3 me-1 text-teal"></i> Ver Más Eventos
+                        </button>
                         <a id="modalVisorBtnEnlace" href="#" target="_blank" class="btn btn-outline-warning btn-sm rounded-pill fw-semibold d-none">
                             <i class="bi bi-box-arrow-up-right me-1"></i> Más Información
                         </a>
@@ -1742,93 +1739,82 @@
                                  data-lng="<?= $lngRm ?? '' ?>"
                                  style="border-left: 5px solid <?= $colorInfo['bg'] ?> !important;">
 
-                                <!-- Barra superior: badge de estado y parada fija -->
-                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-light bg-opacity-50">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge rounded-pill px-2 py-1 extra-small fw-bold" style="background-color: <?= $colorInfo['bg'] ?>; color: <?= $colorInfo['text'] ?>;">
-                                            <i class="bi bi-geo-alt-fill me-1"></i><?= $totalParadasLugar ?> <?= $totalParadasLugar === 1 ? 'Parada' : 'Paradas' ?>
-                                        </span>
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 extra-small fw-semibold">
-                                            <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;vertical-align:middle;"></i> 24h
-                                        </span>
-                                    </div>
-                                    <?php if ($latRm && $lngRm): ?>
-                                        <button type="button" 
-                                                class="btn btn-sm btn-link text-teal p-0 text-decoration-none extra-small fw-bold btn-ver-parada-mapa"
-                                                data-lat="<?= $latRm ?>"
-                                                data-lng="<?= $lngRm ?>"
-                                                data-id="<?= $idLugarRm ?>"
-                                                data-parada-id="0"
-                                                title="Ubicar central en el mapa">
-                                            <i class="bi bi-crosshair me-1 text-danger"></i> Central en mapa
-                                        </button>
-                                    <?php else: ?>
-                                        <span class="extra-small text-muted fw-medium">
-                                            <i class="bi bi-patch-check-fill text-teal me-1"></i> Oficial
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-
-                                <div class="p-3 d-flex flex-column flex-grow-1">
-                                    <!-- Identidad: Ícono con color distintivo + Nombre + Parada -->
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <div class="transporte-app-avatar rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="background-color: <?= $colorInfo['bg'] ?>; color: <?= $colorInfo['text'] ?>; border: 2px solid <?= $colorInfo['border'] ?>; width: 42px; height: 42px; flex-shrink: 0;">
-                                            <i class="bi bi-taxi-front-fill fs-5"></i>
-                                        </div>
-                                        <div class="min-w-0 flex-grow-1">
-                                            <h6 class="fw-bold mb-0 text-truncate lh-sm text-trini-dark"><?= htmlspecialchars($rm['nombre']) ?></h6>
-                                            <p class="extra-small text-muted mb-0 text-truncate">
-                                                <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($rm['direccion'] ?: 'Central Trinidad') ?>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Fila Informativa de Confianza y Cobertura -->
-                                    <div class="transporte-app-info-row rounded-3 py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center gap-1 extra-small text-teal fw-semibold">
-                                            <i class="bi bi-patch-check-fill fs-6"></i>
-                                            <span>Asociación Oficial Registrada</span>
-                                        </div>
-                                        <span class="badge badge-teal-subtle rounded-pill extra-small px-2 py-1">
-                                            <i class="bi bi-shield-lock me-1"></i> Viaje Seguro
-                                        </span>
-                                    </div>
-
-                                    <!-- Chips de Paradas y Casetas de este Sindicato -->
-                                    <?php if (!empty($listaPuntosLugar)): ?>
-                                        <div class="mb-2">
-                                            <div class="extra-small text-muted fw-bold mb-1 d-flex align-items-center gap-1">
-                                                <i class="bi bi-signpost-split text-teal"></i> Paradas oficiales habilitadas:
+                                <div class="p-3.5 p-sm-4 d-flex flex-column flex-grow-1">
+                                    <!-- Cabecera Limpia: Avatar + Nombre con Verificación + Badges Ejecutivos -->
+                                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                        <div class="d-flex align-items-center gap-3 min-w-0">
+                                            <div class="transporte-app-avatar rounded-circle d-flex align-items-center justify-content-center shadow-xs" 
+                                                 style="background-color: <?= $colorInfo['bg'] ?>; color: <?= $colorInfo['text'] ?>; border: 2px solid <?= $colorInfo['border'] ?>; width: 44px; height: 44px; flex-shrink: 0;">
+                                                <i class="bi bi-taxi-front-fill fs-5"></i>
                                             </div>
-                                            <div class="d-flex flex-wrap gap-1">
+                                            <div class="min-w-0 ps-1">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <h6 class="fw-bold mb-0 text-truncate text-trini-dark fs-6"><?= htmlspecialchars($rm['nombre']) ?></h6>
+                                                    <i class="bi bi-patch-check-fill text-teal flex-shrink-0 font-sm" title="Asociación Oficial Registrada"></i>
+                                                </div>
+                                                <p class="extra-small text-muted mb-0 text-truncate mt-1">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($rm['direccion'] ?: 'Central Trinidad') ?>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Badge de Disponibilidad y Conteo -->
+                                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 extra-small fw-semibold">
+                                                <i class="bi bi-circle-fill me-1 font-xxs"></i> 24h
+                                            </span>
+                                            <?php if ($latRm && $lngRm): ?>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 extra-small fw-bold text-teal btn-ver-parada-mapa shadow-2xs"
+                                                        data-lat="<?= $latRm ?>"
+                                                        data-lng="<?= $lngRm ?>"
+                                                        data-id="<?= $idLugarRm ?>"
+                                                        data-parada-id="0"
+                                                        title="Ubicar central en el mapa">
+                                                    <i class="bi bi-crosshair me-1 text-danger"></i> Mapa
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <!-- Paradas Fijas en Cápsulas Compactas y Clickeables -->
+                                    <?php if (!empty($listaPuntosLugar)): ?>
+                                        <div class="transporte-paradas-clean mb-3 pt-2.5 border-top border-light">
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="extra-small text-muted fw-bold me-1">
+                                                    <i class="bi bi-signpost-2-fill text-teal me-1"></i>Paradas:
+                                                </span>
                                                 <?php foreach ($listaPuntosLugar as $pto): ?>
                                                     <button type="button" 
-                                                            class="btn btn-xs rounded-pill extra-small py-0 px-2 btn-ver-parada-mapa d-inline-flex align-items-center gap-1 shadow-2xs"
-                                                            style="font-size: 0.72rem; border: 1px solid <?= $colorInfo['border'] ?>; background-color: #f8fafc; color: #1e293b;"
+                                                            class="btn btn-xs rounded-pill extra-small py-1 px-2.5 btn-parada-chip btn-ver-parada-mapa d-inline-flex align-items-center gap-1.5 shadow-2xs"
                                                             data-lat="<?= $pto['latitud'] ?>"
                                                             data-lng="<?= $pto['longitud'] ?>"
                                                             data-id="<?= $idLugarRm ?>"
                                                             data-parada-id="<?= $pto['id_parada'] ?>"
                                                             title="Ver <?= htmlspecialchars($pto['nombre_parada']) ?> en el mapa">
-                                                        <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: <?= $colorInfo['bg'] ?>;"></span>
-                                                        <strong><?= htmlspecialchars($pto['nombre_parada']) ?></strong>
-                                                        <i class="bi bi-geo-alt text-muted" style="font-size: 0.68rem;"></i>
+                                                        <span class="rounded-circle d-inline-block parada-dot" style="background-color: <?= $colorInfo['bg'] ?>;"></span>
+                                                        <span><?= htmlspecialchars($pto['nombre_parada']) ?></span>
                                                     </button>
                                                 <?php endforeach; ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>
 
-                                    <!-- Destinos y Servicios en micro-etiquetas estilizadas -->
-                                    <div class="d-flex flex-wrap gap-1 mb-3">
-                                        <span class="transporte-tag"><i class="bi bi-signpost-2-fill me-1 text-teal"></i>Carrera Urbana</span>
-                                        <span class="transporte-tag"><i class="bi bi-tree-fill me-1 text-teal"></i>Loma Suárez</span>
-                                        <span class="transporte-tag"><i class="bi bi-water me-1 text-teal"></i>Laguna Suárez</span>
-                                        <span class="transporte-tag"><i class="bi bi-compass-fill me-1 text-secondary"></i>Expresos</span>
+                                    <!-- Micro-etiquetas discretas de Cobertura -->
+                                    <div class="d-flex align-items-center gap-2 mb-3.5 flex-wrap">
+                                        <span class="transporte-tag-clean">
+                                            <i class="bi bi-check-circle-fill text-teal me-1"></i>Carreras Urbanas
+                                        </span>
+                                        <span class="transporte-tag-clean">
+                                            <i class="bi bi-check-circle-fill text-teal me-1"></i>Loma Suárez & Laguna
+                                        </span>
+                                        <span class="transporte-tag-clean">
+                                            <i class="bi bi-check-circle-fill text-teal me-1"></i>Expresos 24h
+                                        </span>
                                     </div>
 
-                                    <!-- Botones de Acción con Paleta BeniTours -->
-                                    <div class="mt-auto d-flex gap-2">
+                                    <!-- Botones de Acción Prominentes y Despejados -->
+                                    <div class="mt-auto pt-2 border-top border-light border-opacity-75 d-flex gap-2.5 align-items-center">
                                         <?php if (!empty($waRaw)): ?>
                                             <button type="button" 
                                                     class="btn btn-teal-action rounded-pill fw-semibold flex-grow-1 d-flex align-items-center justify-content-center gap-2 py-2 btn-pedir-radio shadow-sm"
@@ -1843,14 +1829,14 @@
                                         <?php if (!empty($telRaw)): ?>
                                             <a href="tel:<?= $telRaw ?>" 
                                                onclick="window.BeniTursItinerario?.registrarEvento(<?= $idLugarRm ?>, 'TELEFONO')"
-                                               class="btn btn-outline-teal rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0 size-40"
+                                               class="btn btn-outline-teal rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0 size-40 shadow-xs"
                                                title="Llamar a central telefónica">
                                                 <i class="bi bi-telephone-fill"></i>
                                             </a>
                                         <?php endif; ?>
                                         <a href="<?= $urlFicha ?>" 
-                                           class="btn btn-outline-teal rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0 size-40"
-                                           title="Ver información y paradas completas">
+                                           class="btn btn-outline-teal rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0 size-40 shadow-xs"
+                                           title="Ver información y tarifas">
                                             <i class="bi bi-arrow-up-right"></i>
                                         </a>
                                     </div>
@@ -2232,6 +2218,55 @@
                 XIII Entrada Folklórica <br class="d-none d-md-block">
                 <span class="text-teal-gradient">Universitaria Nacional</span>
             </h2>
+
+            <!-- Cronómetro / Cuenta Regresiva Oficial -->
+            <div class="cronometro-entrada-wrapper mx-auto mt-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="cronometro-entrada-card p-3 p-md-4 rounded-4 shadow-lg border border-white border-opacity-15 position-relative overflow-hidden" 
+                     id="cronometroEntradaBox" 
+                     data-fecha-evento="2026-11-14T09:00:00">
+                    <div class="cronometro-glow-accent" aria-hidden="true"></div>
+                    
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 position-relative z-index-2">
+                        <!-- Info del Evento y Pulso en Vivo -->
+                        <div class="text-center text-md-start">
+                            <div class="d-inline-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-danger bg-opacity-90 text-white rounded-pill px-2.5 py-1 extra-small fw-bold text-uppercase d-inline-flex align-items-center gap-1 shadow-xs">
+                                    <span class="punto-vivo-pulse-mini"></span> Cuenta Regresiva
+                                </span>
+                                <span class="text-white-50 extra-small fw-semibold">
+                                    <i class="bi bi-calendar-event text-warning me-1"></i> Sábado 14 de Noviembre · 09:00 hrs
+                                </span>
+                            </div>
+                            <h5 class="fw-bold text-white mb-0 fs-6 fs-sm-5" id="cronometroEstadoTexto">
+                                Tiempo restante para la Gran Entrada Folklórica
+                            </h5>
+                        </div>
+
+                        <!-- Casillas del Contador (Días, Horas, Minutos, Segundos) -->
+                        <div class="d-flex align-items-center justify-content-center gap-2 gap-sm-3" id="cronometroContadorGrid">
+                            <div class="cronometro-unit-box text-center">
+                                <span class="cronometro-digit" id="cronoDias">00</span>
+                                <span class="cronometro-label">DÍAS</span>
+                            </div>
+                            <span class="cronometro-separator">:</span>
+                            <div class="cronometro-unit-box text-center">
+                                <span class="cronometro-digit" id="cronoHoras">00</span>
+                                <span class="cronometro-label">HORAS</span>
+                            </div>
+                            <span class="cronometro-separator">:</span>
+                            <div class="cronometro-unit-box text-center">
+                                <span class="cronometro-digit" id="cronoMinutos">00</span>
+                                <span class="cronometro-label">MIN</span>
+                            </div>
+                            <span class="cronometro-separator">:</span>
+                            <div class="cronometro-unit-box text-center">
+                                <span class="cronometro-digit cronometro-digit-segundos" id="cronoSegundos">00</span>
+                                <span class="cronometro-label">SEG</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row g-4 align-items-stretch">
@@ -2260,7 +2295,7 @@
 
                     <!-- Contenedor del Mapa Leaflet -->
                     <div class="position-relative flex-grow-1" style="min-height: 380px;">
-                        <div id="mapaEntradaRecorrido" class="w-100 h-100" style="min-height: 380px; z-index: 1;"></div>
+                        <div id="mapaEntradaRecorrido" class="w-100 h-100" data-base-url="<?= htmlspecialchars($baseUrl) ?>" style="min-height: 380px; z-index: 1;"></div>
 
                         <!-- Leyenda Flotante sobre el Mapa -->
                         <div class="position-absolute bottom-0 start-0 m-3 p-3 rounded-4 text-white extra-small d-none d-sm-block leyenda-mapa-entrada" style="z-index: 1000; min-width: 240px;">
@@ -2274,7 +2309,7 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge bg-warning text-dark rounded-circle p-1" style="width: 14px; height: 14px;"> </span>
-                                    <span><strong>Hito:</strong> Calle Antonio Vaca Díez</span>
+                                    <span><strong>Hito:</strong> Punto destacado del recorrido</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge bg-danger rounded-circle p-1" style="width: 14px; height: 14px;"> </span>
@@ -2287,7 +2322,7 @@
                     <!-- Pie del mapa con recomendación turística -->
                     <div class="card-footer bg-dark bg-opacity-40 border-top border-white border-opacity-10 py-2 px-4 d-flex justify-content-between align-items-center text-white-50 extra-small">
                         <span><i class="bi bi-camera-fill text-warning me-1"></i> Palco oficial frente a la Catedral de Trinidad</span>
-                        <a href="https://maps.google.com/?q=-14.835349,-64.903657" target="_blank" rel="noopener noreferrer" class="text-teal text-decoration-none fw-semibold">
+                        <a href="https://maps.google.com/?q=-14.835487,-64.904707" target="_blank" rel="noopener noreferrer" class="text-teal text-decoration-none fw-semibold">
                             Abrir en Google Maps <i class="bi bi-box-arrow-up-right ms-1"></i>
                         </a>
                     </div>

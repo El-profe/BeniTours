@@ -30,6 +30,7 @@
     <!-- Formulario Principal -->
     <form id="formCrearFicha" action="<?= htmlspecialchars($baseUrl) ?>/admin/lugares/guardar" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+        <input type="hidden" name="token_envio" value="<?= htmlspecialchars($tokenEnvio) ?>">
         <input type="hidden" name="foto_portada" id="fotoPortada" value="0">
 
         <div class="row g-4">
@@ -109,17 +110,29 @@
                     </div>
 
                     <div class="row g-3">
-                        <!-- Selector de Categorías Compacto -->
+                        <!-- Selector de Categorías Compacto y Moderno -->
                         <div class="col-12">
-                            <label class="form-label fw-bold small text-dark d-block">Categoría del Catálogo *</label>
+                            <label class="form-label fw-bold small text-dark d-block mb-2">
+                                Categoría del Catálogo <span class="text-danger">*</span>
+                            </label>
                             <div class="category-pill-grid">
                                 <?php foreach ($categorias as $indice => $c): ?>
+                                    <?php 
+                                        $icoRaw = $c['icono'] ?? 'bi-tag';
+                                        $icoClass = (str_starts_with($icoRaw, 'fa-') || str_starts_with($icoRaw, 'bi-') || str_starts_with($icoRaw, 'bi '))
+                                            ? (str_starts_with($icoRaw, 'bi-') ? 'bi ' . $icoRaw : $icoRaw)
+                                            : 'bi ' . $icoRaw;
+                                    ?>
                                     <label class="category-pill-card">
                                         <input type="radio" name="id_categoria" value="<?= (int)$c['id_categoria'] ?>" data-nombre-cat="<?= htmlspecialchars($c['nombre']) ?>" <?= $indice === 0 ? 'checked' : '' ?> required>
-                                        <i class="bi <?= htmlspecialchars($c['icono'] ?? 'bi-tag') ?> category-pill-icon"></i>
-                                        <span class="category-pill-name" title="<?= htmlspecialchars($c['nombre']) ?>">
-                                            <?= htmlspecialchars($c['nombre']) ?>
-                                        </span>
+                                        <div class="category-pill-icon-box">
+                                            <i class="<?= htmlspecialchars($icoClass) ?>"></i>
+                                        </div>
+                                        <div class="category-pill-content">
+                                            <span class="category-pill-name" title="<?= htmlspecialchars($c['nombre']) ?>">
+                                                <?= htmlspecialchars($c['nombre']) ?>
+                                            </span>
+                                        </div>
                                     </label>
                                 <?php endforeach; ?>
                             </div>
@@ -127,17 +140,26 @@
 
                         <!-- Horario de Atención Visual y Flexible -->
                         <div class="col-12">
-                            <div class="p-3 bg-light rounded-4 border">
-                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                                    <label class="form-label fw-bold small text-dark mb-0">
-                                        <i class="bi bi-clock-history text-success me-1"></i>Días y Horarios de Atención
-                                    </label>
+                            <div class="card-horario-panel p-3 p-md-4 rounded-4 border bg-white shadow-2xs">
+                                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="form-check form-switch m-0 d-flex align-items-center gap-1">
-                                            <input class="form-check-input" type="checkbox" id="switchHorario24h">
-                                            <label class="form-check-label extra-small text-muted fw-semibold" for="switchHorario24h">Abierto 24 Horas</label>
+                                        <div class="horario-panel-icon-badge">
+                                            <i class="bi bi-clock-history"></i>
                                         </div>
-                                        <button type="button" class="btn btn-link btn-sm text-decoration-none extra-small text-secondary p-0 ms-2" id="btnAlternarModoHorarioManual">
+                                        <div>
+                                            <label class="form-label fw-bold small text-dark mb-0 d-block">
+                                                Días y Horarios de Atención
+                                            </label>
+                                            <span class="extra-small text-muted">Configura cuándo abre y atiende este lugar al público</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                                            <input class="form-check-input switch-horario-24" type="checkbox" id="switchHorario24h">
+                                            <label class="form-check-label small text-secondary fw-semibold" for="switchHorario24h">Abierto 24 Horas</label>
+                                        </div>
+                                        <div class="vr opacity-25 d-none d-sm-block"></div>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 extra-small fw-semibold" id="btnAlternarModoHorarioManual">
                                             <i class="bi bi-pencil-square me-1"></i><span id="txtModoHorario">Modo manual</span>
                                         </button>
                                     </div>
@@ -147,96 +169,114 @@
                                 <div id="panelHorarioConstructor">
                                     <!-- Selección de Días -->
                                     <div class="mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
-                                            <span class="extra-small text-muted fw-bold text-uppercase">1. Días de atención:</span>
-                                            <!-- Atajos rápidos -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                            <span class="extra-small fw-bold text-uppercase text-secondary tracking-wide-05">
+                                                <i class="bi bi-calendar3 me-1 text-teal"></i>1. Días de atención:
+                                            </span>
+                                            <!-- Atajos rápidos tipo chips -->
                                             <div class="d-flex gap-1 flex-wrap">
-                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="L-V">Lun - Vie</button>
-                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="L-S">Lun - Sáb</button>
-                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="S-D">Sáb y Dom</button>
-                                                <button type="button" class="btn btn-xs rounded-pill border bg-white text-muted fw-semibold py-0 px-2" data-preset-dias="TODOS">Todos los días</button>
+                                                <button type="button" class="btn-preset-chip" data-preset-dias="L-V">Lun - Vie</button>
+                                                <button type="button" class="btn-preset-chip active" data-preset-dias="L-S">Lun - Sáb</button>
+                                                <button type="button" class="btn-preset-chip" data-preset-dias="S-D">Sáb y Dom</button>
+                                                <button type="button" class="btn-preset-chip" data-preset-dias="TODOS">Todos los días</button>
                                             </div>
                                         </div>
-                                        <div class="btn-group w-100 shadow-2xs rounded-3 overflow-hidden" role="group" id="grupoBotonesDias">
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_lun" value="Lun" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_lun">Lun</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_mar" value="Mar" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_mar">Mar</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_mie" value="Mié" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_mie">Mié</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_jue" value="Jue" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_jue">Jue</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_vie" value="Vie" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_vie">Vie</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_sab" value="Sáb" autocomplete="off" checked>
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_sab">Sáb</label>
-
-                                            <input type="checkbox" class="btn-check btn-dia-check" id="dia_dom" value="Dom" autocomplete="off">
-                                            <label class="btn btn-outline-success btn-sm fw-bold py-2" for="dia_dom">Dom</label>
+                                        
+                                        <!-- Barra de días individuales segmentados -->
+                                        <div class="dias-semana-grid" id="grupoBotonesDias">
+                                            <label class="dia-check-pill" for="dia_lun">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_lun" value="Lun" autocomplete="off" checked>
+                                                <span>Lun</span>
+                                            </label>
+                                            <label class="dia-check-pill" for="dia_mar">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_mar" value="Mar" autocomplete="off" checked>
+                                                <span>Mar</span>
+                                            </label>
+                                            <label class="dia-check-pill" for="dia_mie">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_mie" value="Mié" autocomplete="off" checked>
+                                                <span>Mié</span>
+                                            </label>
+                                            <label class="dia-check-pill" for="dia_jue">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_jue" value="Jue" autocomplete="off" checked>
+                                                <span>Jue</span>
+                                            </label>
+                                            <label class="dia-check-pill" for="dia_vie">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_vie" value="Vie" autocomplete="off" checked>
+                                                <span>Vie</span>
+                                            </label>
+                                            <label class="dia-check-pill" for="dia_sab">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_sab" value="Sáb" autocomplete="off" checked>
+                                                <span>Sáb</span>
+                                            </label>
+                                            <label class="dia-check-pill dia-check-pill--dom" for="dia_dom">
+                                                <input type="checkbox" class="btn-dia-check" id="dia_dom" value="Dom" autocomplete="off">
+                                                <span>Dom</span>
+                                            </label>
                                         </div>
                                     </div>
 
                                     <!-- Configuración de Horas (Turno 1 y Turno 2 opcional) -->
-                                    <div class="row g-2 align-items-center mb-2" id="filaHorasTurno1">
-                                        <div class="col-12 col-sm-auto">
-                                            <span class="extra-small text-muted fw-bold text-uppercase d-block d-sm-inline">2. Horario:</span>
+                                    <div class="row g-2 align-items-center mb-3" id="filaHorasTurno1">
+                                        <div class="col-12 col-md-auto">
+                                            <span class="extra-small fw-bold text-uppercase text-secondary tracking-wide-05 d-block d-md-inline">
+                                                <i class="bi bi-clock me-1 text-teal"></i>2. Horario:
+                                            </span>
                                         </div>
                                         <div class="col-5 col-sm">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-open"></i></span>
-                                                <input type="time" class="form-control" id="horaApertura1" value="08:00">
+                                            <div class="input-group input-group-sm horario-time-group">
+                                                <span class="input-group-text bg-light border-end-0 text-teal"><i class="bi bi-sunrise"></i></span>
+                                                <input type="time" class="form-control border-start-0 ps-1 fw-bold" id="horaApertura1" value="08:00">
                                             </div>
                                         </div>
-                                        <div class="col-2 col-sm-auto text-center text-muted small fw-bold">hasta</div>
+                                        <div class="col-2 col-sm-auto text-center text-muted extra-small fw-bold text-uppercase">a</div>
                                         <div class="col-5 col-sm">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-closed"></i></span>
-                                                <input type="time" class="form-control" id="horaCierre1" value="22:00">
+                                            <div class="input-group input-group-sm horario-time-group">
+                                                <span class="input-group-text bg-light border-end-0 text-teal"><i class="bi bi-sunset"></i></span>
+                                                <input type="time" class="form-control border-start-0 ps-1 fw-bold" id="horaCierre1" value="22:00">
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-auto text-end text-sm-start">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 extra-small" id="btnToggleTurno2">
+                                        <div class="col-12 col-md-auto text-end text-md-start">
+                                            <button type="button" class="btn btn-sm btn-outline-teal rounded-pill px-3 py-1 extra-small fw-semibold" id="btnToggleTurno2">
                                                 <i class="bi bi-plus-circle me-1"></i>Segundo Turno
                                             </button>
                                         </div>
                                     </div>
 
                                     <!-- Turno 2 (opcional partido, ej. tarde/noche) -->
-                                    <div class="row g-2 align-items-center mb-2 d-none" id="filaHorasTurno2">
-                                        <div class="col-12 col-sm-auto">
-                                            <span class="extra-small text-muted fw-bold text-uppercase d-block d-sm-inline">Turno 2:</span>
+                                    <div class="row g-2 align-items-center mb-3 d-none" id="filaHorasTurno2">
+                                        <div class="col-12 col-md-auto">
+                                            <span class="extra-small fw-bold text-uppercase text-secondary tracking-wide-05 d-block d-md-inline">
+                                                <i class="bi bi-clock-history me-1 text-teal"></i>Turno 2:
+                                            </span>
                                         </div>
                                         <div class="col-5 col-sm">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-open"></i></span>
-                                                <input type="time" class="form-control" id="horaApertura2" value="15:00">
+                                            <div class="input-group input-group-sm horario-time-group">
+                                                <span class="input-group-text bg-light border-end-0 text-teal"><i class="bi bi-sunrise"></i></span>
+                                                <input type="time" class="form-control border-start-0 ps-1 fw-bold" id="horaApertura2" value="15:00">
                                             </div>
                                         </div>
-                                        <div class="col-2 col-sm-auto text-center text-muted small fw-bold">hasta</div>
+                                        <div class="col-2 col-sm-auto text-center text-muted extra-small fw-bold text-uppercase">a</div>
                                         <div class="col-5 col-sm">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text bg-white text-muted"><i class="bi bi-door-closed"></i></span>
-                                                <input type="time" class="form-control" id="horaCierre2" value="22:00">
+                                            <div class="input-group input-group-sm horario-time-group">
+                                                <span class="input-group-text bg-light border-end-0 text-teal"><i class="bi bi-sunset"></i></span>
+                                                <input type="time" class="form-control border-start-0 ps-1 fw-bold" id="horaCierre2" value="22:00">
                                             </div>
                                         </div>
-                                        <div class="col-12 col-sm-auto text-end text-sm-start">
-                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 extra-small" id="btnQuitarTurno2" title="Quitar segundo turno">
-                                                <i class="bi bi-trash"></i>
+                                        <div class="col-12 col-md-auto text-end text-md-start">
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 extra-small" id="btnQuitarTurno2" title="Quitar segundo turno">
+                                                <i class="bi bi-trash me-1"></i>Quitar
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Vista previa del resultado y campo que se envía al servidor -->
-                                <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="horario-preview-box p-2 px-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                                     <div class="d-flex align-items-center gap-2 flex-grow-1">
-                                        <span class="badge bg-white text-dark border extra-small">Resultado:</span>
-                                        <div class="fw-bold text-success small flex-grow-1" id="previewHorarioSintetizado">
+                                        <span class="badge bg-white text-teal border border-teal-subtle rounded-pill extra-small px-2 py-1 fw-bold shadow-2xs">
+                                            <i class="bi bi-check-circle-fill text-teal me-1"></i>Vista Previa:
+                                        </span>
+                                        <div class="fw-bold text-dark small flex-grow-1" id="previewHorarioSintetizado">
                                             Lun - Sáb: 08:00 - 22:00
                                         </div>
                                     </div>

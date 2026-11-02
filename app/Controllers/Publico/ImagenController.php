@@ -108,7 +108,18 @@ class ImagenController extends Controller {
 
         header('Content-Type: ' . $mimeType);
         header('Content-Length: ' . filesize($rutaFisica));
-        header('Cache-Control: public, max-age=2592000, stale-while-revalidate=86400');
+
+        // Determinar si el recurso es intrínsecamente público o si su acceso depende de una sesión privada
+        $esAccesoPublico = $esVisible || ($esDeGaleria && $galeriaActiva) || $esDeMapa;
+        if ($esAccesoPublico) {
+            header('Cache-Control: public, max-age=2592000, stale-while-revalidate=86400');
+        } else {
+            // Acceso exclusivo por sesión (administrador o comercio propietario)
+            header('Cache-Control: private, no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        }
+
         header('ETag: ' . $etag);
         header('Last-Modified: ' . $lastModified);
         header('X-Content-Type-Options: nosniff');

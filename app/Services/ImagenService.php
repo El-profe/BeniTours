@@ -131,19 +131,29 @@ class ImagenService {
     }
 
     /**
-     * Redimensiona (máx 1200px) y comprime la imagen usando PHP GD antes de almacenarla
+     * Redimensiona (máx 1200px) y comprime la imagen usando PHP GD antes de almacenarla.
+     * Incluye protección previa contra agotamiento de memoria (decompression bombs) validando dimensiones máximas.
      */
     private static function optimizarYGuardar(string $origen, string $destino, string $mime, int $maxDim = 1200, int $calidad = 82): bool {
-        if (!extension_loaded('gd')) {
-            return move_uploaded_file($origen, $destino);
-        }
-
         $info = @getimagesize($origen);
         if (!$info) {
             return move_uploaded_file($origen, $destino);
         }
 
         [$anchoOrig, $altoOrig] = $info;
+
+        // Protección contra descompresión de imágenes desproporcionadas (OOM attack / pixel flood)
+        // Límite: máximo 6000x6000px y 25 megapíxeles totales
+        $maxDimensionPermitida = 6000;
+        $maxMegaPixeles = 25000000;
+
+        if ($anchoOrig > $maxDimensionPermitida || $altoOrig > $maxDimensionPermitida || ($anchoOrig * $altoOrig) > $maxMegaPixeles) {
+            throw new \RuntimeException("La resolución de la imagen es excesiva ({$anchoOrig}x{$altoOrig}px). Por seguridad, use imágenes de hasta 6000x6000px.");
+        }
+
+        if (!extension_loaded('gd')) {
+            return move_uploaded_file($origen, $destino);
+        }
 
         $srcImg = match ($mime) {
             'image/jpeg' => @imagecreatefromjpeg($origen),

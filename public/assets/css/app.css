@@ -72,7 +72,7 @@ body > .navbar-trinidad:not(.navbar-transparente),
 
 /* Compensar el espacio superior en páginas que no son la portada principal */
 body:not(.page-home) {
-    padding-top: 76px;
+    padding-top: 96px;
 }
 
 @media (max-width: 768px) {
@@ -85,7 +85,7 @@ body:not(.page-home) {
         padding: 0.4rem 0.85rem !important;
     }
     body:not(.page-home) {
-        padding-top: 68px;
+        padding-top: 86px;
     }
 }
 
@@ -1901,8 +1901,8 @@ body:not(.page-home) {
 }
 
 /* ==========================================================================
-   FICHA DE DETALLE EDITORIAL Y PANORÁMICA (ESTILO PORTAL TURÍSTICO INTERNACIONAL)
-   Inspirado en la referencia de Keliauk Lietuvoje: Carrusel panorámico + Tarjeta superpuesta
+   FICHA DE DETALLE EDITORIAL Y PANORÁMICA (ESTILO PORTAL TURÍSTICO)
+   Carrusel panorámico adaptable + Tarjeta flotante superpuesta
    ========================================================================== */
 .lugar-panoramico-hero {
     position: relative;
@@ -1912,32 +1912,94 @@ body:not(.page-home) {
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
 }
 
-.place-detail-photo {
-    width: 100%;
-    height: 560px;
-    object-fit: cover;
-    object-position: center 25%;
+.place-detail-slide {
+    position: relative;
+    height: 520px;
     background-color: #051c20;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Capa de fondo desenfocado que armoniza fotos cuadradas, verticales o panorámicas */
+.place-detail-slide-bg {
+    position: absolute;
+    inset: -25px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    filter: blur(28px) brightness(0.45) saturate(1.2);
+    transform: scale(1.12);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Fotografía principal: se ve completa y nítida sin recortes agresivos */
+.place-detail-photo {
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    margin: 0 auto;
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
 }
 
 @media (max-width: 991.98px) {
-    .place-detail-photo {
-        height: 420px;
+    .place-detail-slide {
+        height: 400px;
     }
 }
 
 @media (max-width: 575.98px) {
+    .lugar-panoramico-hero {
+        border-radius: 1.25rem;
+    }
+    .place-detail-slide {
+        height: clamp(260px, 68vw, 340px);
+    }
     .place-detail-photo {
-        height: 320px;
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
     }
 }
 
-/* Tarjeta flotante superpuesta con menor solapamiento para ver la imagen completa */
+/* Controles de navegación e indicadores del carrusel */
+#carruselLugar .carousel-control-prev,
+#carruselLugar .carousel-control-next {
+    z-index: 10;
+    width: 12%;
+    opacity: 0.85;
+    pointer-events: auto;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#carruselLugar .carousel-control-prev:hover,
+#carruselLugar .carousel-control-next:hover {
+    opacity: 1;
+}
+
+#carruselLugar .carousel-indicators {
+    z-index: 10;
+    pointer-events: auto;
+}
+
+#carruselLugar .carousel-indicators [data-bs-target] {
+    cursor: pointer;
+}
+
+/* Tarjeta flotante superpuesta con solapamiento armónico sobre el hero */
 .lugar-header-flotante {
     position: relative;
     background: #ffffff;
     border-radius: 1.75rem;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(15, 59, 67, 0.08);
     margin-top: -38px;
     z-index: 4;
 }
@@ -1945,7 +2007,7 @@ body:not(.page-home) {
 @media (min-width: 992px) {
     .lugar-header-flotante {
         border-top-right-radius: 3rem;
-        max-width: 820px;
+        max-width: 840px;
         margin-top: -48px;
     }
 }
@@ -2142,26 +2204,57 @@ body:not(.page-home) {
     border: 1px solid #fef08a;
     flex-shrink: 0;
 }
-.transporte-app-info-row {
-    background: #f0fdfa;
-    border: 1px solid #ccfbf1;
+.transporte-paradas-clean {
+    position: relative;
 }
-.badge-teal-subtle {
-    background-color: rgba(13, 148, 136, 0.12);
-    color: var(--trini-green-light, #0d9488);
-    font-weight: 600;
-}
-.transporte-tag {
-    font-size: 0.72rem;
+
+.btn-parada-chip {
+    font-size: 0.74rem;
     font-weight: 500;
-    padding: 3px 9px;
-    border-radius: 9999px;
+    padding: 0.28rem 0.65rem;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     color: #334155;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    line-height: 1.25;
+}
+
+.btn-parada-chip:hover {
+    background: #f0fdfa;
+    border-color: #0d9488;
+    color: #0f766e;
+    transform: translateY(-1px);
+}
+
+.parada-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.transporte-tag-clean {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
+    line-height: 1.25;
 }
+
+.font-xxs {
+    font-size: 0.42rem !important;
+}
+
+.font-sm {
+    font-size: 0.85rem !important;
+}
+
 .btn-outline-teal {
     color: var(--trini-green-light, #0d9488);
     border: 1px solid var(--trini-card-border, #cbd5e1);
@@ -2225,11 +2318,31 @@ body:not(.page-home) {
         padding-left: 2px;
         padding-right: 2px;
         -webkit-overflow-scrolling: touch;
+        gap: 0.85rem;
     }
     .transporte-lista-scrollable .card-transporte-app {
         flex: 0 0 88%;
-        max-width: 340px;
+        max-width: 360px;
+        min-width: 285px;
         scroll-snap-align: center;
+    }
+    .transporte-lista-scrollable .card-transporte-app .p-3\.5 {
+        padding: 1.15rem 1rem !important;
+    }
+    .transporte-lista-scrollable .transporte-app-avatar {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        margin-right: 0.25rem;
+    }
+    .transporte-lista-scrollable .card-transporte-app h6 {
+        font-size: 0.95rem !important;
+        line-height: 1.25 !important;
+    }
+    .transporte-lista-scrollable .btn-parada-chip,
+    .transporte-lista-scrollable .transporte-tag-clean {
+        font-size: 0.72rem !important;
+        padding: 0.25rem 0.6rem !important;
     }
     .transporte-mapa-card {
         min-height: 340px;
@@ -2908,6 +3021,17 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 }
 
 /* Publicidad de eventos en la portada */
+#modalEventosBeni.fade .modal-dialog {
+    transform: scale(0.92) translateY(24px);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease-out;
+}
+
+#modalEventosBeni.show .modal-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
 .modal-eventos-beni {
     border-radius: 1.25rem;
     box-shadow: 0 1.25rem 3rem rgba(8, 61, 74, .28);
@@ -2919,13 +3043,27 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 }
 
 .modal-eventos-eyebrow {
-    display: block;
-    margin-bottom: .1rem;
+    display: inline-block;
     color: #DDF4F1;
     font-size: .68rem;
     font-weight: 800;
     letter-spacing: .075em;
     text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.modal-swipe-hint-pill {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    padding: 0.2rem 0.55rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .modal-eventos-beni .modal-title {
@@ -2941,6 +3079,9 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     min-height: auto;
     padding: 0.75rem 1rem 0.25rem 1rem;
     background: radial-gradient(circle at top, #E2F2F0, #EEF5F7 65%);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .evento-publicidad-imagen {
@@ -2950,6 +3091,10 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     border-radius: .75rem;
     box-shadow: 0 .5rem 1.25rem rgba(15, 23, 42, .18);
     object-fit: contain;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    cursor: pointer;
 }
 
 .evento-publicidad-info {
@@ -3512,6 +3657,16 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     animation: pulsoVivo 1.8s infinite;
 }
 
+.punto-vivo-pulse-mini {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0.7);
+    animation: pulsoVivoMini 1.4s infinite;
+}
+
 @keyframes pulsoVivo {
     0% {
         box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
@@ -3521,6 +3676,111 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
     }
     100% {
         box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+@keyframes pulsoVivoMini {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+/* Cronómetro / Cuenta Regresiva de la Entrada Folklórica */
+.cronometro-entrada-wrapper {
+    max-width: 960px;
+}
+
+.cronometro-entrada-card {
+    background: rgba(10, 37, 43, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(45, 212, 191, 0.25) !important;
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 30px rgba(13, 148, 136, 0.15) !important;
+}
+
+.cronometro-glow-accent {
+    position: absolute;
+    top: -40px;
+    right: 15%;
+    width: 220px;
+    height: 100px;
+    background: radial-gradient(ellipse at center, rgba(45, 212, 191, 0.22) 0%, rgba(45, 212, 191, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cronometro-unit-box {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.85rem;
+    padding: 0.45rem 0.65rem;
+    min-width: 60px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+@media (min-width: 576px) {
+    .cronometro-unit-box {
+        min-width: 76px;
+        padding: 0.6rem 0.85rem;
+    }
+}
+
+.cronometro-unit-box:hover {
+    border-color: rgba(45, 212, 191, 0.45);
+    transform: translateY(-2px);
+}
+
+.cronometro-digit {
+    display: block;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #facc15;
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 10px rgba(250, 204, 21, 0.3);
+}
+
+@media (min-width: 576px) {
+    .cronometro-digit {
+        font-size: 1.85rem;
+    }
+}
+
+.cronometro-digit-segundos {
+    color: #2dd4bf;
+    text-shadow: 0 2px 10px rgba(45, 212, 191, 0.4);
+}
+
+.cronometro-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.8px;
+    margin-top: 0.15rem;
+}
+
+.cronometro-separator {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.3);
+    user-select: none;
+    margin-top: -0.85rem;
+}
+
+@media (min-width: 576px) {
+    .cronometro-separator {
+        font-size: 1.65rem;
     }
 }
 
@@ -3661,6 +3921,115 @@ img, video, .place-card img, .hero-video, .gallery-item img, .modal-body img, .b
 
 .marcador-entrada-meta {
     background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+/* Danza de los Judas del Beni: Bailarín animado por el recorrido */
+.marcador-recorrido-animado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.marcador-recorrido-judas {
+    width: 68px;
+    height: 78px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.judas-figura-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: judasDanzaPaso 600ms ease-in-out infinite alternate;
+    transform-origin: bottom center;
+}
+
+.judas-personaje-img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 4px rgba(254, 240, 138, 0.5));
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: transform 0.2s ease;
+}
+
+.judas-sombra-suelo {
+    position: absolute;
+    bottom: -3px;
+    width: 38px;
+    height: 10px;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 75%);
+    border-radius: 50%;
+    z-index: 1;
+    animation: judasSombraPulse 600ms ease-in-out infinite alternate;
+}
+
+.badge-mini-judas {
+    position: absolute;
+    bottom: -11px;
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
+    z-index: 5;
+}
+
+.judas-pulsing-aura {
+    position: absolute;
+    bottom: 2px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #f59e0b;
+    animation: judasAuraPulse 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes judasDanzaPaso {
+    0%   { transform: translateY(0) rotate(-4deg) scale(1); }
+    50%  { transform: translateY(-5px) rotate(0deg) scale(1.03); }
+    100% { transform: translateY(-9px) rotate(5deg) scale(1.06); }
+}
+
+@keyframes judasSombraPulse {
+    0%   { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(0.75); opacity: 0.25; }
+}
+
+@keyframes judasAuraPulse {
+    0%   { transform: scale(0.7); opacity: 0.85; }
+    50%  { transform: scale(1.2); opacity: 0.3; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marcador-recorrido-judas,
+    .judas-figura-container,
+    .judas-sombra-suelo,
+    .judas-pulsing-aura {
+        animation: none;
+    }
 }
 
 .marcador-pulso-anillo {
